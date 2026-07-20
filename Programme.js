@@ -201,7 +201,7 @@
     var byId={}; classes.forEach(function(cl){ if(cl.id){ (byId[cl.id]=byId[cl.id]||[]).push(cl); } });
     var today=new Date(); today.setHours(0,0,0,0);
     var live = items.filter(function(it){ return isVisible(it, byId[it.id]||[], today); });
-    var html='<h2 class="pg-h">Talks &amp; mini-series</h2>'
+    var html='<h2 class="pg-h">Talks &amp; short courses</h2>'
            +'<p class="pg-lead">Short courses and one-off talks — open to everyone, whatever your experience.</p>';
     if(!live.length){ html+='<div class="pg-msg">Nothing scheduled just now — please check back soon.</div>'; }
     else { html += live.map(function(it){return card(it, byId[it.id]||[]);}).join(''); }
