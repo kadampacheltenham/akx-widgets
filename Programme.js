@@ -9,6 +9,7 @@
   var TAB_ITEMS = 'Talks & series';
   var TAB_CLASSES = 'Class times';
   var DIRECTIONS_URL = '/visit-us';
+  var IMG_BASE = 'https://kadampacheltenham.github.io/akx-widgets/images/'; // auto image by id: images/<id>.jpg
 
   var STYLE = String.raw`
   #akx-programme{--ink:#2B2A28;--dteal:#2E7C7C;--lteal:#0c9d94;--coral:#E2886A;font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);max-width:940px;margin:0 auto;}
@@ -22,6 +23,7 @@
   .cc-head{grid-area:head;} .cc-body{grid-area:body;}
   .gfx{grid-area:gfx;width:190px;height:190px;border-radius:14px;overflow:hidden;flex:none;position:relative;background:linear-gradient(150deg,#2E7C7C,#245f5f);}
   .gfx img{width:100%;height:100%;object-fit:cover;display:block;}
+  .gfx img.byid{position:absolute;inset:0;z-index:1;}
   .gfx .ring{position:absolute;border:2px solid rgba(255,255,255,.24);border-radius:50%;}
   .gfx .r1{width:150px;height:150px;right:-34px;bottom:-34px;} .gfx .r2{width:96px;height:96px;right:26px;bottom:26px;border-color:rgba(255,255,255,.16);}
   .ctitle{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:1.62rem;line-height:1.12;color:var(--dteal);margin:0 0 12px;}
@@ -141,9 +143,15 @@
 
   function card(item, classes){
     var isTalk = /talk/i.test(item.type);
-    var gfx = item.graphic
-      ? '<div class="gfx"><img src="'+esc(item.graphic)+'" alt=""></div>'
-      : '<div class="gfx"><span class="ring r1"></span><span class="ring r2"></span></div>';
+    var rings = '<span class="ring r1"></span><span class="ring r2"></span>';
+    var gfx;
+    if(item.graphic){                         // explicit URL in the sheet wins
+      gfx = '<div class="gfx">'+rings+'<img class="byid" src="'+esc(item.graphic)+'" alt="" onerror="this.remove()"></div>';
+    } else if(item.id){                        // else try images/<id>.jpg, then .png, then the auto panel
+      gfx = '<div class="gfx">'+rings+'<img class="byid" src="'+IMG_BASE+encodeURIComponent(item.id)+'.jpg" alt="" onerror="if(this.dataset.tried){this.remove()}else{this.dataset.tried=1;this.src=this.src.replace(/\\.jpg$/,\'.png\')}"></div>';
+    } else {
+      gfx = '<div class="gfx">'+rings+'</div>';
+    }
     var tags = splitList(item.tags).map(function(t){return '<span class="tag '+tagClass(t)+'">'+esc(t)+'</span>';}).join('');
     var wte = splitList(item.what_to_expect);
     var wteHtml = wte.length ? '<div class="wte collapsed"><button class="wte-t">What to expect <span class="chev">▾</span></button><ul>'
