@@ -8,10 +8,10 @@
   :root{--ink:#2B2A28;--red:#C8102E;--teal:#4E938C;}
   *{box-sizing:border-box;}
   body{font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;margin:0;background:#fff;color:var(--ink);padding:36px 24px;}
-  .wag{max-width:940px;margin:0 auto;}
+  .wag{margin:0 auto;}
   .wag-h{text-align:center;font-size:1.9rem;font-weight:600;color:#2E7C7C;margin:0 0 6px;}
   .lead{text-align:center;color:#6f6a62;font-size:1.02rem;margin:0 0 16px;}
-  .wag-closed{display:flex;flex-wrap:wrap;align-items:baseline;gap:5px 14px;justify-content:center;background:#EEEBE4;border:1px solid #DBD5C8;border-radius:10px;padding:11px 20px;margin:0 auto 20px;max-width:840px;}
+  .wag-closed{display:flex;flex-wrap:wrap;align-items:baseline;gap:5px 14px;justify-content:center;background:#EEEBE4;border:1px solid #DBD5C8;border-radius:10px;padding:11px 20px;margin:0 0 20px;}
   .wag-closed .cl-head{font-size:.78rem;font-weight:700;letter-spacing:.03em;color:#7A7261;}
   .wag-closed .cl-dates{font-size:.9rem;color:#6f6a62;} .wag-closed .cl-dates b{color:#4a463f;font-weight:600;} .wag-closed .cl-sep{color:#c3bcac;padding:0 6px;}
   .toolbar{display:flex;justify-content:flex-end;margin:0 0 8px;}
