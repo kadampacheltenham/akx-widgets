@@ -6,9 +6,10 @@
   var STYLE=String.raw`
   @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&display=swap');
   :root{--ink:#2B2A28;--red:#C8102E;--teal:#4E938C;}
-  *{box-sizing:border-box;}
-  body{font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;margin:0;background:#fff;color:var(--ink);padding:36px 24px;}
-  .wag{margin:0 auto;}
+  /* Scoped to the widget — must NOT leak onto the page (the section owns page layout). */
+  #akx-glance *{box-sizing:border-box;}
+  #akx-glance{font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);}
+  .wag{max-width:1000px;margin:0 auto;}   /* lotus/content width, centred (was full width) */
   .wag-h{text-align:center;font-size:1.9rem;font-weight:600;color:#2E7C7C;margin:0 0 6px;}
   .lead{text-align:center;color:#6f6a62;font-size:1.02rem;margin:0 0 16px;}
   .wag-closed{display:flex;flex-wrap:wrap;align-items:baseline;gap:5px 14px;justify-content:center;background:#EEEBE4;border:1px solid #DBD5C8;border-radius:10px;padding:11px 20px;margin:0 0 20px;}
@@ -74,7 +75,7 @@
     <div class="r"><div class="rh"><div class="dt"><span class="day">Fri</span><span class="time">12:00</span></div><span class="nm">Free taster meditation <span class="dur">(15 min)</span></span><span class="meta"><span class="rtags"><span class="ptag t-start">Perfect for beginners</span><span class="ptag t-drop">Drop-in</span></span><span class="loc chelt"><svg viewBox="0 0 24 24" fill="#C8102E"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/></svg>Cheltenham</span></span><button class="det">Details <span class="chev">▾</span></button></div>
       <div class="rd"><div class="sum">A great place to get started for beginners<span class="sep">|</span>Come as you are<span class="sep">|</span>Guided meditation</div><a class="cta" href="#">Get directions →</a></div></div>
 
-    <div class="r"><div class="rh"><div class="dt"><span class="day">Sat</span><span class="time">10:00</span></div><span class="nm">Weekend courses &amp; retreats</span><span class="meta"><span class="rtags"><span class="ptag t-neutral">Half-day</span><span class="ptag t-neutral">Day</span></span><span class="loc chelt"><svg viewBox="0 0 24 24" fill="#C8102E"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/></svg>Cheltenham</span></span><button class="det">Details <span class="chev">▾</span></button></div>
+    <div class="r"><div class="rh"><div class="dt"><span class="day">Sat</span><span class="time">10:00</span></div><span class="nm">Weekend courses &amp; retreats</span><span class="meta"><span class="rtags"><span class="ptag t-neutral">Day/Half-day</span><span class="ptag t-depth">Go deeper</span></span><span class="loc chelt"><svg viewBox="0 0 24 24" fill="#C8102E"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/></svg>Cheltenham</span></span><button class="det">Details <span class="chev">▾</span></button></div>
       <div class="rd"><div class="sum">Day &amp; half-day courses and retreats throughout the year.</div><a class="cta coral" href="#">Courses &amp; retreats →</a></div></div>
 
     <div class="r"><div class="rh"><div class="dt"><span class="day">Sun</span><span class="time">09:30</span></div><span class="nm">Teacher Training (TTP)</span><span class="meta"><span class="rtags"><span class="ptag t-depth">In-depth</span><span class="ptag t-enrol">Enrolment required</span></span><span class="loc chelt"><svg viewBox="0 0 24 24" fill="#C8102E"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/></svg>Cheltenham</span></span><button class="det">Details <span class="chev">▾</span></button></div>
