@@ -11,7 +11,7 @@
   var DIRECTIONS_URL = '/visit-us';
   var IMG_BASE = 'https://kadampacheltenham.github.io/akx-widgets/images/'; // auto image by id: images/<id>.jpg
   var STYLE = String.raw`
-  #akx-programme{--ink:#2B2A28;--dteal:#2E7C7C;--lteal:#0c9d94;--coral:#E2886A;--blue:#22B8F0;--bluedk:#0E90CC;--coral2:#FF7A4D;--coraldk:#E85C2E;font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);max-width:940px;margin:0 auto;}
+  #akx-programme{--ink:#2B2A28;--dteal:#2E7C7C;--lteal:#0c9d94;--coral:#E2886A;--blue:#22B8F0;--bluedk:#0E90CC;--coral2:#FF7A4D;--coraldk:#E85C2E;font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);max-width:1000px;margin:0 auto;}   /* lotus/content width — matches glance + calendars */
   #akx-programme *{box-sizing:border-box;}
   #akx-programme .pg-h{text-align:center;font-size:1.9rem;font-weight:600;color:var(--dteal);margin:0 0 6px;}
   #akx-programme .pg-lead{text-align:center;color:#6f6a62;font-size:1.02rem;margin:0 0 26px;}
