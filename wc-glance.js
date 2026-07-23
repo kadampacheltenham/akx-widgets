@@ -1,6 +1,6 @@
 /* Akanishta — Week at a glance widget (v3: minimal rows, Details expand, mobile tags+loc line).
    Include with: <div id="akx-glance"></div>
-                 <script src="https://kadampacheltenham.github.io/akx-widgets/glance.js" defer></script> */
+                 <script src="https://kadampacheltenham.github.io/akx-widgets/wc-glance.js" defer></script> */
 (function(){
   var MOUNT_ID='akx-glance';
   var STYLE=String.raw`
@@ -10,7 +10,7 @@
   #akx-glance *{box-sizing:border-box;}
   #akx-glance{font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);}
   .wag{max-width:1000px;margin:0 auto;}   /* lotus/content width, centred (was full width) */
-  .wag-h{text-align:center;font-size:1.9rem;font-weight:600;color:#2E7C7C;margin:0 0 6px;}
+  .wag-h{text-align:center;font-size:1.9rem;font-weight:600;color:#2A66A6;margin:0 0 6px;}   /* blue — site heading standard */
   .lead{text-align:center;color:#6f6a62;font-size:1.02rem;margin:0 0 16px;}
   .wag-closed{display:flex;flex-wrap:wrap;align-items:baseline;gap:5px 14px;justify-content:center;background:#EEEBE4;border:1px solid #DBD5C8;border-radius:10px;padding:11px 20px;margin:0 0 20px;}
   .wag-closed .cl-head{font-size:.78rem;font-weight:700;letter-spacing:.03em;color:#7A7261;}
