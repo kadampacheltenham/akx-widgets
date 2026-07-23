@@ -14,10 +14,12 @@
   #akx-programme{--ink:#2B2A28;--dteal:#2E7C7C;--lteal:#0c9d94;--coral:#E2886A;--blue:#22B8F0;--bluedk:#0E90CC;--coral2:#FF7A4D;--coraldk:#E85C2E;font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);max-width:1000px;margin:0 auto;}   /* lotus/content width — matches glance + calendars */
   #akx-programme *{box-sizing:border-box;}
   #akx-programme .pg-h{text-align:center;font-size:1.9rem;font-weight:600;color:var(--dteal);margin:0 0 6px;}
-  #akx-programme .pg-lead{text-align:center;color:#6f6a62;font-size:1.02rem;margin:0 0 26px;}
+  #akx-programme .pg-lead{max-width:840px;margin:0 auto 20px;text-align:center;color:#6f6a62;font-size:.98rem;line-height:1.55;}
+  #akx-programme .pg-lead p{margin:0 0 10px;} #akx-programme .pg-lead p:last-child{margin:0;}
   #akx-programme .pg-msg{text-align:center;color:#8a857c;padding:24px;}
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Oswald:wght@500;600;700&display=swap');
-  .cc{background:#fff;border:1px solid #ece7dd;border-radius:20px;box-shadow:0 8px 30px rgba(0,0,0,.07);overflow:hidden;margin-bottom:26px;}
+  .cc{background:#fff;border:1px solid #ece7dd;border-radius:20px;box-shadow:0 8px 30px rgba(0,0,0,.07);overflow:hidden;margin-bottom:22px;}
+  #akx-programme .cc:last-child{margin-bottom:0;}
   /* two-tone banner: darker timing segment (left) then the type */
   .cc-banner{display:flex;align-items:stretch;color:#fff;font-weight:800;font-size:.82rem;letter-spacing:.05em;text-transform:uppercase;}
   .cc.talk .cc-banner{background:var(--blue);} .cc.course .cc-banner{background:var(--coral2);}
@@ -50,14 +52,18 @@
   .wte li{font-size:.95rem;color:var(--ink);padding-left:20px;position:relative;line-height:1.45;}
   .wte li:before{content:'';position:absolute;left:2px;top:8px;width:7px;height:7px;border-radius:50%;background:var(--coral);}
   .picker{padding:20px 30px 6px;border-top:1px solid #efe9df;margin-top:18px;}
-  .picker.inline{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;}
-  .pk-chip{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--lteal);background:#E3F4F2;padding:5px 13px;border-radius:999px;margin:0 0 13px;}
+  .picker.inline{display:flex;align-items:center;justify-content:flex-start;gap:14px;flex-wrap:wrap;}
+  .picker.inline.center{justify-content:center;}
+  .pk-chip{display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:5px 13px;border-radius:999px;margin:0 0 13px;color:var(--lteal);background:#E3F4F2;}
+  .cc.talk .pk-chip{color:#1276B4;background:#E3F1FB;} .cc.course .pk-chip{color:#C55A24;background:#FBECE3;}
   .picker.inline .pk-chip{margin:0;}
   .tabs{display:flex;gap:10px;flex-wrap:wrap;}
-  .picker.inline .tabs{flex:0 1 auto;justify-content:center;}
+  .picker.inline .tabs{flex:0 1 auto;} .picker.inline.center .tabs{justify-content:center;}
   .tab-btn{flex:0 0 auto;border:1.5px solid #e2ddd2;background:#fff;color:var(--ink);font-size:.9rem;font-weight:600;padding:10px 16px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap;}
   .tab-btn .pin{width:9px;height:9px;border-radius:50%;background:#4E938C;} .tab-btn.ciren .pin{background:#7AA84A;}
-  .tab-btn.on{background:#4E938C;border-color:#4E938C;color:#fff;} .tab-btn.on.ciren{background:#7AA84A;border-color:#7AA84A;} .tab-btn.on .pin{background:#fff;}
+  .tab-btn.on{font-weight:800;}
+  .cc.talk .tab-btn.on{background:#E3F1FB;border-color:#9AD0EF;color:#1276B4;}
+  .cc.course .tab-btn.on{background:#FBECE3;border-color:#F2C4AA;color:#C55A24;}
   .detail{margin:16px 30px 8px;border:1px solid #eee7dd;border-radius:14px;overflow:hidden;}
   .single .detail{margin-top:6px;}
   .pane{display:none;grid-template-columns:1fr auto;} .pane.on{display:grid;}
@@ -67,6 +73,7 @@
   .d-tt{font-weight:700;font-size:1.1rem;} .d-tt .dur{font-weight:500;color:#8a857c;font-size:.92rem;}
   .d-meta{font-size:.95rem;color:var(--ink);margin-top:4px;} .d-meta a{color:var(--lteal);font-weight:700;text-decoration:underline;}
   .d-dates{font-size:.95rem;color:var(--ink);margin-top:4px;}   /* same weight & colour as the 'with' line */
+  .d-dates .d-lbl{font-weight:700;}
   .d-price{padding:18px 22px;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:9px;min-width:170px;background:#fbfaf7;}
   .d-price .pp{font-weight:700;font-size:1.02rem;}
   .d-offer{background:#EAF6EC;color:#2C6E1E;border:1px solid #CDE7CF;border-radius:8px;padding:5px 11px;font-size:.78rem;font-weight:700;line-height:1.3;text-align:center;}
@@ -110,6 +117,13 @@
     var uk=s.match(/^(\d{1,2})[\/.](\d{1,2})[\/.](\d{2,4})/); if(uk){var y=+uk[3]; if(y<100)y+=2000; return new Date(y,+uk[2]-1,+uk[1]);}
     var t=Date.parse(s); return isNaN(t)?null:new Date(t); }
   function parseDDMM(s,year){ var m=(s||'').match(/(\d{1,2})\s*[\/.\-]\s*(\d{1,2})/); return m?new Date(year,(+m[2])-1,+m[1]):null; }
+  function formatDate(raw){
+    var m=(raw||'').match(/(\d{1,2})[\/.\-](\d{1,2})(?:[\/.\-](\d{2,4}))?/); if(!m) return raw;
+    var dd=('0'+(+m[1])).slice(-2), mm=('0'+(+m[2])).slice(-2), yy;
+    if(m[3]){ yy=+m[3]; if(yy<100) yy+=2000; }
+    else { var t0=new Date(); t0.setHours(0,0,0,0); yy=t0.getFullYear(); var test=new Date(yy,+m[2]-1,+m[1]); test.setHours(0,0,0,0); if(test<t0) yy+=1; }
+    return dd+'/'+mm+'/'+yy;
+  }
   function allClassDates(classes, showFrom){
     var raw=[]; classes.forEach(function(cl){ splitList(cl.dates).forEach(function(d){raw.push(d);}); });
     if(!raw.length) return [];
@@ -168,7 +182,7 @@
   }
   function pane(cl,i,on){
     var c=isCiren(cl.location), dates=splitList(cl.dates), n=dates.length;
-    var datesLine = n>1 ? (n+' classes · '+dates.join(', ')) : (n===1 ? dates[0] : '');
+    var datesHtml = n>1 ? esc(n+' classes · '+dates.join(', ')) : (n===1 ? '<span class="d-lbl">Date:</span> '+esc(formatDate(dates[0])) : '');
     var pp = cl.price_class ? '<span class="pp">'+esc(cl.price_class)+' / class</span>' : '';
     var offer = (cl.price_series && n>1) ? '<span class="d-offer">Save 20% — '+n+' classes for '+esc(cl.price_series)+'</span>' : '';
     var book = cl.booking_url ? '<a class="book" href="'+esc(cl.booking_url)+'" target="_blank" rel="noopener">Book →</a>' : '';
@@ -177,7 +191,7 @@
         +'<div class="d-loc'+(c?' ciren':'')+'"><svg viewBox="0 0 24 24" fill="'+(c?'#7AA84A':'#4E938C')+'">'+PIN+'</svg>'+esc(cl.location||'')+'<a class="dir" href="'+DIRECTIONS_URL+'">Get directions</a></div>'
         +'<div class="d-tt">'+esc(fullDay(cl.day))+' '+esc(cl.time)+(cl.duration?' <span class="dur">| '+esc(cl.duration)+'</span>':'')+'</div>'
         +(cl.teacher?'<div class="d-meta">with <a href="/about-us#teachers">'+esc(cl.teacher)+'</a></div>':'')
-        +(datesLine?'<div class="d-dates">'+esc(datesLine)+'</div>':'')
+        +(datesHtml?'<div class="d-dates">'+datesHtml+'</div>':'')
       +'</div>'
       +(pp||offer||book?'<div class="d-price">'+pp+offer+book+'</div>':'')
     +'</div>';
@@ -221,7 +235,7 @@
     } else if(isTalk && classes.length===1){
       body='<div class="single"><div class="detail">'+pane(classes[0],0,true)+'</div></div>';
     } else {
-      var pkClass = isTalk ? 'picker inline' : 'picker';
+      var pkClass = isTalk ? 'picker inline center' : 'picker inline';
       body='<div class="'+pkClass+'"><span class="pk-chip">Choose a class</span><div class="tabs">'
           + classes.map(function(cl,i){return pill(cl,i,i===0);}).join('') + '</div></div>'
           + '<div class="detail">'+classes.map(function(cl,i){return pane(cl,i,i===0);}).join('')+'</div>';
@@ -293,8 +307,9 @@
     var byId={}; classes.forEach(function(cl){ if(cl.id){ (byId[cl.id]=byId[cl.id]||[]).push(cl); } });
     var today=new Date(); today.setHours(0,0,0,0);
     var live = items.filter(function(it){ return isVisible(it, byId[it.id]||[], today); });
-    var html='<h2 class="pg-h">Talks &amp; short courses</h2>'
-           +'<p class="pg-lead">Short courses and one-off talks — open to everyone, whatever your experience.</p>';
+    var html='<h2 class="pg-h">Weekly Classes Programme</h2>'
+           +'<div class="pg-lead"><p>Below you\'ll find the programme of topics, dates and details for all weekly classes, including public talks and short series of classes.</p>'
+           +'<p>All the classes and talks are drop-in and PAYG. You don\'t need to book, however if you book online you\'ll have access to discounts for booking for the whole series and offers such as bring a friend for half price for some events and early bird pricing where that\'s available.</p></div>';
     if(!live.length){ html+='<div class="pg-msg">Nothing scheduled just now — please check back soon.</div>'; }
     else { html += live.map(function(it){return card(it, byId[it.id]||[]);}).join(''); }
     mount.innerHTML=html;
