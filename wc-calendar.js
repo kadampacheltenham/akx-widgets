@@ -1,4 +1,4 @@
-/* Akanishta — Weekly Classes calendar (live Google Calendar feed).
+/* Akanishta — What's On calendar (live Google Calendar feed).
    ONE file, per-page presets. Include with a stub like:
        <div id="calendar" style="scroll-margin-top:130px;"></div>
        <div id="akx-cal" data-cal="weekly"></div>
@@ -28,7 +28,7 @@
   var root = document.getElementById('akx-cal');
   if(!root || root.getAttribute('data-akx-done')==='1') return;
   root.setAttribute('data-akx-done','1');
-  var P = PRESETS.weekly;   // Weekly Classes
+  var P = PRESETS.whatson;   // What's On
   var CALS = P.feeds.map(function(f){ var base=FEEDS[f.k]; return Object.assign({key:f.k, on:f.on}, base); })
                     .filter(function(c){ return c && /@/.test(c.id); });
   var TITLE = P.title;
