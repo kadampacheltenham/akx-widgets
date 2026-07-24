@@ -5,13 +5,13 @@
    One card per puja. Reads the Prayers & Pujas Google calendar: matches each
    upcoming entry to a card by its #ABBR tag (in the event title OR description),
    shows that puja's next date, and floats the soonest-upcoming puja to the front.
-   Card copy lives in CARDS below (rarely changes). Deity images live on the repo /img. */
+   Card copy lives in CARDS below (rarely changes). Deity images live on the repo /images. */
 (function(){
   var root=document.getElementById('akx-prayers-cards');
   if(!root || root.getAttribute('data-akx-done')==='1') return;
   root.setAttribute('data-akx-done','1');
 
-  var IMG='https://kadampacheltenham.github.io/akx-widgets/img/';
+  var IMG='https://kadampacheltenham.github.io/akx-widgets/images/';
   var API_KEY='AIzaSyAVm0epUASAL2aNbAN_aBmpDDPxoPJVOwA';
   var CAL_ID='c_7120941805c32581a9dca9a00783a100d6d53914fc8915ee8df40ae74d864504@group.calendar.google.com';
 
