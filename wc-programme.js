@@ -14,7 +14,7 @@
   #akx-programme{--ink:#2B2A28;--dteal:#2E7C7C;--lteal:#0c9d94;--coral:#E2886A;--blue:#22B8F0;--bluedk:#0E90CC;--coral2:#FF7A4D;--coraldk:#E85C2E;font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);max-width:1000px;margin:0 auto;}   /* lotus/content width — matches glance + calendars */
   #akx-programme *{box-sizing:border-box;}
   #akx-programme .pg-h{text-align:center;font-size:1.9rem;font-weight:600;color:#2A66A6;margin:0 0 6px;}   /* blue — site heading standard */
-  #akx-programme .pg-lead{max-width:840px;margin:0 auto 20px;text-align:center;color:#6f6a62;font-size:.98rem;line-height:1.55;}
+  #akx-programme .pg-lead{max-width:840px;margin:0 auto 20px;text-align:left;color:#6f6a62;font-size:.98rem;line-height:1.55;}
   #akx-programme .pg-lead p{margin:0 0 10px;} #akx-programme .pg-lead p:last-child{margin:0;}
   #akx-programme .pg-msg{text-align:center;color:#8a857c;padding:24px;}
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Oswald:wght@500;600;700&display=swap');
@@ -308,8 +308,8 @@
     var today=new Date(); today.setHours(0,0,0,0);
     var live = items.filter(function(it){ return isVisible(it, byId[it.id]||[], today); });
     var html='<h2 class="pg-h">Weekly Classes Programme</h2>'
-           +'<div class="pg-lead"><p>Below you\'ll find the programme of topics, dates and details for all weekly classes, including public talks and short series of classes.</p>'
-           +'<p>All the classes and talks are drop-in and PAYG. You don\'t need to book, however if you book online you\'ll have access to discounts for booking for the whole series and offers such as bring a friend for half price for some events and early bird pricing where that\'s available.</p></div>';
+           +'<div class="pg-lead"><p>Here you\'ll find full details of the programme of weekly classes &mdash; including one-off talks (public talks) and short courses which run over a number of weeks.</p>'
+           +'<p>All weekly classes and short courses are drop-in and PAYG. You don\'t need to book, however if you book online you\'ll have access to discounts for booking for the whole series and offers such as bring a friend for half price and early bird pricing where these are available.</p></div>';
     if(!live.length){ html+='<div class="pg-msg">Nothing scheduled just now — please check back soon.</div>'; }
     else { html += live.map(function(it){return card(it, byId[it.id]||[]);}).join(''); }
     mount.innerHTML=html;
