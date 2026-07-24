@@ -1,0 +1,12 @@
+<!-- ===== Weekly Classes — HERO IMAGE (block 1 of 2) =====
+     Full-bleed banner. Host the image on Squarespace:
+       Design → Custom CSS → Manage Custom Files → upload your WC hero image →
+       copy its https://static1.squarespace.com/... URL → paste it below where shown.
+     (Keeps the code block tiny — no base64.) -->
+<style>
+  .wc-hero{ position:relative; left:50%; right:50%; margin-left:-50vw; margin-right:-50vw;
+            width:100vw; height:clamp(340px,44vw,560px); overflow:hidden;
+            background-size:cover; background-position:center 30%; margin-bottom:112px; }
+  @media (max-width:640px){ .wc-hero{ height:300px; margin-bottom:60px; } }
+</style>
+<div class="wc-hero" style="background-image:url('PASTE_SQUARESPACE_IMAGE_URL_HERE');"></div>
