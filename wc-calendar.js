@@ -19,9 +19,9 @@
   // ---- per-page presets: title (blue), default view, and which feeds (on:false = present but off by default) ----
   var PRESETS = {
     whatson: { title:'Upcoming Classes & Courses', mode:'list',
-               feeds:[ {k:'weekly'}, {k:'branch',on:false}, {k:'weekend'}, {k:'prayers',on:false}, {k:'announce'} ] },
+               feeds:[ {k:'weekly'}, {k:'branch'}, {k:'weekend'}, {k:'prayers'}, {k:'announce'} ] },
     weekly:  { title:'Weekly Classes Calendar', mode:'list',
-               feeds:[ {k:'weekly'}, {k:'branch'}, {k:'announce'} ] }
+               feeds:[ {k:'weekly'}, {k:'branch'}, {k:'weekend',on:false}, {k:'prayers',on:false}, {k:'announce'} ] }
     // add more pages here later, e.g. courses / prayers, then set data-cal on the stub.
   };
 
@@ -44,7 +44,7 @@
   var CSS = ''
   + '#akx-cal{--coral:#E2886A;--ink:#1D1D1F;--muted:#6B6B6E;--line:#ECE9E2;color:var(--ink);max-width:1000px;margin:0 auto;}'  /* lotus/content width */
   + '#akx-cal *{box-sizing:border-box;}'
-  + '#akx-cal .cal-title{margin:0 auto 20px;text-align:center;font-family:\'Inter\',sans-serif;font-size:1.15rem;font-weight:600;color:#2A66A6;text-transform:uppercase;letter-spacing:0.04em;}'  /* blue heading — site standard */
+  + '#akx-cal .cal-title{margin:0 0 6px;text-align:center;font-family:inherit;font-size:1.9rem;font-weight:600;color:#2A66A6;line-height:1.15;}'  /* blue heading — site standard */
   + '#akx-cal .card{background:#fff;border-radius:16px;box-shadow:0 6px 30px rgba(0,0,0,.07);padding:22px 22px 26px;}'
   + '#akx-cal .ann{display:flex;gap:12px;align-items:flex-start;background:#F3F0EA;border:1px solid #E6E1D6;border-left:5px solid var(--acol,#8F887A);border-radius:12px;padding:14px 16px;margin-bottom:16px;color:#3f3d39;font-size:.96rem;line-height:1.5;}'
   + '#akx-cal .ann svg{flex:none;margin-top:1px;}'
