@@ -14,7 +14,7 @@
   #akx-programme{--ink:#2B2A28;--dteal:#2E7C7C;--lteal:#0c9d94;--coral:#E2886A;--blue:#22B8F0;--bluedk:#0E90CC;--coral2:#FF7A4D;--coraldk:#E85C2E;font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);max-width:1000px;margin:0 auto;}   /* lotus/content width — matches glance + calendars */
   #akx-programme *{box-sizing:border-box;}
   #akx-programme .pg-h{text-align:center;font-size:1.9rem;font-weight:600;color:#2A66A6;margin:0 0 6px;}   /* blue — site heading standard */
-  #akx-programme .pg-lead{max-width:840px;margin:0 auto 20px;text-align:left;color:#6f6a62;font-size:.98rem;line-height:1.55;}
+  #akx-programme .pg-lead{max-width:720px;margin:0 auto 20px;text-align:left;color:#6f6a62;font-size:1.08rem;line-height:1.75;}  /* matches hero body text */
   #akx-programme .pg-lead p{margin:0 0 10px;} #akx-programme .pg-lead p:last-child{margin:0;}
   #akx-programme .pg-msg{text-align:center;color:#8a857c;padding:24px;}
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Oswald:wght@500;600;700&display=swap');
