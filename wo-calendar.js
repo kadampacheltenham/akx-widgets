@@ -14,12 +14,13 @@
     branch:   { name:'Branch classes',              color:'#4FA35A', id:'c_6b6fc5b8541682cc520a71d1bc5683dc16d14d2e907ef4da85a1e7479a73c798@group.calendar.google.com' },
     weekend:  { name:'Courses & retreats',          color:'#E2886A', id:'c_687cfcac60ad1fa647cd2fb654774156e1e48fb2dcbcf5c40a72340e422a4b08@group.calendar.google.com' },
     prayers:  { name:'Prayers & Pujas',             color:'#7E5CA8', id:'c_7120941805c32581a9dca9a00783a100d6d53914fc8915ee8df40ae74d864504@group.calendar.google.com' },
+    volunteer:{ name:'Volunteering',                color:'#C8952B', id:'c_75691d6f7c1a31c8a4ad3bbdaa29431702ceeadcec440781106a4a76a29c1759@group.calendar.google.com' },
     announce: { name:'Announcements',               color:'#BEB8AC', pinned:true, id:'c_8tho1a5ip2rh1g154iea6h0c0k@group.calendar.google.com' }
   };
   // ---- per-page presets: title (blue), default view, and which feeds (on:false = present but off by default) ----
   var PRESETS = {
     whatson: { title:'Upcoming Classes & Courses', mode:'list',
-               feeds:[ {k:'weekly'}, {k:'branch'}, {k:'weekend'}, {k:'prayers'}, {k:'announce'} ] },
+               feeds:[ {k:'weekly'}, {k:'branch'}, {k:'weekend'}, {k:'prayers'}, {k:'volunteer'}, {k:'announce'} ] },
     weekly:  { title:'Weekly Classes Calendar', mode:'list',
                feeds:[ {k:'weekly'}, {k:'branch'}, {k:'weekend',on:false}, {k:'prayers',on:false}, {k:'announce'} ] }
     // add more pages here later, e.g. courses / prayers, then set data-cal on the stub.
