@@ -308,8 +308,7 @@
     var today=new Date(); today.setHours(0,0,0,0);
     var live = items.filter(function(it){ return isVisible(it, byId[it.id]||[], today); });
     var html='<h2 class="pg-h">Weekly Classes Programme</h2>'
-           +'<div class="pg-lead"><p>Here you\'ll find full details of the programme of weekly classes &mdash; including one-off talks (public talks) and short courses which run over a number of weeks.</p>'
-           +'<p>All weekly classes and short courses are drop-in and PAYG. You don\'t need to book, however if you book online you\'ll have access to discounts for booking for the whole series and offers such as bring a friend for half price and early bird pricing where these are available.</p></div>';
+           +'<div class="pg-lead"><p>Here you\'ll find full details of the programme of weekly classes &mdash; including one-off talks (public talks) and short courses which run over a number of weeks. All weekly classes and short courses are drop-in and PAYG. You don\'t need to book, however if you book online you\'ll have access to discounts for booking for the whole series and offers such as bring a friend for half price and early bird pricing where these are available.</p></div>';
     if(!live.length){ html+='<div class="pg-msg">Nothing scheduled just now — please check back soon.</div>'; }
     else { html += live.map(function(it){return card(it, byId[it.id]||[]);}).join(''); }
     mount.innerHTML=html;
