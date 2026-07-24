@@ -266,7 +266,7 @@
       var d=new Date(y,m,dd), ymd=y+'-'+pad(m+1)+'-'+pad(dd), evs=eventsOn(ymd), rows='';
       evs.forEach(function(e,idx){
         var multi = e.allDay && e.endDate && (parseYmd(e.endDate)-parseYmd(e.start) > 86400000);
-        if(multi){ if(shown[e.id]) return; shown[e.id]=true; }
+        if(shown[e.id]) return; shown[e.id]=true;  /* de-dupe any event id across the list — multi-day spans show once, recurrences keep unique ids */
         var tm = multi ? '' : fmtTime(e.start,e.allDay);
         var sub = multi ? rangeStr(e.start,e.endDate,true) : '';  /* address hidden in list view to save space (mobile); branch town lives in the event title. Pop-up still shows it. */
         rows+='<div class="li" data-ymd="'+ymd+'" data-i="'+idx+'"><span class="dot" style="background:'+e.color+'"></span>'
