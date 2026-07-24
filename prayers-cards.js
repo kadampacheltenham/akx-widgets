@@ -56,7 +56,7 @@
   +"#akx-prayers-cards .pc-dots{display:flex;gap:8px;justify-content:center;margin-top:18px;flex-wrap:wrap;}"
   +"#akx-prayers-cards .pc-dots i{width:8px;height:8px;border-radius:50%;background:#d8d2ca;cursor:pointer;transition:all .25s;}"
   +"#akx-prayers-cards .pc-dots i.on{background:var(--purple);width:22px;border-radius:5px;}"
-  +"#akx-prayers-cards .pc-card{background:#fff;border:1px solid #efeadf;border-radius:22px;box-shadow:0 10px 34px rgba(0,0,0,.07);display:flex;gap:34px;align-items:center;padding:30px 34px;}"
+  +"#akx-prayers-cards .pc-card{background:#fff;border:1px solid #efeadf;border-radius:22px;box-shadow:0 10px 34px rgba(0,0,0,.07);display:flex;gap:34px;align-items:flex-start;padding:30px 34px;}"
   +"#akx-prayers-cards .pc-disc{flex:0 0 46%;width:46%;aspect-ratio:1/1;border-radius:50%;overflow:hidden;background:radial-gradient(circle at 50% 42%,#F3EFF7,#E7DEEF);box-shadow:0 0 0 7px rgba(126,92,168,.10);}"
   +"#akx-prayers-cards .pc-disc img{width:100%;height:100%;object-fit:cover;display:block;}"
   +"#akx-prayers-cards .pc-disc.fig img{object-fit:contain;transform:scale(1.04);}"
