@@ -195,11 +195,22 @@
       return fetch(apiUrl(c,tMin,tMax)).then(function(r){return r.json();})
         .then(function(j){return {cal:c,items:(j.items||[])};}).catch(function(){return {cal:c,items:[]};});
     })).then(function(res){
-      var anns=[];
+      var anns=[], LEAD=7;   // show a notice from 7 days before it starts until its last day; hide otherwise
       res.forEach(function(r){ r.items.forEach(function(it){
         var allDay=!!(it.start&&it.start.date);
+        var startStr=(it.start&&(it.start.dateTime||it.start.date)); if(!startStr) return;
+        var from, until;
+        if(allDay){
+          var sD=parseYmd(it.start.date);
+          var endEx=(it.end&&it.end.date)?parseYmd(it.end.date):new Date(sD.getFullYear(),sD.getMonth(),sD.getDate()+1);
+          from=new Date(sD.getFullYear(),sD.getMonth(),sD.getDate()-LEAD); until=endEx;   // until = day after last day → stays visible through the last day
+        } else {
+          var sT=new Date(startStr), eT=(it.end&&it.end.dateTime)?new Date(it.end.dateTime):new Date(sT.getTime()+3600000);
+          from=new Date(sT.getTime()-LEAD*864e5); until=eT;
+        }
+        if(now<from || now>=until) return;   // outside the 7-days-before → last-day window
         anns.push({color:r.cal.color, title:it.summary||'Notice',
-                   start:(it.start&&(it.start.dateTime||it.start.date)),
+                   start:startStr,
                    endDate:(allDay&&it.end&&it.end.date)?it.end.date:null, allDay:allDay});
       }); });
       anns.sort(function(a,b){return (a.start||'').localeCompare(b.start||'');});
