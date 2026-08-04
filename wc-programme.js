@@ -42,8 +42,9 @@
   .tag.teal{background:#D5EFEC;color:#227A72;}
   .desc{font-size:1rem;line-height:1.6;color:var(--ink);margin:0 0 14px;}
   .wte{margin-bottom:2px;}
-  .wte-t{background:none;border:none;padding:0;cursor:pointer;font-size:.8rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--dteal);display:inline-flex;align-items:center;gap:8px;}
-  .wte-t .chev{font-size:1.05rem;font-weight:900;line-height:1;transition:transform .2s;}
+  .wte-t{background:none;border:none;padding:0;cursor:pointer;font-size:1rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--dteal);display:inline-flex;align-items:center;gap:8px;}
+  .cc.talk .wte-t{color:var(--bluedk);} .cc.course .wte-t{color:var(--coraldk);}
+  .wte-t .chev{font-size:1.3rem;font-weight:900;line-height:1;transition:transform .2s;}
   .wte.collapsed .wte-t .chev{transform:rotate(-90deg);}
   .wte ul{margin:10px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px;}
   .wte.collapsed ul{display:none;}
@@ -76,13 +77,15 @@
   .d-price{padding:18px 22px;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:9px;min-width:170px;background:#fbfaf7;}
   .d-price .pp{font-weight:700;font-size:1.02rem;}
   .d-offer{background:#EAF6EC;color:#2C6E1E;border:1px solid #CDE7CF;border-radius:8px;padding:5px 11px;font-size:.78rem;font-weight:700;line-height:1.3;text-align:center;}
-  .book{color:#fff;font-weight:700;font-size:.86rem;text-decoration:none;padding:9px 20px;border-radius:999px;white-space:nowrap;background:var(--coral);}
-  .cc.talk .book{background:var(--blue);} .cc.course .book{background:var(--coral2);}
+  .book{color:#fff;font-weight:700;font-size:.9rem;text-decoration:none;padding:0 22px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;white-space:nowrap;background:var(--coral);}
+  .cc.talk .book{background:var(--bluedk);} .cc.course .book{background:var(--coraldk);}
   .tbc{margin:14px 30px 4px;padding:14px 18px;background:#FBF6ED;border:1px solid #EFE7D6;border-radius:12px;font-size:.92rem;color:#6f6a62;}
   /* mobile summary bar + bottom 'Show less' (both hidden on desktop) */
   .cc-sum,.cc-less{display:none;}
   .foot{padding:8px 30px 26px;}
-  .disc{background:#FBF6ED;border:1px solid #EFE7D6;border-radius:12px;padding:14px 18px;font-size:.92rem;color:var(--ink);line-height:1.5;margin-bottom:14px;} .disc b{color:var(--ink);} .disc .sep{color:#cdbf9e;padding:0 8px;}
+  .disc{background:#FBF6ED;border:1px solid #EFE7D6;border-radius:12px;padding:14px 18px;font-size:.92rem;color:var(--ink);line-height:1.5;margin-bottom:14px;} .disc .sep{color:#cdbf9e;padding:0 8px;}
+  .disc-lbl{font-weight:800;letter-spacing:.02em;}
+  .cc.talk .disc-lbl{color:var(--bluedk);} .cc.course .disc-lbl{color:var(--coraldk);}
   /* social share row */
   .cc-share{display:flex;align-items:center;gap:9px;justify-content:flex-end;}
   .cc-share .sh-lbl{font-size:.82rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#8a857c;margin-right:2px;}
@@ -312,7 +315,7 @@
           + classes.map(function(cl,i){return pill(cl,i,i===0,isTalk);}).join('') + '</div></div>'
           + '<div class="detail">'+classes.map(function(cl,i){return pane(cl,i,i===0);}).join('')+'</div>';
     }
-    var discHtml = item.discount_note ? '<div class="disc">'+discFmt(item.discount_note)+'</div>' : '';
+    var discHtml = item.discount_note ? '<div class="disc"><b class="disc-lbl">DISCOUNTS:</b> '+discFmt(item.discount_note.replace(/^\s*discounts?\s*:\s*/i,''))+'</div>' : '';
     var foot = '<div class="foot">'+discHtml+shareRow(item)+'</div>';
     // mobile collapse: top summary (dates + Show more) when collapsed; a 'Show less' control at the BOTTOM when expanded
     var sumD = summaryDates(isTalk, classes, showFrom);
@@ -352,10 +355,10 @@
       return '#'+out.map(function(x){return ('0'+x.toString(16)).slice(-2);}).join('');
     }catch(e){ return null; }
   }
-  function syncWte(cc){   // 'What to expect' takes the event-title colour
+  function syncWte(cc){   // 'What to expect' BULLETS take the event-title colour (the toggle label keeps the darker header colour from CSS)
     var title=cc.querySelector('.ctitle'); if(!title) return;
     var col=title.style.color||getComputedStyle(title).color;
-    cc.querySelectorAll('.wte-t,.wte li').forEach(function(e){ e.style.color=col; });
+    cc.querySelectorAll('.wte li').forEach(function(e){ e.style.color=col; });
   }
   function colourTitles(root){
     root.querySelectorAll('.cc').forEach(function(cc){
