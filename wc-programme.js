@@ -14,7 +14,7 @@
   #akx-programme{--ink:#2B2A28;--dteal:#2E7C7C;--lteal:#0c9d94;--coral:#E2886A;--blue:#22B8F0;--bluedk:#0E90CC;--coral2:#FF7A4D;--coraldk:#E85C2E;font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);max-width:1000px;margin:0 auto;}   /* lotus/content width — matches glance + calendars */
   #akx-programme *{box-sizing:border-box;}
   #akx-programme .pg-h{text-align:center;font-size:1.9rem;font-weight:600;color:#2A66A6;margin:0 0 6px;}   /* blue — site heading standard */
-  #akx-programme .pg-lead{max-width:840px;margin:0 auto 20px;text-align:left;color:#6f6a62;font-size:.98rem;line-height:1.55;}
+  #akx-programme .pg-lead{max-width:none;margin:0 auto 20px;padding:0 30px;text-align:left;color:#6f6a62;font-size:.98rem;line-height:1.55;}
   #akx-programme .pg-lead p{margin:0 0 10px;} #akx-programme .pg-lead p:last-child{margin:0;}
   #akx-programme .pg-msg{text-align:center;color:#8a857c;padding:24px;}
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Oswald:wght@500;600;700&display=swap');
@@ -88,7 +88,8 @@
   .disc{background:#FBF6ED;border:1px solid #EFE7D6;border-radius:12px;padding:14px 18px;font-size:.92rem;color:var(--ink);line-height:1.5;margin-bottom:14px;} .disc b{color:var(--ink);} .disc .sep{color:#cdbf9e;padding:0 8px;}
   /* social share row */
   .cc-share{display:flex;align-items:center;gap:9px;justify-content:flex-end;}
-  .cc-share .sh-lbl{font-size:.7rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#8a857c;margin-right:2px;}
+  .cc-share .sh-lbl{font-size:.82rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#8a857c;margin-right:2px;}
+  .cc.talk .cc-share .sh-lbl{color:var(--blue);} .cc.course .cc-share .sh-lbl{color:var(--coral2);}
   .sh-btn{width:34px;height:34px;border-radius:50%;border:1px solid #e6e0d5;background:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:#6f6a62;padding:0;text-decoration:none;transition:background .15s,color .15s,border-color .15s;}
   .cc.talk .sh-btn{color:var(--blue);border-color:#bfe6f8;} .cc.course .sh-btn{color:var(--coral2);border-color:#f6cbb8;}
   .cc.talk .sh-btn:hover{background:var(--blue);color:#fff;border-color:var(--blue);} .cc.course .sh-btn:hover{background:var(--coral2);color:#fff;border-color:var(--coral2);}
@@ -105,16 +106,19 @@
     .cc-share{justify-content:flex-start;}
     /* --- title / intro breathing room --- */
     #akx-programme .pg-h{font-size:1.5rem;margin-bottom:14px;}
-    #akx-programme .pg-lead{padding:0 8px;margin-bottom:22px;font-size:.95rem;}
+    #akx-programme .pg-lead{padding:0 20px;margin-bottom:22px;font-size:.95rem;}
     /* --- collapse cards: summary bar + expandable body --- */
-    .cc .cc-sum{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:2px 20px 20px;padding:13px 16px;border:1px solid #eee7dd;border-radius:12px;background:#fbfaf7;cursor:pointer;font-family:inherit;text-align:left;-webkit-appearance:none;}
-    .cc-sum-d{display:flex;flex-direction:column;gap:3px;font-weight:700;font-size:.92rem;}
+    .cc .cc-sum{display:flex;align-items:center;justify-content:space-between;gap:12px;width:calc(100% - 40px);margin:2px 20px 22px;padding:15px 20px;border:1px solid #e5ddcf;border-radius:12px;background:#fbfaf7;cursor:pointer;font-family:inherit;text-align:left;-webkit-appearance:none;}
+    .cc-sum-d{display:flex;flex-direction:column;gap:3px;font-weight:700;font-size:.92rem;flex:none;}
+    .cc-sum-line{white-space:nowrap;}
     .cc.talk .cc-sum-d{color:#1276B4;} .cc.course .cc-sum-d{color:#C55A24;}
     .cc-sum-cta{display:inline-flex;align-items:center;gap:7px;font-size:.8rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--dteal);white-space:nowrap;}
     .cc-sum-cta .chev{font-size:1rem;font-weight:900;transition:transform .2s;}
     .cc.talk .cc-sum-cta{color:#1276B4;} .cc.course .cc-sum-cta{color:#C55A24;}
-    .cc.mcol .cc-exp{display:none;}
-    .cc.mcol .wte{display:none;}
+    /* condensed = header/image/title/tags + summary only; description + detail live behind the one toggle */
+    .cc.mcol .cc-exp,.cc.mcol .wte,.cc.mcol .desc,.cc.mcol .desc-more{display:none;}
+    .cc:not(.mcol) .desc{display:block;overflow:visible;-webkit-line-clamp:initial;margin-bottom:14px;}
+    .desc-more{display:none!important;}   /* mobile: single expander only — never the desc 'More' */
     .cc:not(.mcol) .cc-sum-d{display:none;}
     .cc:not(.mcol) .cc-sum-cta .chev{transform:rotate(180deg);}
   }`;
@@ -317,7 +321,7 @@
     var sumD = summaryDates(isTalk, classes, showFrom);
     var sum = '<button type="button" class="cc-sum">'
         + '<span class="cc-sum-d">'+sumD+'</span>'
-        + '<span class="cc-sum-cta">Show more details <span class="chev">▾</span></span>'
+        + '<span class="cc-sum-cta"><span class="cc-sum-word">Show more details</span> <span class="chev">▾</span></span>'
       +'</button>';
     var exp = '<div class="cc-exp">'+body+foot+'</div>';
     return '<div class="cc '+(isTalk?'talk':'course')+' mcol">'+banner+head+sum+exp+'</div>';
@@ -374,7 +378,8 @@
     root.querySelectorAll('.wte-t').forEach(function(b){b.addEventListener('click',function(){b.parentNode.classList.toggle('collapsed');});});
     // mobile summary toggle
     root.querySelectorAll('.cc-sum').forEach(function(b){b.addEventListener('click',function(){
-      b.closest('.cc').classList.toggle('mcol');
+      var collapsed=b.closest('.cc').classList.toggle('mcol');
+      var w=b.querySelector('.cc-sum-word'); if(w) w.textContent=collapsed?'Show more details':'Show less';
     });});
     // copy-link share button
     root.querySelectorAll('.sh-copy').forEach(function(b){b.addEventListener('click',function(){
