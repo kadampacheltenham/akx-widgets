@@ -92,7 +92,7 @@
   @media(max-width:640px){
     #akx-glance .wag-desktop{display:none;}
     #akx-glance .wag-mobile{display:block;}
-    #akx-glance .wag-h{font-size:1.5rem;} #akx-glance .wag-lead{padding:0 6px;font-size:.95rem;margin-bottom:14px;}
+    #akx-glance .wag-h{font-size:1.5rem;} #akx-glance .wag-lead{padding:0 20px;font-size:.95rem;margin-bottom:14px;}
     #akx-glance .wag-term{font-size:.95rem;padding:13px 15px;}
   }
   /* mobile tabs + list */
