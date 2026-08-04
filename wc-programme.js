@@ -90,9 +90,10 @@
   .cc-share{display:flex;align-items:center;gap:9px;justify-content:flex-end;}
   .cc-share .sh-lbl{font-size:.7rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#8a857c;margin-right:2px;}
   .sh-btn{width:34px;height:34px;border-radius:50%;border:1px solid #e6e0d5;background:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:#6f6a62;padding:0;text-decoration:none;transition:background .15s,color .15s,border-color .15s;}
-  .sh-btn:hover{background:#f6f2e9;color:#2A66A6;border-color:#d8d1c2;}
+  .cc.talk .sh-btn{color:var(--blue);border-color:#bfe6f8;} .cc.course .sh-btn{color:var(--coral2);border-color:#f6cbb8;}
+  .cc.talk .sh-btn:hover{background:var(--blue);color:#fff;border-color:var(--blue);} .cc.course .sh-btn:hover{background:var(--coral2);color:#fff;border-color:var(--coral2);}
   .sh-btn svg{width:16px;height:16px;}
-  .sh-btn.copied{color:#2C8A34;border-color:#BFE3C2;background:#EAF6EC;}
+  .sh-btn.copied,.cc.talk .sh-btn.copied,.cc.course .sh-btn.copied{color:#2C8A34;border-color:#BFE3C2;background:#EAF6EC;}
   @media(max-width:640px){
     .cc-top{grid-template-columns:110px 1fr;grid-template-areas:"gfx head" "body body";column-gap:14px;row-gap:12px;padding:22px 20px 4px;} .gfx{width:110px;height:110px;} .ctitle{font-size:1.34rem;margin-bottom:9px;} .cc-head .tags{margin-bottom:0;}
     .picker{padding:16px 20px 4px;}
