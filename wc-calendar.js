@@ -1,4 +1,4 @@
-/* Akanishta — shared calendar widget (live Google Calendar feed).
+/* Akanishta &mdash; shared calendar widget (live Google Calendar feed).
    ONE file, per-page presets. Include with a stub like:
        <div id="calendar" style="scroll-margin-top:130px;"></div>
        <div id="akx-cal" data-cal="weekly"></div>
@@ -19,19 +19,16 @@
   // ---- per-page presets: title (blue), default view, and which feeds (on:false = present but off by default) ----
   var PRESETS = {
     whatson: { title:'Upcoming Classes & Courses', mode:'list',
-               feeds:[ {k:'weekly'}, {k:'branch'}, {k:'weekend'}, {k:'prayers'}, {k:'announce'} ] },   /* NOTE: live also had a 'volunteer' feed here — omitted (its calendar id isn't in this copy). Re-add {k:'volunteer'} + a FEEDS.volunteer entry when the id is to hand. */
+               feeds:[ {k:'weekly'}, {k:'branch',on:false}, {k:'weekend'}, {k:'prayers',on:false}, {k:'announce'} ] },
     weekly:  { title:'Weekly Classes Calendar', mode:'list',
-               feeds:[ {k:'weekly'}, {k:'branch'}, {k:'weekend',on:false}, {k:'prayers',on:false}, {k:'announce'} ] },
-    courses: { title:'Courses & Retreats Calendar', mode:'list',
-               feeds:[ {k:'weekly',on:false}, {k:'branch',on:false}, {k:'weekend'}, {k:'announce'} ] },
-    prayers: { title:'Prayers & Puja Calendar', mode:'list',
-               feeds:[ {k:'prayers'}, {k:'announce'} ] }
+               feeds:[ {k:'weekly'}, {k:'branch'}, {k:'announce'} ] }
+    // add more pages here later, e.g. courses / prayers, then set data-cal on the stub.
   };
 
   var root = document.getElementById('akx-cal');
   if(!root || root.getAttribute('data-akx-done')==='1') return;
   root.setAttribute('data-akx-done','1');
-  var P = PRESETS[(root.getAttribute('data-cal')||'whatson').trim()] || PRESETS.whatson;
+  var P = PRESETS[(root.getAttribute('data-cal')||'weekly').trim()] || PRESETS.weekly;  /* this file = Weekly Classes page; default to the weekly preset (weekly+branch+announce) */
   var CALS = P.feeds.map(function(f){ var base=FEEDS[f.k]; return Object.assign({key:f.k, on:f.on}, base); })
                     .filter(function(c){ return c && /@/.test(c.id); });
   var TITLE = P.title;
@@ -47,7 +44,7 @@
   var CSS = ''
   + '#akx-cal{--coral:#E2886A;--ink:#1D1D1F;--muted:#6B6B6E;--line:#ECE9E2;color:var(--ink);max-width:1000px;margin:0 auto;}'  /* lotus/content width */
   + '#akx-cal *{box-sizing:border-box;}'
-  + '#akx-cal .cal-title{margin:0 auto 34px;text-align:center;font-family:\'Inter\',sans-serif;font-size:1.15rem;font-weight:600;color:#2A66A6;text-transform:uppercase;letter-spacing:0.04em;}'  /* blue heading — site standard; extra space under the title */
+  + '#akx-cal .cal-title{margin:0 auto 34px;text-align:center;font-family:\'Inter\',sans-serif;font-size:clamp(1.5rem,4.5vw,1.9rem);font-weight:600;color:#2A66A6;}'  /* blue heading &mdash; Title Case, size matches Week at a Glance / Programme */
   + '#akx-cal .card{background:#fff;border-radius:16px;box-shadow:0 6px 30px rgba(0,0,0,.07);padding:22px 22px 26px;}'
   + '#akx-cal .ann{display:flex;gap:12px;align-items:center;border:1px solid;border-radius:12px;padding:16px 18px;margin-bottom:16px;font-size:1rem;line-height:1.45;}'  /* matches homepage announcement banner */
   + '#akx-cal .ann.notice{background:#FDF3E3;color:#6E5212;border-color:#F1E0C2;}'
@@ -191,25 +188,10 @@
     }
     return longDate(new Date(startStr))+', '+fmtTime(startStr,false);
   }
-  // per-notice visibility (agreed 4 Aug 2026): closures ('closed') show 10 days ahead, end MIDDAY the day BEFORE the last day;
-  // all other notices show 2 days before, end ON the last day.
-  function annVisible(a, now){
-    var isClosure=/clos(e|ed|ure)|shut|cancel/i.test(a.title||'');
-    var startD, lastD;
-    if(a.allDay){ startD=parseYmd(a.start);
-      if(a.endDate){ lastD=parseYmd(a.endDate); lastD.setDate(lastD.getDate()-1); } else lastD=new Date(startD); }
-    else { startD=new Date(a.start); startD.setHours(0,0,0,0); lastD=new Date(startD); }
-    var lead=isClosure?10:2;
-    var showFrom=new Date(startD); showFrom.setDate(showFrom.getDate()-lead); showFrom.setHours(0,0,0,0);
-    var showUntil;
-    if(isClosure){ showUntil=new Date(lastD); showUntil.setDate(showUntil.getDate()-1); showUntil.setHours(12,0,0,0); }
-    else { showUntil=new Date(lastD); showUntil.setHours(23,59,59,999); }
-    return now>=showFrom && now<=showUntil;
-  }
   function loadBanner(){
     var pins=CALS.filter(function(c){return c.pinned;}); if(!pins.length){return;}
     var now=new Date(), t0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-    var tMin=t0.toISOString(), tMax=new Date(t0.getFullYear(),t0.getMonth(),t0.getDate()+11).toISOString();   // fetch window; per-notice visibility decided by annVisible()
+    var tMin=t0.toISOString(), tMax=new Date(t0.getFullYear(),t0.getMonth(),t0.getDate()+14).toISOString();   // only show notices active now or starting within 14 days (was 90)
     Promise.all(pins.map(function(c){
       return fetch(apiUrl(c,tMin,tMax)).then(function(r){return r.json();})
         .then(function(j){return {cal:c,items:(j.items||[])};}).catch(function(){return {cal:c,items:[]};});
@@ -221,8 +203,6 @@
                    start:(it.start&&(it.start.dateTime||it.start.date)),
                    endDate:(allDay&&it.end&&it.end.date)?it.end.date:null, allDay:allDay});
       }); });
-      var nowT=new Date();
-      anns=anns.filter(function(a){return annVisible(a, nowT);});
       anns.sort(function(a,b){return (a.start||'').localeCompare(b.start||'');});
       var box=document.getElementById('akx-banner'); box.innerHTML='';
       anns.slice(0,3).forEach(function(a){
