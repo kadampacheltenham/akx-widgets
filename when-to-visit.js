@@ -15,11 +15,24 @@
   var API_KEY='AIzaSyAVm0epUASAL2aNbAN_aBmpDDPxoPJVOwA';
   var TZ='Europe/London';
   var OPEN_FEEDS=[
-    'c_9e95a300a2d0f8775b28d30ebfe5eb816d8dc678d4dffbebbc09cd59d9208ffd@group.calendar.google.com', /* weekly (Cheltenham) */
-    'c_687cfcac60ad1fa647cd2fb654774156e1e48fb2dcbcf5c40a72340e422a4b08@group.calendar.google.com', /* courses & retreats */
-    'c_7120941805c32581a9dca9a00783a100d6d53914fc8915ee8df40ae74d864504@group.calendar.google.com'  /* prayers & pujas */
+    {key:'weekly',  id:'c_9e95a300a2d0f8775b28d30ebfe5eb816d8dc678d4dffbebbc09cd59d9208ffd@group.calendar.google.com'}, /* weekly (Cheltenham) */
+    {key:'weekend', id:'c_687cfcac60ad1fa647cd2fb654774156e1e48fb2dcbcf5c40a72340e422a4b08@group.calendar.google.com'}, /* courses & retreats */
+    {key:'prayers', id:'c_7120941805c32581a9dca9a00783a100d6d53914fc8915ee8df40ae74d864504@group.calendar.google.com'}  /* prayers & pujas */
   ];
   var CLOSE_FEED='c_8tho1a5ip2rh1g154iea6h0c0k@group.calendar.google.com'; /* announcements (closures) */
+  /* Open window is DERIVED per event: doors open {b} mins before it starts, stay open {a} mins after
+     it ends. Buffer depends on the event TYPE (from the brief). The event's own time shows in brackets. */
+  function bufFor(e,wd){
+    var n=e.name||'';
+    if(/volunteer/i.test(n)) return {b:0,a:0};                       /* volunteering: no buffer */
+    if(/\bTTP\b|teacher\s*training/i.test(n)) return {b:30,a:0};      /* TTP: 30 before, none after */
+    if(/\bFP\b|foundation\s*programme/i.test(n)) return {b:30,a:15};  /* FP: 30 before, 15 after */
+    if(e.feed==='prayers') return {b:10,a:15};                        /* prayers & pujas: 10 before, 15 after */
+    if(wd===1 && e.tS>=1020) return {b:60,a:30};                      /* Monday evening class: 1hr before, 30 after */
+    return {b:30,a:30};                                              /* default */
+  }
+  /* Fixed opening windows for specific days (applied only when a daytime event exists). Fri = 9:30am-1pm. */
+  var DAY_FIXED={ 5:[{s:570,e:780}] };
 
   var CSS=
   '#akx-visit{--bg:#FBFAF7;--card:#fff;--ink:#241f33;--mut:#8b8698;--acc:#2A66A6;--line:#efeae0;'
@@ -38,15 +51,15 @@
   +'#akx-visit .st .sub{font-size:.86rem;opacity:.9;margin-top:2px;}'
   +'#akx-visit .strip{display:flex;gap:9px;overflow-x:auto;padding:18px 2px 6px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}'
   +'#akx-visit .strip::-webkit-scrollbar{height:0;}'
-  +'#akx-visit .tile{flex:none;width:60px;height:72px;border-radius:15px;background:var(--card);border:1.5px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;position:relative;transition:.15s;}'
+  +'#akx-visit .tile{flex:none;width:60px;height:82px;border-radius:15px;background:var(--card);border:1.5px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:12px;gap:3px;cursor:pointer;position:relative;transition:.15s;}'
   +'#akx-visit .tile .dw{font-size:.62rem;font-weight:700;letter-spacing:.04em;color:var(--mut);}'
   +'#akx-visit .tile .dn{font-size:1.28rem;font-weight:700;color:var(--date);}'
-  +'#akx-visit .tile .act{width:5px;height:5px;border-radius:50%;background:var(--op-dot);position:absolute;bottom:9px;}'
+  +'#akx-visit .tile .act{width:5px;height:5px;border-radius:50%;background:var(--op-dot);position:absolute;bottom:11px;}'
   +'#akx-visit .tile.closed{opacity:.5;} #akx-visit .tile.closed .act{display:none;}'
   +'#akx-visit .tile.today{border-color:var(--acc);}'
   +'#akx-visit .tile.sel{background:var(--acc);border-color:var(--acc);}'
   +'#akx-visit .tile.sel .dw,#akx-visit .tile.sel .dn{color:#fff;} #akx-visit .tile.sel .act{background:#fff;}'
-  +'#akx-visit .brk{flex:none;min-width:112px;height:72px;border-radius:15px;border:1.5px dashed var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:0 10px;text-align:center;color:var(--mut);cursor:pointer;}'
+  +'#akx-visit .brk{flex:none;min-width:112px;height:82px;border-radius:15px;border:1.5px dashed var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:0 10px;text-align:center;color:var(--mut);cursor:pointer;}'
   +'#akx-visit .brk b{font-size:.72rem;color:var(--ink);opacity:.85;line-height:1.15;} #akx-visit .brk small{font-size:.62rem;}'
   +'#akx-visit .detail{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:4px 18px 14px;}'
   +'#akx-visit .dhead{font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);padding:12px 0 6px;}'
@@ -61,7 +74,7 @@
   +'#akx-visit .wev .et{color:var(--mut);}'
   +'#akx-visit .cltxt{padding:14px 0;color:var(--cl-tx);font-size:.95rem;}'
   +'#akx-visit .msg{padding:22px 4px;color:var(--mut);font-size:.9rem;}'
-  +'@media(min-width:768px){#akx-visit .st{max-width:420px;}}';
+  +'@media(min-width:768px){#akx-visit .whead{text-align:center;} #akx-visit .st{max-width:420px;margin:0 auto;}}';
   if(!document.getElementById('akx-visit-css')){
     var stEl=document.createElement('style'); stEl.id='akx-visit-css'; stEl.textContent=CSS; document.head.appendChild(stEl);
   }
@@ -78,6 +91,7 @@
   function addDays(ymd,n){var d=noonUTC(ymd); d.setUTCDate(d.getUTCDate()+n); return ymdOf(d);}
   function diffDays(a,b){return Math.round((noonUTC(b)-noonUTC(a))/86400000);}
   function to12(hm){var p=hm.split(':'),h=+p[0],m=+p[1],ap=h<12?'am':'pm',h12=(h%12)||12;return h12+':'+(m<10?'0':'')+m+ap;}
+  function minToHM(m){var h=Math.floor(m/60),mm=m%60;return (h<10?'0':'')+h+':'+(mm<10?'0':'')+mm;}
   var DOWS=['SUN','MON','TUE','WED','THU','FRI','SAT'];
   var DOWL=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   var MONS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -95,15 +109,14 @@
   }
   function esc(s){return String(s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];});}
 
-  function ingestOpen(items){
+  function ingestOpen(items,feedKey){
     items.forEach(function(it){
       if(!it.start||!it.start.dateTime) return;                 /* timed events only */
       var s=new Date(it.start.dateTime);
       var e=new Date(it.end&&it.end.dateTime?it.end.dateTime:it.start.dateTime);
       var sp=tzParts(s), ep=tzParts(e);
-      var em=ep.min; if(ep.ymd!==sp.ymd) em=24*60;              /* crosses midnight -> clamp to end of day */
-      if(em<sp.min) em=sp.min;
-      (byDate[sp.ymd]=byDate[sp.ymd]||[]).push({startMin:sp.min,endMin:em,startHM:sp.hm,endHM:(em>=24*60?'23:59':ep.hm),name:esc((it.summary||'Open').trim())});
+      var tS=sp.min, tE=(ep.ymd!==sp.ymd)?(24*60-1):ep.min; if(tE<tS) tE=tS;   /* event's own times */
+      (byDate[sp.ymd]=byDate[sp.ymd]||[]).push({tS:tS,tE:tE,name:esc((it.summary||'Open').trim()),feed:feedKey});
     });
   }
   function ingestClose(items){
@@ -120,13 +133,22 @@
   function closureFor(ymd){for(var i=0;i<closures.length;i++){if(ymd>=closures[i].from&&ymd<=closures[i].to)return closures[i];}return null;}
 
   function windowsFor(ymd){
-    var evs=(byDate[ymd]||[]).slice().sort(function(a,b){return a.startMin-b.startMin;});
-    var w=[];
-    evs.forEach(function(e){
-      var cur=w[w.length-1];
-      if(cur && e.startMin<=cur.endMin){ if(e.endMin>cur.endMin){cur.endMin=e.endMin;cur.endHM=e.endHM;} cur.events.push(e); }
-      else w.push({startMin:e.startMin,endMin:e.endMin,startHM:e.startHM,endHM:e.endHM,events:[e]});
+    var wd=noonUTC(ymd).getUTCDay();
+    var evs=(byDate[ymd]||[]).slice();
+    evs.forEach(function(e){var bf=bufFor(e,wd); e.oS=Math.max(0,e.tS-bf.b); e.oE=Math.min(24*60-1,e.tE+bf.a);});
+    var wins=[];
+    (DAY_FIXED[wd]||[]).forEach(function(fx){                          /* seed fixed windows only when a matching daytime event exists */
+      if(evs.some(function(e){return e.tS<fx.e && e.tE>fx.s;})) wins.push({oS:fx.s,oE:fx.e,events:[]});
     });
+    evs.forEach(function(e){ wins.push({oS:e.oS,oE:e.oE,events:[e]}); });
+    wins.sort(function(a,b){return a.oS-b.oS;});
+    var w=[];
+    wins.forEach(function(x){
+      var cur=w[w.length-1];
+      if(cur && x.oS<=cur.oE){ if(x.oE>cur.oE)cur.oE=x.oE; x.events.forEach(function(ev){cur.events.push(ev);}); }
+      else w.push({oS:x.oS,oE:x.oE,events:x.events.slice()});
+    });
+    w.forEach(function(x){x.events.sort(function(a,b){return a.tS-b.tS;});});
     return w;
   }
   function resolve(ymd){
@@ -159,30 +181,30 @@
   function liveStatus(today){
     var mins=tzParts(new Date()).min;
     var c=closureFor(today);
-    if(c){ var no=nextOpen(c.to); return {open:false,big:'Closed'+(c.label&&!/^closed$/i.test(c.label)?' for '+c.label:''),sub:no?('Reopens '+whenLabel(today,no.ymd)+', '+to12(no.win.startHM)):c.raw}; }
+    if(c){ var no=nextOpen(c.to); return {open:false,big:'Closed'+(c.label&&!/^closed$/i.test(c.label)?' for '+c.label:''),sub:no?('Reopens '+whenLabel(today,no.ymd)+', '+to12(minToHM(no.win.oS))):c.raw}; }
     var r=resolve(today);
-    if(r.closed){ var nx=nextOpen(today); return {open:false,big:'Closed today',sub:nx?('Open again '+whenLabel(today,nx.ymd)+', '+to12(nx.win.startHM)):''}; }
+    if(r.closed){ var nx=nextOpen(today); return {open:false,big:'Closed today',sub:nx?('Open again '+whenLabel(today,nx.ymd)+', '+to12(minToHM(nx.win.oS))):''}; }
     for(var i=0;i<r.wins.length;i++){
       var w=r.wins[i];
-      if(mins>=w.startMin && mins<w.endMin) return {open:true,big:"We're open now",sub:'for '+w.events[0].name+' (until '+to12(w.endHM)+')'};
-      if(mins<w.startMin) return {open:false,big:'Opens '+to12(w.startHM)+' today',sub:'for '+w.events[0].name};
+      if(mins>=w.oS && mins<w.oE) return {open:true,big:"We're open now",sub:'for '+w.events[0].name+' (until '+to12(minToHM(w.oE))+')'};
+      if(mins<w.oS) return {open:false,big:'Opens '+to12(minToHM(w.oS))+' today',sub:'for '+w.events[0].name};
     }
     var n2=nextOpen(today);
-    return {open:false,big:'Closed now',sub:n2?('Open again '+whenLabel(today,n2.ymd)+', '+to12(n2.win.startHM)):''};
+    return {open:false,big:'Closed now',sub:n2?('Open again '+whenLabel(today,n2.ymd)+', '+to12(minToHM(n2.win.oS))):''};
   }
 
   /* ---------- render ---------- */
   function evLine(e,w){
-    var diff=(e.startHM!==w.startHM || e.endHM!==w.endHM);
-    var t=diff?' <span class="et">('+to12(e.startHM)+' &ndash; '+to12(e.endHM)+')</span>':'';
+    var diff=(e.tS!==w.oS || e.tE!==w.oE);
+    var t=diff?' <span class="et">('+to12(minToHM(e.tS))+' &ndash; '+to12(minToHM(e.tE))+')</span>':'';
     return '<div class="wev"><span class="en">'+e.name+'</span>'+t+'</div>';
   }
   function winHTML(w){
-    return '<div class="win"><div class="wtime"><span class="odot"></span>Open '+to12(w.startHM)+' &ndash; '+to12(w.endHM)+'</div>'
+    return '<div class="win"><div class="wtime"><span class="odot"></span>Open '+to12(minToHM(w.oS))+' &ndash; '+to12(minToHM(w.oE))+'</div>'
       +'<div class="wevs">'+w.events.map(function(e){return evLine(e,w);}).join('')+'</div></div>';
   }
   function detailHTML(r,isToday){
-    if(r.closure) return '<div class="cltxt">'+r.closure.raw+'.'+(r.reopen?(' We reopen '+whenLabel(build(1).today,r.reopen.ymd)+', '+to12(r.reopen.win.startHM)+'.'):'')+'</div>';
+    if(r.closure) return '<div class="cltxt">'+r.closure.raw+'.'+(r.reopen?(' We reopen '+whenLabel(build(1).today,r.reopen.ymd)+', '+to12(minToHM(r.reopen.win.oS))+'.'):'')+'</div>';
     if(r.closed) return '<div class="cltxt">'+(isToday?'Closed today.':'Closed.')+'</div>';
     return r.wins.map(winHTML).join('');
   }
@@ -223,11 +245,11 @@
     var now=new Date();
     var tMin=new Date(now.getTime()-24*3600*1000).toISOString();
     var tMax=new Date(now.getTime()+35*24*3600*1000).toISOString();
-    var jobs=OPEN_FEEDS.map(function(id){return fetchFeed(id,tMin,tMax);});
+    var jobs=OPEN_FEEDS.map(function(f){return fetchFeed(f.id,tMin,tMax);});
     jobs.push(fetchFeed(CLOSE_FEED,tMin,tMax));
     Promise.all(jobs).then(function(res){
       var closeItems=res.pop();
-      res.forEach(function(items){ if(items) ingestOpen(items); });
+      res.forEach(function(items,i){ if(items) ingestOpen(items, OPEN_FEEDS[i].key); });
       if(closeItems) ingestClose(closeItems);
       failed = res.every(function(x){return x===null;}) && !closeItems;
       loaded=true; render();
