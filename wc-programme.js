@@ -1,7 +1,7 @@
-/* Akanishta — Talks & mini-series widget.
+/* Akanishta — Talks & short courses widget.
    Reads a public Google Sheet (tabs "Talks & series" + "Class times") and renders flyer cards.
    Include with:  <div id="akx-programme"></div>
-                  <script src="https://kadampacheltenham.github.io/akx-widgets/wc-programme.js" defer></script>
+                  <script src="https://kadampacheltenham.github.io/akx-widgets/programme.js" defer></script>
 */
 (function(){
   var SHEET_ID = '1YArubV8QgCvPUIIvHOHWhCN2fYLRz0DDPSRSHD_tSmY';
@@ -14,7 +14,7 @@
   #akx-programme{--ink:#2B2A28;--dteal:#2E7C7C;--lteal:#0c9d94;--coral:#E2886A;--blue:#22B8F0;--bluedk:#0E90CC;--coral2:#FF7A4D;--coraldk:#E85C2E;font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);max-width:1000px;margin:0 auto;}   /* lotus/content width — matches glance + calendars */
   #akx-programme *{box-sizing:border-box;}
   #akx-programme .pg-h{text-align:center;font-size:1.9rem;font-weight:600;color:#2A66A6;margin:0 0 6px;}   /* blue — site heading standard */
-  #akx-programme .pg-lead{max-width:720px;margin:0 auto 20px;text-align:left;color:#6f6a62;font-size:1.08rem;line-height:1.75;}  /* matches hero body text */
+  #akx-programme .pg-lead{max-width:840px;margin:0 auto 20px;text-align:left;color:#6f6a62;font-size:.98rem;line-height:1.55;}
   #akx-programme .pg-lead p{margin:0 0 10px;} #akx-programme .pg-lead p:last-child{margin:0;}
   #akx-programme .pg-msg{text-align:center;color:#8a857c;padding:24px;}
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Oswald:wght@500;600;700&display=swap');
@@ -39,13 +39,14 @@
   .tag{font-size:.69rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:4px 11px;border-radius:999px;}
   .tag.purple{background:#ECE4F7;color:#6A38B0;} .tag.green{background:#D6EFCB;color:#3B8B2E;} .tag.blue{background:#E4EDF7;color:#35679E;}
   .tag.amber{background:#F6E6C2;color:#A5741A;} .tag.rose{background:#F7E4EA;color:#B0466A;} .tag.sand{background:#EAE7E0;color:#7A746A;}
+  .tag.teal{background:#D5EFEC;color:#227A72;}
   .desc{font-size:1rem;line-height:1.6;color:var(--ink);margin:0 0 14px;}
   .desc.clamp{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:4px;}
   .desc-more{display:none;background:none;border:none;padding:0;margin:0 0 14px;cursor:pointer;font-size:.82rem;font-weight:700;color:var(--dteal);}
   .desc-more.show{display:inline-block;}
   .wte{margin-bottom:2px;}
-  .wte-t{background:none;border:none;padding:0;cursor:pointer;font-size:.8rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--dteal);display:inline-flex;align-items:center;gap:6px;}
-  .wte-t .chev{font-size:.7rem;transition:transform .2s;}
+  .wte-t{background:none;border:none;padding:0;cursor:pointer;font-size:.8rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--dteal);display:inline-flex;align-items:center;gap:8px;}
+  .wte-t .chev{font-size:1.05rem;font-weight:900;line-height:1;transition:transform .2s;}
   .wte.collapsed .wte-t .chev{transform:rotate(-90deg);}
   .wte ul{margin:10px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px;}
   .wte.collapsed ul{display:none;}
@@ -54,12 +55,13 @@
   .picker{padding:20px 30px 6px;border-top:1px solid #efe9df;margin-top:18px;}
   .picker.inline{display:flex;align-items:center;justify-content:flex-start;gap:14px;flex-wrap:wrap;}
   .picker.inline.center{justify-content:center;}
-  .pk-chip{display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:5px 13px;border-radius:999px;margin:0 0 13px;color:var(--lteal);background:#E3F4F2;}
-  .cc.talk .pk-chip{color:#1276B4;background:#E3F1FB;} .cc.course .pk-chip{color:#C55A24;background:#FBECE3;}
+  /* 'Choose a class' — solid pill, same height as the option buttons */
+  .pk-chip{display:inline-flex;align-items:center;min-height:44px;font-size:.78rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:0 20px;border-radius:999px;margin:0 0 13px;color:#fff;background:var(--dteal);border:1.5px solid transparent;}
+  .cc.talk .pk-chip{color:#fff;background:var(--blue);} .cc.course .pk-chip{color:#fff;background:var(--coral2);}
   .picker.inline .pk-chip{margin:0;}
   .tabs{display:flex;gap:10px;flex-wrap:wrap;}
   .picker.inline .tabs{flex:0 1 auto;} .picker.inline.center .tabs{justify-content:center;}
-  .tab-btn{flex:0 0 auto;border:1.5px solid #e2ddd2;background:#fff;color:var(--ink);font-size:.9rem;font-weight:600;padding:10px 16px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap;}
+  .tab-btn{flex:0 0 auto;min-height:44px;border:1.5px solid #e2ddd2;background:#fff;color:var(--ink);font-size:.9rem;font-weight:600;padding:0 16px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap;}
   .tab-btn .pin{width:9px;height:9px;border-radius:50%;background:#4E938C;} .tab-btn.ciren .pin{background:#7AA84A;}
   .tab-btn.on{font-weight:800;}
   .cc.talk .tab-btn.on{background:#E3F1FB;border-color:#9AD0EF;color:#1276B4;}
@@ -80,17 +82,48 @@
   .book{color:#fff;font-weight:700;font-size:.86rem;text-decoration:none;padding:9px 20px;border-radius:999px;white-space:nowrap;background:var(--coral);}
   .cc.talk .book{background:var(--blue);} .cc.course .book{background:var(--coral2);}
   .tbc{margin:14px 30px 4px;padding:14px 18px;background:#FBF6ED;border:1px solid #EFE7D6;border-radius:12px;font-size:.92rem;color:#6f6a62;}
+  /* mobile summary bar (hidden on desktop) */
+  .cc-sum{display:none;}
   .foot{padding:8px 30px 26px;}
-  .disc{background:#FBF6ED;border:1px solid #EFE7D6;border-radius:12px;padding:14px 18px;font-size:.92rem;color:var(--ink);line-height:1.5;} .disc b{color:var(--ink);} .disc .sep{color:#cdbf9e;padding:0 8px;}
+  .disc{background:#FBF6ED;border:1px solid #EFE7D6;border-radius:12px;padding:14px 18px;font-size:.92rem;color:var(--ink);line-height:1.5;margin-bottom:14px;} .disc b{color:var(--ink);} .disc .sep{color:#cdbf9e;padding:0 8px;}
+  /* social share row */
+  .cc-share{display:flex;align-items:center;gap:9px;justify-content:flex-end;}
+  .cc-share .sh-lbl{font-size:.7rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#8a857c;margin-right:2px;}
+  .sh-btn{width:34px;height:34px;border-radius:50%;border:1px solid #e6e0d5;background:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:#6f6a62;padding:0;text-decoration:none;transition:background .15s,color .15s,border-color .15s;}
+  .sh-btn:hover{background:#f6f2e9;color:#2A66A6;border-color:#d8d1c2;}
+  .sh-btn svg{width:16px;height:16px;}
+  .sh-btn.copied{color:#2C8A34;border-color:#BFE3C2;background:#EAF6EC;}
   @media(max-width:640px){
     .cc-top{grid-template-columns:110px 1fr;grid-template-areas:"gfx head" "body body";column-gap:14px;row-gap:12px;padding:22px 20px 4px;} .gfx{width:110px;height:110px;} .ctitle{font-size:1.34rem;margin-bottom:9px;} .cc-head .tags{margin-bottom:0;}
     .picker{padding:16px 20px 4px;}
-    .picker.inline{display:block;text-align:center;} .picker.inline .pk-chip{margin-bottom:13px;} .picker.inline .tabs{justify-content:center;}
+    .picker.inline{display:block;text-align:left;} .picker.inline .pk-chip{margin-bottom:13px;} .picker.inline .tabs{justify-content:flex-start;}
     .detail{margin:14px 20px 4px;} .pane.on{grid-template-columns:1fr;}
-    .d-price{align-items:flex-start;flex-direction:column;justify-content:flex-start;width:100%;gap:8px;} .d-offer{text-align:left;}
+    .d-price{flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:space-between;width:100%;gap:10px;}
+    .d-price .pp{order:1;} .d-price .book{order:2;} .d-price .d-offer{order:3;flex-basis:100%;text-align:left;}
     .tbc,.foot{margin-left:20px;margin-right:20px;padding-left:18px;padding-right:18px;} .foot{padding:8px 20px 22px;}
+    .cc-share{justify-content:flex-start;}
+    /* --- title / intro breathing room --- */
+    #akx-programme .pg-h{font-size:1.5rem;margin-bottom:14px;}
+    #akx-programme .pg-lead{padding:0 8px;margin-bottom:22px;font-size:.95rem;}
+    /* --- collapse cards: summary bar + expandable body --- */
+    .cc .cc-sum{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:2px 20px 20px;padding:13px 16px;border:1px solid #eee7dd;border-radius:12px;background:#fbfaf7;cursor:pointer;font-family:inherit;text-align:left;-webkit-appearance:none;}
+    .cc-sum-d{display:flex;flex-direction:column;gap:3px;font-weight:700;font-size:.92rem;}
+    .cc.talk .cc-sum-d{color:#1276B4;} .cc.course .cc-sum-d{color:#C55A24;}
+    .cc-sum-cta{display:inline-flex;align-items:center;gap:7px;font-size:.8rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--dteal);white-space:nowrap;}
+    .cc-sum-cta .chev{font-size:1rem;font-weight:900;transition:transform .2s;}
+    .cc.talk .cc-sum-cta{color:#1276B4;} .cc.course .cc-sum-cta{color:#C55A24;}
+    .cc.mcol .cc-exp{display:none;}
+    .cc.mcol .wte{display:none;}
+    .cc:not(.mcol) .cc-sum-d{display:none;}
+    .cc:not(.mcol) .cc-sum-cta .chev{transform:rotate(180deg);}
   }`;
   var PIN='<path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/>';
+  // ---- social share icons ----
+  var SH_FB='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.8 3.8-3.8 1.1 0 2.2.2 2.2.2v2.4h-1.2c-1.2 0-1.6.8-1.6 1.5V12h2.7l-.43 2.9h-2.27v7A10 10 0 0 0 22 12z"/></svg>';
+  var SH_X='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2h3.3l-7.2 8.2L23.5 22h-6.6l-5.2-6.8L5.8 22H2.5l7.7-8.8L1.5 2h6.8l4.7 6.2L18.9 2zm-1.15 18h1.83L7.33 3.9H5.36L17.75 20z"/></svg>';
+  var SH_WA='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.28-.14-1.65-.81-1.9-.9-.26-.1-.44-.14-.63.14-.18.28-.72.9-.88 1.08-.16.18-.32.2-.6.07-1.63-.82-2.7-1.46-3.78-3.3-.28-.49.28-.45.8-1.5.09-.18.05-.34-.02-.48-.07-.14-.63-1.5-.86-2.06-.22-.54-.45-.47-.62-.48h-.53c-.18 0-.48.07-.73.34-.25.28-.96.94-.96 2.3 0 1.36.98 2.67 1.12 2.85.14.18 1.94 2.96 4.7 4.15 2.28.98 2.74.79 3.24.74.5-.05 1.62-.66 1.85-1.3.23-.64.23-1.18.16-1.3-.07-.11-.25-.18-.53-.32zM12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.4A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.17l-.3-.18-2.9.76.77-2.83-.2-.3A8.2 8.2 0 1 1 12 20.2z"/></svg>';
+  var SH_LINK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>';
+  var SH_CHECK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
   function parseCSV(text){
     var rows=[],row=[],f='',i=0,q=false,c;
     while(i<text.length){c=text[i];
@@ -108,8 +141,10 @@
   function tagClass(t){t=t.toLowerCase();
     if(/mini|series/.test(t))return'purple'; if(/beginn|start|open|free|welcome/.test(t))return'green';
     if(/talk/.test(t))return'blue'; if(/depth|study/.test(t))return'amber'; if(/enrol/.test(t))return'rose'; return'sand';}
+  var TAG_CYCLE=['blue','purple','green','amber','teal'];   // three tags, each a different colour (talks + courses)
   var DAYS={mon:'Monday',tue:'Tuesday',wed:'Wednesday',thu:'Thursday',fri:'Friday',sat:'Saturday',sun:'Sunday'};
   function fullDay(d){var k=(d||'').slice(0,3).toLowerCase();return DAYS[k]||d;}
+  function shortDay(d){var s=(d||'').slice(0,3);return s?s.charAt(0).toUpperCase()+s.slice(1).toLowerCase():d;}
   function isCiren(loc){return /ciren/i.test(loc||'');}
   // ---- scheduling: show_from (planning) + auto-expire after the last class date ----
   function parseFullDate(s){ if(!s) return null;
@@ -124,6 +159,8 @@
     else { var t0=new Date(); t0.setHours(0,0,0,0); yy=t0.getFullYear(); var test=new Date(yy,+m[2]-1,+m[1]); test.setHours(0,0,0,0); if(test<t0) yy+=1; }
     return dd+'/'+mm+'/'+yy;
   }
+  function shortDMY(raw){ var f=formatDate(raw); var m=f.match(/(\d{2})\/(\d{2})/); return m?m[1]+'/'+m[2]:f; }  // dd/mm
+  function ddmm(d){ return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2); }
   function allClassDates(classes, showFrom){
     var raw=[]; classes.forEach(function(cl){ splitList(cl.dates).forEach(function(d){raw.push(d);}); });
     if(!raw.length) return [];
@@ -176,8 +213,28 @@
     if(toEnd<=7) return 'Final week';
     return 'Drop in to join';
   }
-  function pill(cl,i,on){
-    var lab = cl.audience ? cl.audience : (isCiren(cl.location) ? cl.location : (cl.day+' '+cl.time));
+  // summary shown in the collapsed mobile bar (HTML) — talks list each date stacked; courses a 'from' date
+  function summaryDates(isTalk, classes, showFrom){
+    if(isTalk){
+      var lines = classes.map(function(cl){
+        var d0=splitList(cl.dates)[0];
+        var lbl = (shortDay(cl.day)+(d0?' '+shortDMY(d0):'')).trim();
+        return lbl ? '<span class="cc-sum-line">'+esc(lbl)+'</span>' : '';
+      }).filter(Boolean);
+      return lines.join('');
+    }
+    var dates=allClassDates(classes, showFrom);
+    if(!dates.length) return '';
+    return '<span class="cc-sum-line">from '+ddmm(dates[0])+'</span>';
+  }
+  function pill(cl,i,on,isTalk){
+    var lab;
+    if(cl.audience) lab = cl.audience;
+    else if(isCiren(cl.location) && !isTalk) lab = cl.location;
+    else if(isTalk){                                   // talks: Day | Date | Time
+      var d0 = splitList(cl.dates)[0];
+      lab = shortDay(cl.day) + (d0 ? ' | '+shortDMY(d0) : '') + (cl.time ? ' | '+cl.time : '');
+    } else lab = cl.day+' '+cl.time;
     return '<button class="tab-btn'+(isCiren(cl.location)?' ciren':'')+(on?' on':'')+'" data-i="'+i+'"><span class="pin"></span>'+esc(lab)+'</button>';
   }
   function pane(cl,i,on){
@@ -197,6 +254,16 @@
     +'</div>';
   }
   function discFmt(s){ return esc(s).replace(/\s*\|\s*/g,'<span class="sep">|</span>'); }
+  function shareRow(item){
+    var url=encodeURIComponent(location.href);
+    var text=encodeURIComponent(item.title+' — Akanishta Kadampa Meditation Centre');
+    return '<div class="cc-share"><span class="sh-lbl">Share</span>'
+      +'<a class="sh-btn" title="Share on Facebook" aria-label="Share on Facebook" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u='+url+'">'+SH_FB+'</a>'
+      +'<a class="sh-btn" title="Share on X" aria-label="Share on X" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?url='+url+'&text='+text+'">'+SH_X+'</a>'
+      +'<a class="sh-btn" title="Share on WhatsApp" aria-label="Share on WhatsApp" target="_blank" rel="noopener" href="https://wa.me/?text='+text+'%20'+url+'">'+SH_WA+'</a>'
+      +'<button type="button" class="sh-btn sh-copy" title="Copy link" aria-label="Copy link">'+SH_LINK+'</button>'
+    +'</div>';
+  }
   function card(item, classes){
     var isTalk = /talk/i.test(item.type);
     var showFrom = parseFullDate(item.show_from);
@@ -209,12 +276,15 @@
     } else {
       gfx = '<div class="gfx">'+rings+'</div>';
     }
-    var tags = splitList(item.tags).map(function(t){return '<span class="tag '+tagClass(t)+'">'+esc(t)+'</span>';}).join('');
+    var tags = splitList(item.tags).map(function(t,i){
+      var cls = TAG_CYCLE[i % TAG_CYCLE.length];
+      return '<span class="tag '+cls+'">'+esc(t)+'</span>';
+    }).join('');
     var wte = splitList(item.what_to_expect);
     var wteHtml = wte.length ? '<div class="wte collapsed"><button class="wte-t">What to expect <span class="chev">▾</span></button><ul>'
         + wte.map(function(x){return '<li>'+esc(x)+'</li>';}).join('') + '</ul></div>' : '';
     var tlabel = timingLabel(isTalk, classes, showFrom);
-    var typeLabel = isTalk ? 'Public Talk' : 'Short Course';
+    var typeLabel = isTalk ? (classes.length>1 ? 'Public Talks' : 'Public Talk') : 'Short Course';
     var banner = '<div class="cc-banner">'
         + (tlabel ? '<span class="cc-when"><span class="cc-dot"></span>'+esc(tlabel)+'</span>' : '')
         + '<span class="cc-type">'+typeLabel+'</span>'
@@ -235,13 +305,21 @@
     } else if(isTalk && classes.length===1){
       body='<div class="single"><div class="detail">'+pane(classes[0],0,true)+'</div></div>';
     } else {
-      var pkClass = isTalk ? 'picker inline center' : 'picker inline';
+      var pkClass = 'picker inline';
       body='<div class="'+pkClass+'"><span class="pk-chip">Choose a class</span><div class="tabs">'
-          + classes.map(function(cl,i){return pill(cl,i,i===0);}).join('') + '</div></div>'
+          + classes.map(function(cl,i){return pill(cl,i,i===0,isTalk);}).join('') + '</div></div>'
           + '<div class="detail">'+classes.map(function(cl,i){return pane(cl,i,i===0);}).join('')+'</div>';
     }
-    var foot = item.discount_note ? '<div class="foot"><div class="disc">'+discFmt(item.discount_note)+'</div></div>' : '';
-    return '<div class="cc '+(isTalk?'talk':'course')+'">'+banner+head+body+foot+'</div>';
+    var discHtml = item.discount_note ? '<div class="disc">'+discFmt(item.discount_note)+'</div>' : '';
+    var foot = '<div class="foot">'+discHtml+shareRow(item)+'</div>';
+    // mobile collapse: summary bar (date + toggle) + expandable region
+    var sumD = summaryDates(isTalk, classes, showFrom);
+    var sum = '<button type="button" class="cc-sum">'
+        + '<span class="cc-sum-d">'+sumD+'</span>'
+        + '<span class="cc-sum-cta">Show more details <span class="chev">▾</span></span>'
+      +'</button>';
+    var exp = '<div class="cc-exp">'+body+foot+'</div>';
+    return '<div class="cc '+(isTalk?'talk':'course')+' mcol">'+banner+head+sum+exp+'</div>';
   }
   // ---- pull a readable title colour from the card graphic (fallback: charcoal, left as-is) ----
   function rgb2hsl(r,g,b){r/=255;g/=255;b/=255;var mx=Math.max(r,g,b),mn=Math.min(r,g,b),h,s,l=(mx+mn)/2;
@@ -293,6 +371,18 @@
     checkClamp(root);
     if(document.fonts&&document.fonts.ready){document.fonts.ready.then(function(){checkClamp(root);});}
     root.querySelectorAll('.wte-t').forEach(function(b){b.addEventListener('click',function(){b.parentNode.classList.toggle('collapsed');});});
+    // mobile summary toggle
+    root.querySelectorAll('.cc-sum').forEach(function(b){b.addEventListener('click',function(){
+      b.closest('.cc').classList.toggle('mcol');
+    });});
+    // copy-link share button
+    root.querySelectorAll('.sh-copy').forEach(function(b){b.addEventListener('click',function(){
+      var done=function(){ b.classList.add('copied'); b.innerHTML=SH_CHECK; b.title='Link copied';
+        setTimeout(function(){ b.classList.remove('copied'); b.innerHTML=SH_LINK; b.title='Copy link'; },1800); };
+      var url=location.href;
+      if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(done,done); }
+      else { try{ var ta=document.createElement('textarea');ta.value=url;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);done(); }catch(e){} }
+    });});
     root.querySelectorAll('.cc').forEach(function(cc){
       cc.querySelectorAll('.tab-btn').forEach(function(btn){btn.addEventListener('click',function(){
         var i=btn.getAttribute('data-i');
@@ -308,7 +398,7 @@
     var today=new Date(); today.setHours(0,0,0,0);
     var live = items.filter(function(it){ return isVisible(it, byId[it.id]||[], today); });
     var html='<h2 class="pg-h">Weekly Classes Programme</h2>'
-           +'<div class="pg-lead"><p>Here you\'ll find full details of the programme of weekly classes &mdash; including one-off talks (public talks) and short courses which run over a number of weeks. All weekly classes and short courses are drop-in and PAYG. You don\'t need to book, however if you book online you\'ll have access to discounts for booking for the whole series and offers such as bring a friend for half price and early bird pricing where these are available.</p></div>';
+           +'<div class="pg-lead"><p>Below you\'ll find full details of the programme of weekly classes — including one-off public talks and short courses which run over a number of weeks. All these classes are drop-in and PAYG. If you choose to book online you\'ll have access to discounts such as bring a friend for half price, early bird pricing and 20% discount for booking a series, where these are available.</p></div>';
     if(!live.length){ html+='<div class="pg-msg">Nothing scheduled just now — please check back soon.</div>'; }
     else { html += live.map(function(it){return card(it, byId[it.id]||[]);}).join(''); }
     mount.innerHTML=html;
