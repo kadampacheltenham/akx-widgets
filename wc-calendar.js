@@ -19,10 +19,13 @@
   // ---- per-page presets: title (blue), default view, and which feeds (on:false = present but off by default) ----
   var PRESETS = {
     whatson: { title:'Upcoming Classes & Courses', mode:'list',
-               feeds:[ {k:'weekly'}, {k:'branch',on:false}, {k:'weekend'}, {k:'prayers',on:false}, {k:'announce'} ] },
+               feeds:[ {k:'weekly'}, {k:'branch'}, {k:'weekend'}, {k:'prayers'}, {k:'announce'} ] },   /* NOTE: live also had a 'volunteer' feed here — omitted (its calendar id isn't in this copy). Re-add {k:'volunteer'} + a FEEDS.volunteer entry when the id is to hand. */
     weekly:  { title:'Weekly Classes Calendar', mode:'list',
-               feeds:[ {k:'weekly'}, {k:'branch'}, {k:'announce'} ] }
-    // add more pages here later, e.g. courses / prayers, then set data-cal on the stub.
+               feeds:[ {k:'weekly'}, {k:'branch'}, {k:'weekend',on:false}, {k:'prayers',on:false}, {k:'announce'} ] },
+    courses: { title:'Courses & Retreats Calendar', mode:'list',
+               feeds:[ {k:'weekly',on:false}, {k:'branch',on:false}, {k:'weekend'}, {k:'announce'} ] },
+    prayers: { title:'Prayers & Puja Calendar', mode:'list',
+               feeds:[ {k:'prayers'}, {k:'announce'} ] }
   };
 
   var root = document.getElementById('akx-cal');
@@ -46,9 +49,11 @@
   + '#akx-cal *{box-sizing:border-box;}'
   + '#akx-cal .cal-title{margin:0 auto 34px;text-align:center;font-family:\'Inter\',sans-serif;font-size:1.15rem;font-weight:600;color:#2A66A6;text-transform:uppercase;letter-spacing:0.04em;}'  /* blue heading — site standard; extra space under the title */
   + '#akx-cal .card{background:#fff;border-radius:16px;box-shadow:0 6px 30px rgba(0,0,0,.07);padding:22px 22px 26px;}'
-  + '#akx-cal .ann{display:flex;gap:12px;align-items:flex-start;background:#F3F0EA;border:1px solid #E6E1D6;border-left:5px solid var(--acol,#8F887A);border-radius:12px;padding:14px 16px;margin-bottom:16px;color:#3f3d39;font-size:.96rem;line-height:1.5;}'
-  + '#akx-cal .ann svg{flex:none;margin-top:1px;}'
-  + '#akx-cal .ann strong{color:#2c2b28;}'
+  + '#akx-cal .ann{display:flex;gap:12px;align-items:center;border:1px solid;border-radius:12px;padding:16px 18px;margin-bottom:16px;font-size:1rem;line-height:1.45;}'  /* matches homepage announcement banner */
+  + '#akx-cal .ann.notice{background:#FDF3E3;color:#6E5212;border-color:#F1E0C2;}'
+  + '#akx-cal .ann.closure{background:#FBEAE8;color:#8A2A26;border-color:#F2D2CD;}'
+  + '#akx-cal .ann svg{flex:none;}'
+  + '#akx-cal .ann strong{font-weight:700;}'
   + '#akx-cal .top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px;}'
   + '#akx-cal .mnav{display:flex;align-items:center;gap:10px;}'
   + '#akx-cal .mnav h2{margin:0;font-size:1.5rem;font-weight:600;min-width:180px;}'
@@ -186,10 +191,25 @@
     }
     return longDate(new Date(startStr))+', '+fmtTime(startStr,false);
   }
+  // per-notice visibility (agreed 4 Aug 2026): closures ('closed') show 10 days ahead, end MIDDAY the day BEFORE the last day;
+  // all other notices show 2 days before, end ON the last day.
+  function annVisible(a, now){
+    var isClosure=/clos(e|ed|ure)|shut|cancel/i.test(a.title||'');
+    var startD, lastD;
+    if(a.allDay){ startD=parseYmd(a.start);
+      if(a.endDate){ lastD=parseYmd(a.endDate); lastD.setDate(lastD.getDate()-1); } else lastD=new Date(startD); }
+    else { startD=new Date(a.start); startD.setHours(0,0,0,0); lastD=new Date(startD); }
+    var lead=isClosure?10:2;
+    var showFrom=new Date(startD); showFrom.setDate(showFrom.getDate()-lead); showFrom.setHours(0,0,0,0);
+    var showUntil;
+    if(isClosure){ showUntil=new Date(lastD); showUntil.setDate(showUntil.getDate()-1); showUntil.setHours(12,0,0,0); }
+    else { showUntil=new Date(lastD); showUntil.setHours(23,59,59,999); }
+    return now>=showFrom && now<=showUntil;
+  }
   function loadBanner(){
     var pins=CALS.filter(function(c){return c.pinned;}); if(!pins.length){return;}
     var now=new Date(), t0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-    var tMin=t0.toISOString(), tMax=new Date(t0.getFullYear(),t0.getMonth(),t0.getDate()+90).toISOString();
+    var tMin=t0.toISOString(), tMax=new Date(t0.getFullYear(),t0.getMonth(),t0.getDate()+11).toISOString();   // fetch window; per-notice visibility decided by annVisible()
     Promise.all(pins.map(function(c){
       return fetch(apiUrl(c,tMin,tMax)).then(function(r){return r.json();})
         .then(function(j){return {cal:c,items:(j.items||[])};}).catch(function(){return {cal:c,items:[]};});
@@ -201,11 +221,15 @@
                    start:(it.start&&(it.start.dateTime||it.start.date)),
                    endDate:(allDay&&it.end&&it.end.date)?it.end.date:null, allDay:allDay});
       }); });
+      var nowT=new Date();
+      anns=anns.filter(function(a){return annVisible(a, nowT);});
       anns.sort(function(a,b){return (a.start||'').localeCompare(b.start||'');});
       var box=document.getElementById('akx-banner'); box.innerHTML='';
       anns.slice(0,3).forEach(function(a){
-        var el=document.createElement('div'); el.className='ann'; el.style.setProperty('--acol',a.color);
-        el.innerHTML='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="'+a.color+'" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 8h.01M11 12h1v4h1"></path></svg>'
+        var closure=/clos(e|ed|ure)|shut|cancel/i.test(a.title);
+        var ink=closure?'#8A2A26':'#B7791F';
+        var el=document.createElement('div'); el.className='ann '+(closure?'closure':'notice');
+        el.innerHTML='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="'+ink+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>'
           +'<div><strong>'+esc(a.title)+'</strong> &middot; '+rangeStr(a.start,a.endDate,a.allDay)+'</div>';
         box.appendChild(el);
       });
