@@ -17,6 +17,9 @@
   #akx-programme .pg-lead{max-width:none;margin:0 auto 20px;padding:0 30px;text-align:left;color:#6f6a62;font-size:.98rem;line-height:1.55;}
   #akx-programme .pg-lead p{margin:0 0 10px;} #akx-programme .pg-lead p:last-child{margin:0;}
   #akx-programme .pg-msg{text-align:center;color:#8a857c;padding:24px;}
+  #akx-programme .pg-more{display:none;} #akx-programme .pg-more.on{display:block;}
+  #akx-programme .pg-showall{display:block;margin:2px auto 6px;background:none;border:none;cursor:pointer;font-size:.92rem;font-weight:700;letter-spacing:.02em;color:#8a857c;padding:10px 16px;}
+  #akx-programme .pg-showall:hover{color:#2A66A6;}
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Oswald:wght@500;600;700&display=swap');
   .cc{background:#fff;border:1px solid #ece7dd;border-radius:20px;box-shadow:0 8px 30px rgba(0,0,0,.07);overflow:hidden;margin-bottom:22px;}
   #akx-programme .cc:last-child{margin-bottom:0;}
@@ -76,25 +79,27 @@
   .d-dates .d-lbl{font-weight:700;}
   .d-price{padding:18px 22px;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:9px;min-width:170px;background:#fbfaf7;}
   .d-price .pp{font-weight:700;font-size:1.02rem;}
-  .d-offer{background:#EAF6EC;color:#2C6E1E;border:1px solid #CDE7CF;border-radius:8px;padding:5px 11px;font-size:.78rem;font-weight:700;line-height:1.3;text-align:center;}
+  .d-offer{border-radius:8px;padding:6px 12px;font-size:.78rem;font-weight:700;line-height:1.3;text-align:center;border:1px solid transparent;}
+  .cc.talk .d-offer{background:#E4F1FB;color:#1F6FB0;border-color:#C4E1F5;} .cc.course .d-offer{background:#FCEAE1;color:#C25A2E;border-color:#F5D4C4;}
   .book{color:#fff;font-weight:700;font-size:.9rem;text-decoration:none;padding:0 22px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;white-space:nowrap;background:var(--coral);}
   .cc.talk .book{background:var(--bluedk);} .cc.course .book{background:var(--coraldk);}
   .tbc{margin:14px 30px 4px;padding:14px 18px;background:#FBF6ED;border:1px solid #EFE7D6;border-radius:12px;font-size:.92rem;color:#6f6a62;}
   /* mobile summary bar + bottom 'Show less' (both hidden on desktop) */
   .cc-sum,.cc-less{display:none;}
   .foot{padding:8px 30px 26px;}
-  .disc{background:#FBF6ED;border:1px solid #EFE7D6;border-radius:12px;padding:14px 18px;font-size:.92rem;color:var(--ink);line-height:1.5;margin-bottom:14px;} .disc .sep{color:#cdbf9e;padding:0 8px;}
-  .disc-lbl{font-weight:800;letter-spacing:.02em;}
-  .cc.talk .disc-lbl{color:var(--bluedk);} .cc.course .disc-lbl{color:var(--coraldk);}
+  .disc{display:flex;align-items:stretch;background:#FBF6ED;border:1px solid #EFE7D6;border-radius:12px;overflow:hidden;font-size:.92rem;color:var(--ink);line-height:1.5;margin-bottom:14px;} .disc .sep{color:#cdbf9e;padding:0 8px;}
+  .disc-lbl{display:flex;align-items:center;color:#fff;font-weight:800;letter-spacing:.03em;padding:14px 16px;white-space:nowrap;}
+  .cc.talk .disc-lbl{background:var(--blue);} .cc.course .disc-lbl{background:var(--coral2);}
+  .disc-body{padding:14px 18px;}
   /* social share row */
   .cc-share{display:flex;align-items:center;gap:9px;justify-content:flex-end;}
   .cc-share .sh-lbl{font-size:.82rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#8a857c;margin-right:2px;}
-  .cc.talk .cc-share .sh-lbl{color:var(--blue);} .cc.course .cc-share .sh-lbl{color:var(--coral2);}
-  .sh-btn{width:34px;height:34px;border-radius:50%;border:1px solid #e6e0d5;background:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:#6f6a62;padding:0;text-decoration:none;transition:background .15s,color .15s,border-color .15s;}
-  .cc.talk .sh-btn{color:var(--blue);border-color:#bfe6f8;} .cc.course .sh-btn{color:var(--coral2);border-color:#f6cbb8;}
-  .cc.talk .sh-btn:hover{background:var(--blue);color:#fff;border-color:var(--blue);} .cc.course .sh-btn:hover{background:var(--coral2);color:#fff;border-color:var(--coral2);}
+  .cc.talk .cc-share .sh-lbl{color:var(--bluedk);} .cc.course .cc-share .sh-lbl{color:var(--coraldk);}
+  .sh-btn{width:34px;height:34px;border-radius:50%;border:1px solid transparent;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;text-decoration:none;transition:background .15s,color .15s,border-color .15s;}
+  .cc.talk .sh-btn{background:var(--bluedk);color:#fff;border-color:var(--bluedk);} .cc.course .sh-btn{background:var(--coraldk);color:#fff;border-color:var(--coraldk);}
+  .cc.talk .sh-btn:hover{background:#fff;color:var(--bluedk);} .cc.course .sh-btn:hover{background:#fff;color:var(--coraldk);}
   .sh-btn svg{width:16px;height:16px;}
-  .sh-btn.copied,.cc.talk .sh-btn.copied,.cc.course .sh-btn.copied{color:#2C8A34;border-color:#BFE3C2;background:#EAF6EC;}
+  .sh-btn.copied,.cc.talk .sh-btn.copied,.cc.course .sh-btn.copied{background:#2C8A34;color:#fff;border-color:#2C8A34;}
   @media(max-width:640px){
     .cc-top{grid-template-columns:110px 1fr;grid-template-areas:"gfx head" "body body";column-gap:14px;row-gap:12px;padding:22px 20px 4px;} .gfx{width:110px;height:110px;} .ctitle{font-size:1.34rem;margin-bottom:9px;} .cc-head .tags{margin-bottom:0;}
     .picker{padding:16px 20px 4px;}
@@ -217,6 +222,22 @@
     if(toEnd<=7) return 'Final week';
     return 'Drop in to join';
   }
+  // ---- left-header label by position: 1st = countdown / Current series; 2nd–3rd = Booking open|Upcoming; 4th+ = Upcoming ----
+  function bannerLabel(idx, classes, showFrom){
+    var hasBooking = classes.some(function(cl){return cl.booking_url;});
+    if(idx===0){
+      var dates=allClassDates(classes, showFrom);
+      if(!dates.length) return 'Upcoming';
+      var now=new Date(); now.setHours(0,0,0,0);
+      if(dates[0] < now) return 'Current series';         // already started
+      var days=Math.round((dates[0]-now)/86400000);
+      if(days===0) return 'Today';
+      if(days===1) return '1 day';
+      return days+' days';
+    }
+    if(idx===1 || idx===2) return hasBooking ? 'Booking open' : 'Upcoming';
+    return 'Upcoming';
+  }
   // summary shown in the collapsed mobile bar (HTML) — talks list each date stacked; courses a 'from' date
   function summaryDates(isTalk, classes, showFrom){
     if(isTalk){
@@ -245,7 +266,7 @@
     var c=isCiren(cl.location), dates=splitList(cl.dates), n=dates.length;
     var datesHtml = n>1 ? esc(n+' classes · '+dates.join(', ')) : (n===1 ? '<span class="d-lbl">Date:</span> '+esc(formatDate(dates[0])) : '');
     var pp = cl.price_class ? '<span class="pp">'+esc(cl.price_class)+' / class</span>' : '';
-    var offer = (cl.price_series && n>1) ? '<span class="d-offer">Save 20% — '+n+' classes for '+esc(cl.price_series)+'</span>' : '';
+    var offer = (cl.price_series && n>1) ? '<span class="d-offer">Special offer '+n+' classes only '+esc(cl.price_series)+'</span>' : '';
     var book = cl.booking_url ? '<a class="book" href="'+esc(cl.booking_url)+'" target="_blank" rel="noopener">Book →</a>' : '';
     return '<div class="pane'+(c?' ciren':'')+(on?' on':'')+'" data-i="'+i+'">'
       +'<div class="d-main">'
@@ -259,16 +280,15 @@
   }
   function discFmt(s){ return esc(s).replace(/\s*\|\s*/g,'<span class="sep">|</span>'); }
   function shareRow(item){
-    var url=encodeURIComponent(location.href);
-    var text=encodeURIComponent(item.title+' — Akanishta Kadampa Meditation Centre');
+    var t=esc(item.title+' — Akanishta Kadampa Meditation Centre');
     return '<div class="cc-share"><span class="sh-lbl">Share</span>'
-      +'<a class="sh-btn" title="Share on Facebook" aria-label="Share on Facebook" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u='+url+'">'+SH_FB+'</a>'
-      +'<a class="sh-btn" title="Share on X" aria-label="Share on X" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?url='+url+'&text='+text+'">'+SH_X+'</a>'
-      +'<a class="sh-btn" title="Share on WhatsApp" aria-label="Share on WhatsApp" target="_blank" rel="noopener" href="https://wa.me/?text='+text+'%20'+url+'">'+SH_WA+'</a>'
+      +'<button type="button" class="sh-btn" data-share="fb" title="Share on Facebook" aria-label="Share on Facebook">'+SH_FB+'</button>'
+      +'<button type="button" class="sh-btn" data-share="x" data-text="'+t+'" title="Share on X" aria-label="Share on X">'+SH_X+'</button>'
+      +'<button type="button" class="sh-btn" data-share="wa" data-text="'+t+'" title="Share on WhatsApp" aria-label="Share on WhatsApp">'+SH_WA+'</button>'
       +'<button type="button" class="sh-btn sh-copy" title="Copy link" aria-label="Copy link">'+SH_LINK+'</button>'
     +'</div>';
   }
-  function card(item, classes){
+  function card(item, classes, idx){
     var isTalk = /talk/i.test(item.type);
     var showFrom = parseFullDate(item.show_from);
     var rings = '<span class="ring r1"></span><span class="ring r2"></span>';
@@ -287,7 +307,7 @@
     var wte = splitLines(item.what_to_expect);
     var wteHtml = wte.length ? '<div class="wte collapsed"><button class="wte-t">What to expect <span class="chev">▾</span></button><ul>'
         + wte.map(function(x){return '<li>'+esc(x)+'</li>';}).join('') + '</ul></div>' : '';
-    var tlabel = timingLabel(isTalk, classes, showFrom);
+    var tlabel = bannerLabel(idx, classes, showFrom);
     var totalDates = classes.reduce(function(n,cl){return n+splitList(cl.dates).length;},0);
     var typeLabel = isTalk ? ((classes.length>1||totalDates>1) ? 'Public Talks' : 'Public Talk') : 'Short Course';
     var banner = '<div class="cc-banner">'
@@ -315,7 +335,7 @@
           + classes.map(function(cl,i){return pill(cl,i,i===0,isTalk);}).join('') + '</div></div>'
           + '<div class="detail">'+classes.map(function(cl,i){return pane(cl,i,i===0);}).join('')+'</div>';
     }
-    var discHtml = item.discount_note ? '<div class="disc"><b class="disc-lbl">DISCOUNTS:</b> '+discFmt(item.discount_note.replace(/^\s*discounts?\s*:\s*/i,''))+'</div>' : '';
+    var discHtml = item.discount_note ? '<div class="disc"><span class="disc-lbl">DISCOUNTS</span><span class="disc-body">'+discFmt(item.discount_note.replace(/^\s*discounts?\s*:\s*/i,''))+'</span></div>' : '';
     var foot = '<div class="foot">'+discHtml+shareRow(item)+'</div>';
     // mobile collapse: top summary (dates + Show more) when collapsed; a 'Show less' control at the BOTTOM when expanded
     var sumD = summaryDates(isTalk, classes, showFrom);
@@ -392,6 +412,16 @@
       if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(done,done); }
       else { try{ var ta=document.createElement('textarea');ta.value=url;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);done(); }catch(e){} }
     });});
+    // FB / X / WhatsApp share
+    root.querySelectorAll('.sh-btn[data-share]').forEach(function(b){b.addEventListener('click',function(){
+      var url=encodeURIComponent(location.href), tx=encodeURIComponent(b.getAttribute('data-text')||document.title), k=b.getAttribute('data-share'), href='';
+      if(k==='fb') href='https://www.facebook.com/sharer/sharer.php?u='+url;
+      else if(k==='x') href='https://twitter.com/intent/tweet?url='+url+'&text='+tx;
+      else if(k==='wa') href='https://wa.me/?text='+tx+'%20'+url;
+      if(href) window.open(href,'_blank','noopener');
+    });});
+    // show-all (5th event onward)
+    var sa=root.querySelector('#pgShowAll'); if(sa){ sa.addEventListener('click',function(){ var m=root.querySelector('#pgMore'); if(m)m.classList.add('on'); sa.style.display='none'; }); }
     root.querySelectorAll('.cc').forEach(function(cc){
       cc.querySelectorAll('.tab-btn').forEach(function(btn){btn.addEventListener('click',function(){
         var i=btn.getAttribute('data-i');
@@ -409,7 +439,14 @@
     var html='<h2 class="pg-h">Weekly Classes Programme</h2>'
            +'<div class="pg-lead"><p>Below you\'ll find full details of the programme of weekly classes — including one-off public talks and short courses which run over a number of weeks. All these classes are drop-in and PAYG. If you choose to book online you\'ll have access to discounts such as bring a friend for half price, early bird pricing and 20% discount for booking a series, where these are available.</p></div>';
     if(!live.length){ html+='<div class="pg-msg">Nothing scheduled just now — please check back soon.</div>'; }
-    else { html += live.map(function(it){return card(it, byId[it.id]||[]);}).join(''); }
+    else {
+      var cardsHtml = live.map(function(it,idx){ return card(it, byId[it.id]||[], idx); });
+      html += cardsHtml.slice(0,4).join('');
+      if(cardsHtml.length>4){
+        html += '<div class="pg-more" id="pgMore">'+cardsHtml.slice(4).join('')+'</div>'
+              + '<button type="button" class="pg-showall" id="pgShowAll">Show all '+cardsHtml.length+' events &darr;</button>';
+      }
+    }
     mount.innerHTML=html;
     wire(mount);
   }
