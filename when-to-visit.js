@@ -71,7 +71,7 @@
   +'#akx-visit .wevs{margin:7px 0 0 19px;}'
   +'#akx-visit .wev{font-size:.94rem;color:var(--mut);line-height:1.5;margin-top:4px;}'
   +'#akx-visit .wev:first-child{margin-top:0;}'
-  +'#akx-visit .wev .en{color:var(--mut);font-weight:600;}'
+  +'#akx-visit .wev .en{color:var(--acc);font-weight:700;}'
   +'#akx-visit .wev .et{color:var(--mut);}'
   +'#akx-visit .cltxt{padding:14px 0;color:var(--cl-tx);font-size:.95rem;}'
   +'#akx-visit .msg{padding:22px 4px;color:var(--mut);font-size:.9rem;}'
