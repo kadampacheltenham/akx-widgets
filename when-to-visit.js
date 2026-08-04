@@ -28,12 +28,12 @@
     if(e.feed==='volunteering' || /volunteer/i.test(n)) return {b:0,a:0};  /* volunteering: no buffer */
     if(/\bTTP\b|teacher\s*training/i.test(n)) return {b:30,a:0};      /* TTP: 30 before, none after */
     if(/\bFP\b|foundation\s*programme/i.test(n)) return {b:30,a:15};  /* FP: 30 before, 15 after */
-    if(e.feed==='prayers') return {b:10,a:15};                        /* prayers & pujas: 10 before, 15 after */
+    if(e.feed==='prayers') return {b:0,a:15};                         /* prayers & pujas: none before, 15 after */
     if(wd===1 && e.tS>=1020) return {b:60,a:30};                      /* Monday evening class: 1hr before, 30 after */
     return {b:30,a:30};                                              /* default */
   }
   /* Fixed opening windows for specific days (applied only when a daytime event exists). Fri = 9:30am-1pm. */
-  var DAY_FIXED={ 5:[{s:570,e:780}] };
+  var DAY_FIXED={ 5:[{s:570,e:750}] };  /* Fri 9:30am-12:30pm */
 
   var CSS=
   '#akx-visit{--bg:#FBFAF7;--card:#fff;--ink:#241f33;--mut:#8b8698;--acc:#2A66A6;--line:#efeae0;'
@@ -71,7 +71,7 @@
   +'#akx-visit .wevs{margin:7px 0 0 19px;}'
   +'#akx-visit .wev{font-size:.94rem;color:var(--mut);line-height:1.5;margin-top:4px;}'
   +'#akx-visit .wev:first-child{margin-top:0;}'
-  +'#akx-visit .wev .en{color:var(--acc);font-weight:700;}'
+  +'#akx-visit .wev .en{color:var(--mut);font-weight:600;}'
   +'#akx-visit .wev .et{color:var(--mut);}'
   +'#akx-visit .cltxt{padding:14px 0;color:var(--cl-tx);font-size:.95rem;}'
   +'#akx-visit .msg{padding:22px 4px;color:var(--mut);font-size:.9rem;}'
@@ -136,7 +136,10 @@
   function windowsFor(ymd){
     var wd=noonUTC(ymd).getUTCDay();
     var evs=(byDate[ymd]||[]).slice();
-    evs.forEach(function(e){var bf=bufFor(e,wd); e.oS=Math.max(0,e.tS-bf.b); e.oE=Math.min(24*60-1,e.tE+bf.a);});
+    evs.forEach(function(e){
+      var bf=bufFor(e,wd); e.oS=Math.max(0,e.tS-bf.b); e.oE=Math.min(24*60-1,e.tE+bf.a);
+      (DAY_FIXED[wd]||[]).forEach(function(fx){ if(e.tS>=fx.s && e.tE<=fx.e){ e.oS=Math.max(e.oS,fx.s); e.oE=Math.min(e.oE,fx.e); } }); /* keep events inside a fixed window's bounds */
+    });
     var wins=[];
     (DAY_FIXED[wd]||[]).forEach(function(fx){                          /* seed fixed windows only when a matching daytime event exists */
       if(evs.some(function(e){return e.tS<fx.e && e.tE>fx.s;})) wins.push({oS:fx.s,oE:fx.e,events:[]});
@@ -197,7 +200,7 @@
   /* ---------- render ---------- */
   function evLine(e,w){
     var diff=(e.tS!==w.oS || e.tE!==w.oE);
-    var t=diff?' <span class="et">('+to12(minToHM(e.tS))+' &ndash; '+to12(minToHM(e.tE))+')</span>':'';
+    var t=diff?' &middot; <span class="et">'+to12(minToHM(e.tS))+' &ndash; '+to12(minToHM(e.tE))+'</span>':'';
     return '<div class="wev"><span class="en">'+e.name+'</span>'+t+'</div>';
   }
   function winHTML(w){
@@ -212,7 +215,7 @@
   function headLabel(ymd,isToday){var d=disp(ymd);return (isToday?'Today &middot; ':'')+d.wl+' '+d.dn+' '+d.mo;}
 
   var state={sel:0,touched:false};
-  function ndays(){return window.matchMedia('(min-width:768px)').matches?7:5;}
+  function ndays(){return window.matchMedia('(min-width:768px)').matches?14:7;}
 
   function render(){
     if(!loaded){
@@ -231,7 +234,7 @@
     }).join('');
     var sd=data.days[state.sel], isT=sd.ymd===todayStr;
     var s=liveStatus(todayStr);
-    root.innerHTML='<div class="whead">When to Visit</div>'
+    root.innerHTML='<div class="whead">When to Visit &middot; Opening Times</div>'
       +'<div class="st '+(s.open?'open':'closed')+'"><span class="dot"></span><div><div class="big">'+s.big+'</div>'+(s.sub?'<div class="sub">'+s.sub+'</div>':'')+'</div></div>'
       +'<div class="strip">'+strip+'</div>'
       +'<div class="detail"><div class="dhead">'+headLabel(sd.ymd,isT)+'</div>'+detailHTML(sd,isT)+'</div>';
