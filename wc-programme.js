@@ -112,9 +112,8 @@
     .cc-sum-d{display:flex;flex-direction:column;gap:3px;font-weight:700;font-size:.92rem;flex:none;}
     .cc-sum-line{white-space:nowrap;}
     .cc.talk .cc-sum-d{color:#1276B4;} .cc.course .cc-sum-d{color:#C55A24;}
-    .cc-sum-cta{display:inline-flex;align-items:center;gap:7px;font-size:.8rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--dteal);white-space:nowrap;}
+    .cc-sum-cta{display:inline-flex;align-items:center;gap:7px;font-size:.8rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:#2B2A28;white-space:nowrap;}
     .cc-sum-cta .chev{font-size:1rem;font-weight:900;transition:transform .2s;}
-    .cc.talk .cc-sum-cta{color:#1276B4;} .cc.course .cc-sum-cta{color:#C55A24;}
     /* condensed = header/image/title/tags + summary only; description + detail live behind the one toggle */
     .cc.mcol .cc-exp,.cc.mcol .wte,.cc.mcol .desc,.cc.mcol .desc-more{display:none;}
     .cc:not(.mcol) .desc{display:block;overflow:visible;-webkit-line-clamp:initial;margin-bottom:14px;}
@@ -289,7 +288,8 @@
     var wteHtml = wte.length ? '<div class="wte collapsed"><button class="wte-t">What to expect <span class="chev">▾</span></button><ul>'
         + wte.map(function(x){return '<li>'+esc(x)+'</li>';}).join('') + '</ul></div>' : '';
     var tlabel = timingLabel(isTalk, classes, showFrom);
-    var typeLabel = isTalk ? (classes.length>1 ? 'Public Talks' : 'Public Talk') : 'Short Course';
+    var totalDates = classes.reduce(function(n,cl){return n+splitList(cl.dates).length;},0);
+    var typeLabel = isTalk ? ((classes.length>1||totalDates>1) ? 'Public Talks' : 'Public Talk') : 'Short Course';
     var banner = '<div class="cc-banner">'
         + (tlabel ? '<span class="cc-when"><span class="cc-dot"></span>'+esc(tlabel)+'</span>' : '')
         + '<span class="cc-type">'+typeLabel+'</span>'
