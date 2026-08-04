@@ -1,44 +1,55 @@
-/* Akanishta &mdash; Week at a Glance widget (v4)
+/* Akanishta &mdash; Week at a Glance widget (v5)
    - Title/intro styled like Weekly Classes Programme
    - Amber term-dates banner (calendar-banner style, no warning icon)
-   - Open House strip UNDER the tags on Mon eve + Fri taster
+   - Open House strip UNDER the tags on Mon eve + Fri taster (yellow)
    - Desktop: full table with Details expand
-   - Mobile (<=640px): collapsed 'teaser' + filter tabs (technique A: first event, fade, nudge)
+   - Mobile (<=640px): collapsed 'teaser' + filter tabs; rows TAP TO EXPAND (summary + link)
    Include with: <div id="akx-glance"></div>
                  <script src="https://kadampacheltenham.github.io/akx-widgets/glance.js" defer></script> */
 (function(){
   var MOUNT_ID='akx-glance';
   var OH_INVITE='New? Let us welcome you and show you around before the class.';
+  var DIR_CH='https://maps.google.com/?q=59+Whaddon+Road,+Cheltenham';
+  var DIR_CI='https://maps.google.com/?q=Cirencester';   /* TODO: exact Cirencester venue address */
 
   /* ---- single source of truth for both desktop + mobile ---- */
   var EVENTS=[
     {day:'Mon',time:'12:30',name:'Simply Meditate',dur:'30 min',loc:'chelt',
      tags:[['Drop-in','t-drop'],['Get started','t-start']],key:['Get started','t-start'],
-     sum:'Come as you are|Reduce stress and cultivate inner peace|Check term dates or calendar',cta:{label:'Get directions &rarr;'}},
+     sum:'Reduce stress and cultivate inner peace|Come as you are|Check term dates above or calendar below',
+     cta:{label:'Get directions &rarr;',url:DIR_CH,ext:1}},
     {day:'Mon',time:'18:30',name:'Evening meditation class',dur:'75 min',loc:'chelt',oh:'5:45&ndash;6:15 pm',
      tags:[['Main class','t-main'],['Drop-in','t-drop']],key:['Main class','t-main'],
-     sum:'One-off talks &amp; short series on a theme or topic|Includes talk &amp; two guided meditations',cta:{label:'Get directions &rarr;'}},
+     sum:'One-off talks &amp; short series on a theme or topic|See programme &amp; calendar below for details',
+     cta:{label:'Get directions &rarr;',url:DIR_CH,ext:1}},
     {day:'Tue',time:'10:30',name:'Daytime meditation class',dur:'75 min',loc:'chelt',
      tags:[['Main class','t-main'],['Drop-in','t-drop']],key:['Main class','t-main'],
-     sum:'The same weekly class in a daytime slot.',cta:{label:'Get directions &rarr;'}},
+     sum:'One-off talks &amp; short series on a theme or topic|See programme &amp; calendar below for details',
+     cta:{label:'Get directions &rarr;',url:DIR_CH,ext:1}},
     {day:'Wed',time:'19:00',name:'Young Adults',dur:'60 min',loc:'chelt',
      tags:[['Young Adults','t-ya'],['Drop-in','t-drop']],key:['Young Adults','t-ya'],
-     sum:'For young adults 18+|Check programme or calendar for dates',cta:{label:'Get directions &rarr;'}},
+     sum:'Aimed at young adults 18+|Check programme or calendar below for more details',
+     cta:{label:'Get directions &rarr;',url:DIR_CH,ext:1}},
     {day:'Thu',time:'18:30',name:'Cirencester evening class',dur:'75 min',loc:'ciren',
      tags:[['Drop-in','t-drop'],['Branch class','t-branch']],key:['Branch class','t-branch'],
-     sum:'Talks &amp; meditations following a theme|Check programme or calendar for dates',cta:{label:'Get directions &rarr;'}},
-    {day:'Fri',time:'12:00',name:'Free taster meditation',dur:'15 min',loc:'chelt',free:1,oh:'11:30&ndash;12:00',
+     sum:'Talks &amp; meditations following a theme|Check programme or calendar for dates',
+     cta:{label:'Get directions &rarr;',url:DIR_CI,ext:1}},
+    {day:'Fri',time:'12:00',name:'Free guided meditation',dur:'15 min',loc:'chelt',free:1,oh:'11:30&ndash;12:00',
      tags:[['Perfect for beginners','t-start'],['Drop-in','t-drop']],key:['Free','t-start'],
-     sum:'A great place to get started for beginners|Come as you are|Guided meditation',cta:{label:'Get directions &rarr;'}},
+     sum:'Get started|Come as you are|Check term dates above or calendar below',
+     cta:{label:'Get directions &rarr;',url:DIR_CH,ext:1}},
     {day:'Sat',time:'10:00',name:'Weekend courses &amp; retreats',dur:'',loc:'chelt',
      tags:[['Day/Half-day','t-neutral'],['Go deeper','t-depth']],key:['Go deeper','t-depth'],
-     sum:'Day &amp; half-day courses and retreats throughout the year.',cta:{label:'Courses &amp; retreats &rarr;',coral:1}},
+     sum:'Day &amp; half-day courses and retreats throughout the year.',
+     cta:{label:'Courses &amp; retreats page &rarr;',url:'/courses-retreats',coral:1}},
     {day:'Sun',time:'09:30',name:'Teacher Training (TTP)',dur:'',loc:'chelt',depth:1,
      tags:[['In-depth','t-depth'],['Enrolment required','t-enrol']],key:['In-depth','t-depth'],
-     sum:'In-depth training for those wishing to train as meditation teachers|Not a drop-in class',cta:{label:'More information &rarr;',coral:1}},
+     sum:'In-depth training for those wishing to train as qualified meditation teachers|Not a drop-in class',
+     cta:{label:'In-depth study page &rarr;',url:'/in-depth-study',coral:1}},
     {day:'Sun',time:'15:00',name:'Foundation Programme (FP)',dur:'',loc:'chelt',depth:1,
      tags:[['In-depth','t-depth'],['Enrolment required','t-enrol']],key:['In-depth','t-depth'],
-     sum:'Go further|In-depth structured study &amp; meditation|Not a drop-in class',cta:{label:'More information &rarr;',coral:1}}
+     sum:'Go further|In-depth structured study &amp; meditation|Not a drop-in class',
+     cta:{label:'In-depth study page &rarr;',url:'/in-depth-study',coral:1}}
   ];
   var TABS=['All','Cheltenham','AM','PM','Free','Branches','In-depth'];
 
@@ -53,10 +64,8 @@
   #akx-glance *{box-sizing:border-box;}
   #akx-glance{font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);}
   #akx-glance .wag{max-width:1000px;margin:0 auto;}
-  /* header &mdash; matches Weekly Classes Programme */
   #akx-glance .wag-h{text-align:center;font-size:1.9rem;font-weight:600;color:#2A66A6;margin:0 0 6px;}
   #akx-glance .wag-lead{margin:0 auto 18px;padding:0 30px;text-align:left;color:#6f6a62;font-size:.98rem;line-height:1.55;}
-  /* term banner &mdash; calendar-banner style, amber, no warning icon, one term per line */
   #akx-glance .wag-term{display:flex;gap:12px;align-items:flex-start;background:#FDF3E3;color:#6E5212;border:1px solid #F1E0C2;border-radius:12px;padding:15px 18px;margin:0 0 20px;font-size:1rem;line-height:1.55;}
   #akx-glance .wag-term .cal{flex:none;margin-top:3px;}
   #akx-glance .wag-term .line{display:block;} #akx-glance .wag-term b{font-weight:700;} #akx-glance .wag-term .ht{color:#957c3c;}
@@ -78,7 +87,6 @@
   #akx-glance .det{grid-area:det;align-self:center;border:1.5px solid #d9e3e0;background:#fff;color:var(--teal);font-size:.8rem;font-weight:700;padding:6px 12px;border-radius:999px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;}
   #akx-glance .det .chev{font-size:.66rem;transition:transform .2s;}
   #akx-glance .r.open .det{background:#EEF5F3;border-color:#bcd8d2;} #akx-glance .r.open .det .chev{transform:rotate(180deg);}
-  /* open house strip &mdash; under the tags, as wide as the content column */
   #akx-glance .oh{grid-area:oh;display:flex;align-items:center;gap:8px;background:#FFF4CC;color:#6E5212;border:1px solid #F0DFA3;border-left:3px solid #E0A82E;border-radius:8px;padding:7px 12px;font-size:.84rem;line-height:1.4;}
   #akx-glance .oh .oh-ico{font-size:.95rem;flex:none;} #akx-glance .oh b{font-weight:700;color:#4A3908;}
   #akx-glance .rd{display:none;padding:0 20px 16px 90px;}
@@ -101,13 +109,22 @@
   #akx-glance .m-tab{flex:0 0 auto;border:1.5px solid #dcd6ca;background:#fff;color:#6f6a62;border-radius:999px;padding:6px 13px;font-size:.8rem;font-weight:600;cursor:pointer;white-space:nowrap;}
   #akx-glance .m-tab.on{background:#2A66A6;border-color:#2A66A6;color:#fff;}
   #akx-glance .m-list{background:#fff;border:1px solid #ece7dd;border-radius:12px;box-shadow:0 3px 14px rgba(0,0,0,.05);overflow:hidden;position:relative;}
-  #akx-glance .mrow{display:grid;grid-template-columns:46px 1fr;column-gap:10px;padding:12px 14px;border-top:1px solid #f0ece3;align-items:start;}
+  #akx-glance .mrow{display:grid;grid-template-columns:46px 1fr auto;column-gap:10px;padding:12px 14px;border-top:1px solid #f0ece3;align-items:start;}
   #akx-glance .mrow:first-child{border-top:none;}
+  #akx-glance .mrow.mx{cursor:pointer;}
   #akx-glance .mrow .mday{font-family:'Oswald',sans-serif;color:var(--red);font-weight:700;font-size:.98rem;line-height:1.05;}
   #akx-glance .mrow .mtime{font-family:'Oswald',sans-serif;font-size:.74rem;color:var(--ink);}
   #akx-glance .mrow .mname{font-weight:700;font-size:.94rem;}
   #akx-glance .mrow .msub{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:4px;}
   #akx-glance .mrow .msub .ptag{font-size:.57rem;padding:2px 7px;} #akx-glance .mrow .msub .loc{font-size:.77rem;}
+  #akx-glance .mchev{align-self:center;border:1.5px solid #d9e3e0;background:#fff;color:var(--teal);width:26px;height:26px;border-radius:999px;font-size:.62rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;}
+  #akx-glance .mchev .c{transition:transform .2s;}
+  #akx-glance .mrow.open .mchev{background:#EEF5F3;border-color:#bcd8d2;} #akx-glance .mrow.open .mchev .c{transform:rotate(180deg);}
+  #akx-glance .mrd{display:none;margin-top:10px;}
+  #akx-glance .mrow.open .mrd{display:block;}
+  #akx-glance .mrd .msum{font-size:.82rem;color:#5A5A5A;line-height:1.5;margin-bottom:10px;} #akx-glance .mrd .msum .sep{color:#cfc8bc;padding:0 5px;}
+  #akx-glance .mcta{display:inline-block;background:#E4F1E7;color:#0B7A3B;border:1px solid #C4E1CC;font-weight:600;font-size:.8rem;text-decoration:none;padding:7px 14px;border-radius:999px;}
+  #akx-glance .mcta.coral{background:#F8E8DF;color:#B85C37;border-color:#EDCDBD;}
   #akx-glance .oh-m{margin-top:7px;display:flex;gap:7px;align-items:center;background:#FFF4CC;color:#6E5212;border:1px solid #F0DFA3;border-left:3px solid #E0A82E;border-radius:7px;padding:6px 9px;font-size:.75rem;line-height:1.35;}
   #akx-glance .oh-m b{font-weight:700;color:#4A3908;}
   #akx-glance .m-list.teaser{cursor:pointer;}
@@ -126,8 +143,8 @@
   function locHTML(e){return '<span class="loc '+e.loc+'">'+pin(e.loc)+locName(e.loc)+'</span>';}
   function tagsHTML(e){return e.tags.map(function(t){return '<span class="ptag '+t[1]+'">'+t[0]+'</span>';}).join('');}
   function keyTagHTML(e){return '<span class="ptag '+e.key[1]+'">'+e.key[0]+'</span>';}
-  function ohText(e){return DOOR+' <span><b>Open House '+e.oh+'</b> &mdash; '+OH_INVITE+'</span>';}
   function sumHTML(s){return s.split('|').map(function(x,i){return (i?'<span class="sep">|</span>':'')+x;}).join('');}
+  function ctaAttrs(e){return 'href="'+e.cta.url+'"'+(e.cta.ext?' target="_blank" rel="noopener"':'');}
 
   function desktopRow(e){
     var oh=e.oh?'<div class="oh"><span class="oh-ico">'+DOOR+'</span><span><b>Open House '+e.oh+'</b> &mdash; '+OH_INVITE+'</span></div>':'';
@@ -138,13 +155,19 @@
       +'<button class="det">Details <span class="chev">&#9662;</span></button>'
       +oh
       +'</div><div class="rd"><div class="sum">'+sumHTML(e.sum)+'</div>'
-      +'<a class="cta'+(e.cta.coral?' coral':'')+'" href="#">'+e.cta.label+'</a></div></div>';
+      +'<a class="cta'+(e.cta.coral?' coral':'')+'" '+ctaAttrs(e)+'>'+e.cta.label+'</a></div></div>';
   }
-  function mobileRow(e,cls){
+  function mobileRow(e,cls,expandable){
+    var dur=e.dur?' <span class="dur" style="color:#9a948b;font-weight:500;font-size:.8rem">('+e.dur+')</span>':'';
     var oh=e.oh?'<div class="oh-m">'+DOOR+' <span><b>Open House '+e.oh+'</b> &mdash; '+OH_INVITE+'</span></div>':'';
-    return '<div class="mrow'+(cls?' '+cls:'')+'"><div><div class="mday">'+e.day+'</div><div class="mtime">'+e.time+'</div></div>'
-      +'<div><div class="mname">'+e.name+(e.dur?' <span class="dur" style="color:#9a948b;font-weight:500;font-size:.8rem">('+e.dur+')</span>':'')+'</div>'
-      +'<div class="msub">'+keyTagHTML(e)+locHTML(e)+'</div>'+oh+'</div></div>';
+    var chev=expandable?'<button class="mchev"><span class="c">&#9662;</span></button>':'';
+    var det=expandable?'<div class="mrd"><div class="msum">'+sumHTML(e.sum)+'</div>'
+      +'<a class="mcta'+(e.cta.coral?' coral':'')+'" '+ctaAttrs(e)+'>'+e.cta.label+'</a></div>':'';
+    return '<div class="mrow'+(cls?' '+cls:'')+(expandable?' mx':'')+'">'
+      +'<div><div class="mday">'+e.day+'</div><div class="mtime">'+e.time+'</div></div>'
+      +'<div class="mbody"><div class="mname">'+e.name+dur+'</div>'
+      +'<div class="msub">'+keyTagHTML(e)+locHTML(e)+'</div>'+oh+det+'</div>'
+      +chev+'</div>';
   }
   function match(e,tab){
     if(tab==='All')return true;
@@ -159,7 +182,7 @@
 
   function headerHTML(){
     return '<h2 class="wag-h">Week at a Glance</h2>'
-      +'<div class="wag-lead">Here&rsquo;s the whole week at a glance &mdash; our regular drop-in classes plus the courses, retreats and study programmes that run alongside them. The weekly classes are drop-in and pay-as-you-go, so you can simply turn up. Check the term dates below (or the calendar) for any breaks, and tap any class for a little more detail and directions.</div>'
+      +'<div class="wag-lead">Here&rsquo;s the week at a glance &mdash; all our weekly classes and events. Tap an event to expand for more details. Please check the programme, or the calendar, as we do take breaks and not every class runs every week.</div>'
       +'<div class="wag-term">'+CAL_ICON+'<div>'
       +'<span class="line"><b>Autumn Term:</b> 22 Aug &ndash; 15 Dec <span class="ht">(half-term 8&ndash;15 Oct)</span></span>'
       +'<span class="line"><b>Spring Term:</b> from 2 Jan 2027</span>'
@@ -192,9 +215,12 @@
     }
     list.className='m-list'; list.onclick=null;
     var rows=EVENTS.filter(function(e){return match(e,state);});
-    list.innerHTML=(rows.length?rows.map(function(e){return mobileRow(e);}).join('')
+    list.innerHTML=(rows.length?rows.map(function(e){return mobileRow(e,null,true);}).join('')
       :'<div class="m-empty">Nothing in this filter.</div>')
       +'<div class="m-reset">&#8634; Reset</div>';
+    list.querySelectorAll('.mrow.mx').forEach(function(row){
+      row.addEventListener('click',function(ev){ if(ev.target.closest('a')) return; row.classList.toggle('open'); });
+    });
     var rs=list.querySelector('.m-reset'); if(rs)rs.addEventListener('click',function(){renderMobile(root,null);});
   }
 
