@@ -1,4 +1,4 @@
-/* Akanishta — Weekly Classes calendar (live Google Calendar feed).
+/* Akanishta — shared calendar widget (live Google Calendar feed).
    ONE file, per-page presets. Include with a stub like:
        <div id="calendar" style="scroll-margin-top:130px;"></div>
        <div id="akx-cal" data-cal="weekly"></div>
@@ -19,16 +19,16 @@
   // ---- per-page presets: title (blue), default view, and which feeds (on:false = present but off by default) ----
   var PRESETS = {
     whatson: { title:'Upcoming Classes & Courses', mode:'list',
-               feeds:[ {k:'weekly'}, {k:'branch'}, {k:'weekend'}, {k:'prayers'}, {k:'announce'} ] },
+               feeds:[ {k:'weekly'}, {k:'branch',on:false}, {k:'weekend'}, {k:'prayers',on:false}, {k:'announce'} ] },
     weekly:  { title:'Weekly Classes Calendar', mode:'list',
-               feeds:[ {k:'weekly'}, {k:'branch'}, {k:'weekend',on:false}, {k:'prayers',on:false}, {k:'announce'} ] }
+               feeds:[ {k:'weekly'}, {k:'branch'}, {k:'announce'} ] }
     // add more pages here later, e.g. courses / prayers, then set data-cal on the stub.
   };
 
   var root = document.getElementById('akx-cal');
   if(!root || root.getAttribute('data-akx-done')==='1') return;
   root.setAttribute('data-akx-done','1');
-  var P = PRESETS.weekly;   // Weekly Classes
+  var P = PRESETS[(root.getAttribute('data-cal')||'whatson').trim()] || PRESETS.whatson;
   var CALS = P.feeds.map(function(f){ var base=FEEDS[f.k]; return Object.assign({key:f.k, on:f.on}, base); })
                     .filter(function(c){ return c && /@/.test(c.id); });
   var TITLE = P.title;
@@ -44,7 +44,7 @@
   var CSS = ''
   + '#akx-cal{--coral:#E2886A;--ink:#1D1D1F;--muted:#6B6B6E;--line:#ECE9E2;color:var(--ink);max-width:1000px;margin:0 auto;}'  /* lotus/content width */
   + '#akx-cal *{box-sizing:border-box;}'
-  + '#akx-cal .cal-title{margin:0 0 6px;text-align:center;font-family:inherit;font-size:1.9rem;font-weight:600;color:#2A66A6;line-height:1.15;}'  /* blue heading — site standard */
+  + '#akx-cal .cal-title{margin:0 auto 34px;text-align:center;font-family:\'Inter\',sans-serif;font-size:1.15rem;font-weight:600;color:#2A66A6;text-transform:uppercase;letter-spacing:0.04em;}'  /* blue heading — site standard; extra space under the title */
   + '#akx-cal .card{background:#fff;border-radius:16px;box-shadow:0 6px 30px rgba(0,0,0,.07);padding:22px 22px 26px;}'
   + '#akx-cal .ann{display:flex;gap:12px;align-items:flex-start;background:#F3F0EA;border:1px solid #E6E1D6;border-left:5px solid var(--acol,#8F887A);border-radius:12px;padding:14px 16px;margin-bottom:16px;color:#3f3d39;font-size:.96rem;line-height:1.5;}'
   + '#akx-cal .ann svg{flex:none;margin-top:1px;}'
@@ -194,22 +194,11 @@
       return fetch(apiUrl(c,tMin,tMax)).then(function(r){return r.json();})
         .then(function(j){return {cal:c,items:(j.items||[])};}).catch(function(){return {cal:c,items:[]};});
     })).then(function(res){
-      var anns=[], LEAD=7;   // show a notice from 7 days before it starts until its last day; hide otherwise
+      var anns=[];
       res.forEach(function(r){ r.items.forEach(function(it){
         var allDay=!!(it.start&&it.start.date);
-        var startStr=(it.start&&(it.start.dateTime||it.start.date)); if(!startStr) return;
-        var from, until;
-        if(allDay){
-          var sD=parseYmd(it.start.date);
-          var endEx=(it.end&&it.end.date)?parseYmd(it.end.date):new Date(sD.getFullYear(),sD.getMonth(),sD.getDate()+1);
-          from=new Date(sD.getFullYear(),sD.getMonth(),sD.getDate()-LEAD); until=endEx;   // until = day after last day → stays visible through the last day
-        } else {
-          var sT=new Date(startStr), eT=(it.end&&it.end.dateTime)?new Date(it.end.dateTime):new Date(sT.getTime()+3600000);
-          from=new Date(sT.getTime()-LEAD*864e5); until=eT;
-        }
-        if(now<from || now>=until) return;   // outside the 7-days-before → last-day window
         anns.push({color:r.cal.color, title:it.summary||'Notice',
-                   start:startStr,
+                   start:(it.start&&(it.start.dateTime||it.start.date)),
                    endDate:(allDay&&it.end&&it.end.date)?it.end.date:null, allDay:allDay});
       }); });
       anns.sort(function(a,b){return (a.start||'').localeCompare(b.start||'');});
@@ -277,7 +266,7 @@
       var d=new Date(y,m,dd), ymd=y+'-'+pad(m+1)+'-'+pad(dd), evs=eventsOn(ymd), rows='';
       evs.forEach(function(e,idx){
         var multi = e.allDay && e.endDate && (parseYmd(e.endDate)-parseYmd(e.start) > 86400000);
-        if(shown[e.id]) return; shown[e.id]=true;  /* de-dupe any event id across the list — multi-day spans show once, recurrences keep unique ids */
+        if(multi){ if(shown[e.id]) return; shown[e.id]=true; }
         var tm = multi ? '' : fmtTime(e.start,e.allDay);
         var sub = multi ? rangeStr(e.start,e.endDate,true) : '';  /* address hidden in list view to save space (mobile); branch town lives in the event title. Pop-up still shows it. */
         rows+='<div class="li" data-ymd="'+ymd+'" data-i="'+idx+'"><span class="dot" style="background:'+e.color+'"></span>'
