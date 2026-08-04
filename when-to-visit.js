@@ -15,16 +15,17 @@
   var API_KEY='AIzaSyAVm0epUASAL2aNbAN_aBmpDDPxoPJVOwA';
   var TZ='Europe/London';
   var OPEN_FEEDS=[
-    {key:'weekly',  id:'c_9e95a300a2d0f8775b28d30ebfe5eb816d8dc678d4dffbebbc09cd59d9208ffd@group.calendar.google.com'}, /* weekly (Cheltenham) */
-    {key:'weekend', id:'c_687cfcac60ad1fa647cd2fb654774156e1e48fb2dcbcf5c40a72340e422a4b08@group.calendar.google.com'}, /* courses & retreats */
-    {key:'prayers', id:'c_7120941805c32581a9dca9a00783a100d6d53914fc8915ee8df40ae74d864504@group.calendar.google.com'}  /* prayers & pujas */
+    {key:'weekly',       id:'c_9e95a300a2d0f8775b28d30ebfe5eb816d8dc678d4dffbebbc09cd59d9208ffd@group.calendar.google.com'}, /* weekly (Cheltenham) */
+    {key:'weekend',      id:'c_687cfcac60ad1fa647cd2fb654774156e1e48fb2dcbcf5c40a72340e422a4b08@group.calendar.google.com'}, /* courses & retreats */
+    {key:'prayers',      id:'c_7120941805c32581a9dca9a00783a100d6d53914fc8915ee8df40ae74d864504@group.calendar.google.com'}, /* prayers & pujas */
+    {key:'volunteering', id:'c_75691d6f7c1a31c8a4ad3bbdaa29431702ceeadcec440781106a4a76a29c1759@group.calendar.google.com'}  /* volunteering */
   ];
   var CLOSE_FEED='c_8tho1a5ip2rh1g154iea6h0c0k@group.calendar.google.com'; /* announcements (closures) */
   /* Open window is DERIVED per event: doors open {b} mins before it starts, stay open {a} mins after
      it ends. Buffer depends on the event TYPE (from the brief). The event's own time shows in brackets. */
   function bufFor(e,wd){
     var n=e.name||'';
-    if(/volunteer/i.test(n)) return {b:0,a:0};                       /* volunteering: no buffer */
+    if(e.feed==='volunteering' || /volunteer/i.test(n)) return {b:0,a:0};  /* volunteering: no buffer */
     if(/\bTTP\b|teacher\s*training/i.test(n)) return {b:30,a:0};      /* TTP: 30 before, none after */
     if(/\bFP\b|foundation\s*programme/i.test(n)) return {b:30,a:15};  /* FP: 30 before, 15 after */
     if(e.feed==='prayers') return {b:10,a:15};                        /* prayers & pujas: 10 before, 15 after */
