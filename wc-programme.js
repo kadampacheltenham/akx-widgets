@@ -41,16 +41,13 @@
   .tag.amber{background:#F6E6C2;color:#A5741A;} .tag.rose{background:#F7E4EA;color:#B0466A;} .tag.sand{background:#EAE7E0;color:#7A746A;}
   .tag.teal{background:#D5EFEC;color:#227A72;}
   .desc{font-size:1rem;line-height:1.6;color:var(--ink);margin:0 0 14px;}
-  .desc.clamp{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:4px;}
-  .desc-more{display:none;background:none;border:none;padding:0;margin:0 0 14px;cursor:pointer;font-size:.82rem;font-weight:700;color:var(--dteal);}
-  .desc-more.show{display:inline-block;}
   .wte{margin-bottom:2px;}
   .wte-t{background:none;border:none;padding:0;cursor:pointer;font-size:.8rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--dteal);display:inline-flex;align-items:center;gap:8px;}
   .wte-t .chev{font-size:1.05rem;font-weight:900;line-height:1;transition:transform .2s;}
   .wte.collapsed .wte-t .chev{transform:rotate(-90deg);}
   .wte ul{margin:10px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px;}
   .wte.collapsed ul{display:none;}
-  .wte li{font-size:.95rem;color:var(--ink);padding-left:20px;position:relative;line-height:1.45;}
+  .wte li{font-size:1rem;color:var(--ink);padding-left:20px;position:relative;line-height:1.55;}
   .wte li:before{content:'';position:absolute;left:2px;top:8px;width:7px;height:7px;border-radius:50%;background:var(--coral);}
   .picker{padding:20px 30px 6px;border-top:1px solid #efe9df;margin-top:18px;}
   .picker.inline{display:flex;align-items:center;justify-content:flex-start;gap:14px;flex-wrap:wrap;}
@@ -82,8 +79,8 @@
   .book{color:#fff;font-weight:700;font-size:.86rem;text-decoration:none;padding:9px 20px;border-radius:999px;white-space:nowrap;background:var(--coral);}
   .cc.talk .book{background:var(--blue);} .cc.course .book{background:var(--coral2);}
   .tbc{margin:14px 30px 4px;padding:14px 18px;background:#FBF6ED;border:1px solid #EFE7D6;border-radius:12px;font-size:.92rem;color:#6f6a62;}
-  /* mobile summary bar (hidden on desktop) */
-  .cc-sum{display:none;}
+  /* mobile summary bar + bottom 'Show less' (both hidden on desktop) */
+  .cc-sum,.cc-less{display:none;}
   .foot{padding:8px 30px 26px;}
   .disc{background:#FBF6ED;border:1px solid #EFE7D6;border-radius:12px;padding:14px 18px;font-size:.92rem;color:var(--ink);line-height:1.5;margin-bottom:14px;} .disc b{color:var(--ink);} .disc .sep{color:#cdbf9e;padding:0 8px;}
   /* social share row */
@@ -115,11 +112,10 @@
     .cc-sum-cta{display:inline-flex;align-items:center;gap:7px;font-size:.8rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:#2B2A28;white-space:nowrap;}
     .cc-sum-cta .chev{font-size:1rem;font-weight:900;transition:transform .2s;}
     /* condensed = header/image/title/tags + summary only; description + detail live behind the one toggle */
-    .cc.mcol .cc-exp,.cc.mcol .wte,.cc.mcol .desc,.cc.mcol .desc-more{display:none;}
-    .cc:not(.mcol) .desc{display:block;overflow:visible;-webkit-line-clamp:initial;margin-bottom:14px;}
-    .desc-more{display:none!important;}   /* mobile: single expander only — never the desc 'More' */
-    .cc:not(.mcol) .cc-sum-d{display:none;}
-    .cc:not(.mcol) .cc-sum-cta .chev{transform:rotate(180deg);}
+    .cc.mcol .cc-exp,.cc.mcol .wte,.cc.mcol .desc{display:none;}
+    .cc:not(.mcol) .desc{display:block;overflow:visible;margin-bottom:14px;}
+    .cc:not(.mcol) .cc-sum{display:none;}   /* top summary hides once expanded */
+    .cc .cc-less{display:flex;align-items:center;justify-content:center;gap:10px;width:calc(100% - 40px);margin:8px 20px 22px;padding:15px 20px;border:1px solid #e5ddcf;border-radius:12px;background:#fbfaf7;cursor:pointer;font-family:inherit;-webkit-appearance:none;}
   }`;
   var PIN='<path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/>';
   // ---- social share icons ----
@@ -142,6 +138,7 @@
       .filter(function(o){return Object.keys(o).some(function(k){return o[k];});}); }
   function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
   function splitList(s){return (s||'').split(/[;,]|\r?\n/).map(function(x){return x.trim();}).filter(Boolean);}
+  function splitLines(s){return (s||'').split(/[;\n]|\r\n/).map(function(x){return x.trim();}).filter(Boolean);}  /* bullets: split on line-breaks/semicolons only — keep commas inside a bullet */
   function tagClass(t){t=t.toLowerCase();
     if(/mini|series/.test(t))return'purple'; if(/beginn|start|open|free|welcome/.test(t))return'green';
     if(/talk/.test(t))return'blue'; if(/depth|study/.test(t))return'amber'; if(/enrol/.test(t))return'rose'; return'sand';}
@@ -250,8 +247,8 @@
     return '<div class="pane'+(c?' ciren':'')+(on?' on':'')+'" data-i="'+i+'">'
       +'<div class="d-main">'
         +'<div class="d-loc'+(c?' ciren':'')+'"><svg viewBox="0 0 24 24" fill="'+(c?'#7AA84A':'#4E938C')+'">'+PIN+'</svg>'+esc(cl.location||'')+'<a class="dir" href="'+DIRECTIONS_URL+'">Get directions</a></div>'
-        +'<div class="d-tt">'+esc(fullDay(cl.day))+' '+esc(cl.time)+(cl.duration?' <span class="dur">| '+esc(cl.duration)+'</span>':'')+'</div>'
         +(cl.teacher?'<div class="d-meta">with <a href="/about-us#teachers">'+esc(cl.teacher)+'</a></div>':'')
+        +'<div class="d-tt">'+esc(fullDay(cl.day))+' '+esc(cl.time)+(cl.duration?' <span class="dur">| '+esc(cl.duration)+'</span>':'')+'</div>'
         +(datesHtml?'<div class="d-dates">'+datesHtml+'</div>':'')
       +'</div>'
       +(pp||offer||book?'<div class="d-price">'+pp+offer+book+'</div>':'')
@@ -284,7 +281,7 @@
       var cls = TAG_CYCLE[i % TAG_CYCLE.length];
       return '<span class="tag '+cls+'">'+esc(t)+'</span>';
     }).join('');
-    var wte = splitList(item.what_to_expect);
+    var wte = splitLines(item.what_to_expect);
     var wteHtml = wte.length ? '<div class="wte collapsed"><button class="wte-t">What to expect <span class="chev">▾</span></button><ul>'
         + wte.map(function(x){return '<li>'+esc(x)+'</li>';}).join('') + '</ul></div>' : '';
     var tlabel = timingLabel(isTalk, classes, showFrom);
@@ -300,7 +297,7 @@
           +(tags?'<div class="tags">'+tags+'</div>':'')
         +'</div>'
         +'<div class="cc-body">'
-          +(item.description?'<p class="desc clamp">'+esc(item.description)+'</p><button type="button" class="desc-more">More</button>':'')
+          +(item.description?'<p class="desc">'+esc(item.description)+'</p>':'')
           + wteHtml
         +'</div>'
       +'</div>';
@@ -317,13 +314,14 @@
     }
     var discHtml = item.discount_note ? '<div class="disc">'+discFmt(item.discount_note)+'</div>' : '';
     var foot = '<div class="foot">'+discHtml+shareRow(item)+'</div>';
-    // mobile collapse: summary bar (date + toggle) + expandable region
+    // mobile collapse: top summary (dates + Show more) when collapsed; a 'Show less' control at the BOTTOM when expanded
     var sumD = summaryDates(isTalk, classes, showFrom);
     var sum = '<button type="button" class="cc-sum">'
         + '<span class="cc-sum-d">'+sumD+'</span>'
-        + '<span class="cc-sum-cta"><span class="cc-sum-word">Show more details</span> <span class="chev">▾</span></span>'
+        + '<span class="cc-sum-cta">Show more details <span class="chev">▾</span></span>'
       +'</button>';
-    var exp = '<div class="cc-exp">'+body+foot+'</div>';
+    var less = '<button type="button" class="cc-less"><span class="cc-sum-cta">Show less <span class="chev">▴</span></span></button>';
+    var exp = '<div class="cc-exp">'+body+foot+less+'</div>';
     return '<div class="cc '+(isTalk?'talk':'course')+' mcol">'+banner+head+sum+exp+'</div>';
   }
   // ---- pull a readable title colour from the card graphic (fallback: charcoal, left as-is) ----
@@ -354,13 +352,21 @@
       return '#'+out.map(function(x){return ('0'+x.toString(16)).slice(-2);}).join('');
     }catch(e){ return null; }
   }
+  function syncWte(cc){   // 'What to expect' takes the event-title colour
+    var title=cc.querySelector('.ctitle'); if(!title) return;
+    var col=title.style.color||getComputedStyle(title).color;
+    cc.querySelectorAll('.wte-t,.wte li').forEach(function(e){ e.style.color=col; });
+  }
   function colourTitles(root){
     root.querySelectorAll('.cc').forEach(function(cc){
       var img=cc.querySelector('.gfx img.byid'), title=cc.querySelector('.ctitle');
-      if(!img||!title) return;
-      var apply=function(){ var col=titleColorFromImg(img); if(col) title.style.color=col; };
-      if(img.complete && img.naturalWidth) apply();
-      img.addEventListener('load',apply);   // also fires after a .jpg→.png swap
+      if(!title) return;
+      if(img){
+        var apply=function(){ var col=titleColorFromImg(img); if(col) title.style.color=col; syncWte(cc); };
+        if(img.complete && img.naturalWidth) apply();
+        img.addEventListener('load',apply);   // also fires after a .jpg→.png swap
+      }
+      syncWte(cc);   // no-image cards + initial state
     });
   }
   function checkClamp(root){
@@ -370,16 +376,10 @@
     });
   }
   function wire(root){
-    root.querySelectorAll('.desc-more').forEach(function(b){b.addEventListener('click',function(){
-      var d=b.previousElementSibling; var on=d.classList.toggle('clamp'); b.textContent=on?'More':'Less';
-    });});
-    checkClamp(root);
-    if(document.fonts&&document.fonts.ready){document.fonts.ready.then(function(){checkClamp(root);});}
     root.querySelectorAll('.wte-t').forEach(function(b){b.addEventListener('click',function(){b.parentNode.classList.toggle('collapsed');});});
-    // mobile summary toggle
-    root.querySelectorAll('.cc-sum').forEach(function(b){b.addEventListener('click',function(){
-      var collapsed=b.closest('.cc').classList.toggle('mcol');
-      var w=b.querySelector('.cc-sum-word'); if(w) w.textContent=collapsed?'Show more details':'Show less';
+    // mobile expand/collapse: top 'Show more' (collapsed) + bottom 'Show less' (expanded) both toggle
+    root.querySelectorAll('.cc-sum,.cc-less').forEach(function(b){b.addEventListener('click',function(){
+      b.closest('.cc').classList.toggle('mcol');
     });});
     // copy-link share button
     root.querySelectorAll('.sh-copy').forEach(function(b){b.addEventListener('click',function(){
