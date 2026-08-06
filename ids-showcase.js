@@ -15,84 +15,98 @@
     { key:'jpgf', prog:'both', col:'#B5771E', img:'book-jpgf.jpg',
       title:'Joyful Path of Good Fortune',
       link:'https://kadampa.org/book/joyful-path-of-good-fortune-2',
+      shop:'https://tharpa.com/uk/joyful-path-of-good-fortune',
       desc:'A clear and comprehensive explanation of the entire path to enlightenment. We all have the potential for self-transformation, and a limitless capacity for the growth of good qualities, but to fulfil this potential we need to know what to do along every stage of our spiritual journey. With this book, Geshe Kelsang offers us step-by-step guidance on the meditation practices that will lead us to lasting inner peace and happiness. With extraordinary clarity, he presents all Buddha&rsquo;s teachings in the order in which they are to be practised, enriching his explanation with stories and illuminating analogies. This is a perfect guidebook to the Buddhist path.',
       quote:'The practice of Lamrim is very important because everyone needs to cultivate peaceful states of mind. By listening to or reading these teachings we can learn how to control our mind and always keep a good motivation in our heart. This will make all our daily actions pure and meaningful.' },
 
     { key:'ucomp', prog:'both', col:'#C9911F', img:'book-ucomp.jpg',
       title:'Universal Compassion',
       link:'https://kadampa.org/book/universal-compassion',
+      shop:'https://tharpa.com/uk/universal-compassion',
       desc:'The heart of Buddha&rsquo;s teachings is unconditional love and compassion. In this inspiring explanation of the popular Buddhist poem Training the Mind in Seven Points, Geshe Kelsang reveals powerful and far-reaching methods for us to develop these altruistic states. Ancient meditative techniques that have been tried and tested for centuries are brought alive and made relevant to our everyday experiences. Also included is a practical explanation of how we can transform our day-to-day problems &ndash; even the most demanding and difficult conditions &ndash; into opportunities for personal and spiritual development. By pointing the way to an unchanging freedom and happiness, this immensely readable book challenges us to grow, and will have a remarkable impact on our life.',
       quote:'To have the opportunity to practise this precious and profound teaching is infinitely more meaningful than being given all the precious jewels in the world.' },
 
     { key:'eight', prog:'both', col:'#4B8B3B', img:'book-eight.jpg',
       title:'The New Eight Steps to Happiness',
       link:'https://kadampa.org/book/eight-steps-to-happiness',
+      shop:'https://tharpa.com/uk/the-new-eight-steps-to-happiness',
       desc:'A detailed and practical explanation of one of Buddhism&rsquo;s best-loved teachings, Eight Verses of Training the Mind, by the great Bodhisattva, Langri Tangpa. Clear methods are simply presented for transforming all life&rsquo;s difficulties into valuable spiritual insights, for improving our relationships, and for bringing greater patience, empathy and compassion into our daily life. These methods have inspired generations of Buddhist practitioners for almost a thousand years, and brought lasting peace, inspiration and serenity to countless people. Now, with this book, Venerable Geshe Kelsang shares the immeasurably rich insight of this ancient wisdom to help us find greater happiness and meaning in our busy, modern lives.',
       quote:'Everyone, whether religious or non-religious, is looking for happiness all the time and wants to be free from problems and suffering permanently. We can fulfil these wishes through understanding and practising the instructions given in this book.' },
 
     { key:'nhw', prog:'both', col:'#2A66A6', img:'book-nhw.jpg',
       title:'The New Heart of Wisdom',
       link:'https://kadampa.org/book/the-new-heart-of-wisdom-2',
+      shop:'https://tharpa.com/uk/the-new-heart-of-wisdom',
       desc:'This special presentation of Buddha&rsquo;s teachings by the author of Modern Buddhism offers truly liberating insights and advice for the contemporary reader. It reveals the profound meaning of the very heart of Buddha&rsquo;s teachings &ndash; the Perfection of Wisdom Sutras. The author shows how all our problems and suffering come from our ignorance of the ultimate nature of things, and how we can abandon this ignorance and come to enjoy pure, lasting happiness by developing a special wisdom associated with compassion for all living beings.',
       quote:'Wisdom will never deceive us. It is our inner Spiritual Guide, who leads us to the correct path.' },
 
     { key:'mtb', prog:'both', col:'#B23A34', img:'book-mtb.jpg',
       title:'Meaningful to Behold',
       link:'https://kadampa.org/book/meaningful-to-behold',
+      shop:'https://tharpa.com/uk/meaningful-to-behold',
       desc:'This highly acclaimed work is based on the great Indian Buddhist Master Shantideva&rsquo;s famous spiritual poem Guide to the Bodhisattva&rsquo;s Way of Life, one of the best loved and most important Mahayana Buddhist texts, which reveals with poetic beauty and deep spiritual insight how to enter, make progress on, and complete the Buddhist path to enlightenment. Bodhisattvas are friends of the world, who have such strong compassion that they are able to transform all their daily activities into ways of benefiting others. With this commentary, the full effectiveness and profundity of this wonderful poem are revealed in full and made applicable for our time.',
       quote:'At this moment we have attained a precious human life far more valuable than gold, but if we do not recognize its worth we are apt to squander it in meaningless and purposeless pursuits.' },
 
     { key:'htutm', prog:'both', col:'#C4611A', img:'book-htutm.jpg',
       title:'How to Understand the Mind',
       link:'https://kadampa.org/book/how-to-understand-the-mind',
+      shop:'https://tharpa.com/uk/how-to-understand-the-mind',
       desc:'This book offers us deep insight into our mind, and shows how an understanding of its nature and functions can be used practically in every day experience to improve our lives. Part 1 is a practical guide to developing and maintaining a light, positive mind &ndash; showing how to recognize and abandon states of mind that harm us, and to replace them with peaceful and beneficial ones. Part 2 describes different types of mind in detail, revealing the depth and profundity of the Buddhist understanding of the mind. It concludes with a detailed explanation of meditation, showing how by controlling and transforming our mind we can attain a lasting state of joy, independent of external conditions.',
       quote:'Problems arise only if we respond to difficult external situations with a negative state of mind. Therefore, if we really want to be free from problems we must learn to control our mind.' },
 
     { key:'ocean', prog:'ttp', col:'#3A7CA5', img:'book-ocean.jpg',
       title:'Ocean of Nectar',
       link:'https://kadampa.org/book/ocean-of-nectar',
+      shop:'https://tharpa.com/uk/ocean-of-nectar',
       desc:'Ocean of Nectar is the first complete explanation in English of the renowned Indian Buddhist Master Chandrakirti&rsquo;s Guide to the Middle Way, a precious Mahayana scripture, which to this day is regarded as the principal presentation of Buddha&rsquo;s profound view of emptiness, the ultimate nature of reality. With a definitive translation and verse-by-verse commentary, the author reveals this profound meaning to the modern world with utmost clarity, and guides us along the stages of the Bodhisattva path to full enlightenment. This book is an indispensable guide for the serious practitioner of Mahayana Buddhism.',
       quote:'From the extremely vast and deep ocean of Nagarjuna&rsquo;s wisdom the precious nectar of emptiness has flowed forth, completely fulfilling the hopes of Madhyamika scholars such as Chandrakirti.' },
 
     { key:'clb', prog:'ttp', col:'#4A8FA6', img:'book-clb.jpg',
       title:'Clear Light of Bliss',
       link:'https://kadampa.org/book/clear-light-of-bliss',
+      shop:'https://tharpa.com/uk/clear-light-of-bliss',
       desc:'Within all of us lies a source of infinite bliss, clarity of wisdom, and compassion for others. In this unique and highly praised book, based on Buddha&rsquo;s Tantric teachings, Geshe Kelsang Gyatso presents authentic methods for discovering this inner wealth for ourselves. In a clear and precise way, he explains step-by-step how we can generate a deeply peaceful and concentrated mind by harnessing the subtle energy system within our body. With this blissful awareness we can uncover our true nature, destroy ignorance and suffering at its root, and swiftly become a source of inspiration and benefit for others.',
       quote:'The highest of all possible human goals is the attainment of complete enlightenment, an ultimate state of peace in which all obstacles obscuring the mind have been removed and all good qualities have been fully developed.' },
 
     { key:'bvow', prog:'ttp', col:'#B5771E', img:'book-bvow.jpg',
       title:'The Bodhisattva Vow',
       link:'https://kadampa.org/book/the-bodhisattva-vow',
+      shop:'https://tharpa.com/uk/the-bodhisattva-vow',
       desc:'A Bodhisattva is a friend of the world who, motivated by compassion, seeks enlightenment to benefit all living beings. In this welcome guide to compassionate living, Geshe Kelsang explains in detail how to take and keep the Bodhisattva vows, how to purify negative minds, and how to practise the Bodhisattva&rsquo;s actions of giving, moral discipline, patience, effort, concentration and wisdom. With this handbook as our companion, we can enter the Bodhisattva&rsquo;s way of life and progress along the path to full enlightenment.',
       quote:'The term Bodhisattva is the name given to anyone who, motivated by great compassion, has generated bodhichitta, a spontaneous wish to attain Buddhahood for the benefit of all living beings.' },
 
     { key:'gtom', prog:'ttp', col:'#2A66A6', img:'book-gtom.jpg',
       title:'Great Treasury of Merit',
       link:'https://kadampa.org/book/great-treasury-of-merit',
+      shop:'https://tharpa.com/uk/great-treasury-of-merit',
       desc:'Great Treasury of Merit provides a full explanation of how to practise Offering to the Spiritual Guide (Lama Ch&ouml;pa), one of the most important meditation practices of Kadampa Buddhism. A work of unparalleled profundity and clarity, this book contains a wealth of accessible and practical instructions on Lamrim, Lojong and Tantric Mahamudra, the very essence of Buddha&rsquo;s teachings. An indispensable handbook for all those who wish to accomplish the swift path to enlightenment.',
       quote:'Our mind is like a field, our Spiritual Guide&rsquo;s instructions are like seeds sown in that field, and our faith in our Spiritual Guide is like water that germinates these seeds.' },
 
     { key:'mahamudra', prog:'ttp', col:'#C77B33', img:'book-mahamudra.jpg',
       title:'Mahamudra Tantra',
       link:'https://kadampa.org/book/mahamudra-tantra',
+      shop:'https://tharpa.com/uk/mahamudra-tantra',
       desc:'Mahamudra is a Sanskrit term that means the union of great bliss and emptiness: the most subtle mind that experiences great bliss and realizes ultimate truth, or emptiness, the way things actually exist. Based on his deep knowledge and practical experience, Geshe Kelsang Gyatso explains clearly and succinctly how to prepare our mind for Mahamudra meditation, how to remove obstacles to successful practice, and how we can experience progressively subtler states of mind. By revealing how to uncover and purify the deepest level of our mind, he shows how we can destroy all our negative minds at their very root and quickly reach the state of full enlightenment.',
       quote:'Incorrect views and intentions cause us to follow wrong paths that lead to suffering, whereas correct views and intentions enable us to follow spiritual paths that lead to happiness.' },
 
     { key:'dakini', prog:'ttp', col:'#C0392B', img:'book-dakini.jpg',
       title:'The New Guide to Dakini Land',
       link:'https://kadampa.org/book/the-new-guide-to-dakini-land',
+      shop:'https://tharpa.com/uk/the-new-guide-to-dakini-land',
       desc:'Vajrayogini is a female enlightened Deity of Highest Yoga Tantra, a manifestation of all Buddha&rsquo;s wisdom. By engaging in the Tantric practice of Vajrayogini under the guidance of a qualified Spiritual Guide, sincere practitioners can completely purify their body, speech and mind and attain a state of full enlightenment, the ultimate goal of human life. This comprehensive guide provides a detailed and practical explanation of the two stages of Vajrayogini practice &ndash; generation stage and completion stage &ndash; and shows how we can integrate these practices into our daily life, transforming every moment into the path to enlightenment.',
       quote:'Living beings have many different capacities for spiritual understanding and practice. For this reason, out of his compassion, Buddha gave teachings on many levels, just as a skilful doctor administers a variety of remedies.' },
 
     { key:'tgp', prog:'ttp', col:'#6A4A9C', img:'book-tgp.jpg',
       title:'Tantric Grounds and Paths',
       link:'https://kadampa.org/book/tantric-grounds-and-paths',
+      shop:'https://tharpa.com/uk/tantric-grounds-and-paths',
       desc:'A definitive manual for completing the spiritual path through the practice of Highest Yoga Tantra. Actual Tantra, also known as Secret Mantra or Vajrayana, is a special method taught by Buddha to purify our world, our self, our enjoyments and our activities. Although there is great interest in Tantra, very few people understand its real meaning. Drawing from his own experience and the works of Je Tsongkhapa and other great Yogis, Geshe Kelsang presents an authoritative and comprehensive guide to the four classes of Tantra in general, and to the generation and completion stages of Highest Yoga Tantra in particular.',
       quote:'The Vajrayana path is like a vehicle that takes us directly to our final destination and the common paths are like the road on which the vehicle travels.' },
 
     { key:'eov', prog:'ttp', col:'#1F84C4', img:'book-eov.jpg',
       title:'Essence of Vajrayana',
       link:'https://kadampa.org/book/essence-of-vajrayana',
+      shop:'https://tharpa.com/uk/essence-of-vajrayana',
       desc:'Buddha Heruka is a manifestation of the enlightened compassion of all the Buddhas. By relying upon him, we can swiftly attain spontaneous great bliss, a very subtle mind of profound concentration and wisdom that enables us to realize quickly the ultimate nature of ourself and other phenomena. Geshe Kelsang Gyatso explains with clarity and precision how we can practise the sublime instructions of Heruka body mandala, and thereby gradually transform our ordinary world and experiences into those of a Buddha, a fully awakened being. This is a treasury of instructions for those wishing to follow the Tantric path.',
       quote:'If the human beings of this world sincerely rely upon Heruka with strong faith, especially at this degenerate time, Heruka will bestow powerful blessings upon them to pacify anger and conflicts.' }
   ];
@@ -157,12 +171,11 @@
   }
 
   function bookCard(b,status){
-    var fmt=''; for(var i=0;i<FORMATS.length;i++) fmt+='<span class="ids-pill">'+FORMATS[i]+'</span>';
     return ''+
     '<article class="ids-card">'+tagHTML(b,status)+
       '<div class="ids-cov"><img src="'+IMG+b.img+'" alt="'+b.title+'"></div>'+
       '<div class="ids-txt">'+
-        '<h3 style="color:'+b.col+'">'+b.title+'</h3>'+
+        '<h3 style="color:'+b.col+'"><a class="ids-tl" href="'+b.link+'" target="_blank" rel="noopener">'+b.title+'</a></h3>'+
         '<div class="ids-desc">'+
           '<p>'+b.desc+'</p>'+
           '<div class="ids-q">&ldquo;'+b.quote+'&rdquo;</div>'+
@@ -170,9 +183,8 @@
         '<button class="ids-more" type="button">Read more</button>'+
         '<a class="ids-authlink" href="#'+MOUNT+'-author">About the author &rarr;</a>'+
         '<div class="ids-cta">'+
-          '<div class="ids-fmts"><span class="ids-fl">Available as</span>'+fmt+'</div>'+
-          '<div class="ids-buy"><span class="ids-stk">&#10003; In stock at our bookshop</span>'+
-            '<a class="ids-ord" href="'+b.link+'" target="_blank" rel="noopener">View the book &rarr;</a></div>'+
+          '<span class="ids-stk">&#10003; Paperback in stock at the centre</span>'+
+          '<a class="ids-ord" href="'+b.shop+'" target="_blank" rel="noopener">Other formats from Tharpa UK &rarr;</a>'+
         '</div>'+
       '</div>'+
     '</article>';
@@ -210,7 +222,8 @@
 '#'+MOUNT+' .ids-more{display:none;margin-top:10px;background:none;border:none;padding:0;color:var(--coral);font-weight:700;font-size:.85rem;cursor:pointer;font-family:inherit}'+
 '#'+MOUNT+' .ids-authlink{display:block;text-align:left;margin-top:10px;color:var(--coral);font-weight:700;font-size:.78rem;letter-spacing:.6px;text-transform:uppercase;text-decoration:none}'+
 '#'+MOUNT+' .ids-authlink:hover{text-decoration:underline}'+
-'#'+MOUNT+' .ids-cta{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}'+
+'#'+MOUNT+' .ids-cta{margin-top:14px;padding-top:14px;border-top:1px solid var(--line);display:flex;gap:16px;align-items:center;flex-wrap:wrap}'+
+'#'+MOUNT+' .ids-tl{color:inherit;text-decoration:none}#'+MOUNT+' .ids-tl:hover{text-decoration:underline}'+
 '#'+MOUNT+' .ids-fmts{display:flex;align-items:center;gap:8px;flex-wrap:wrap}#'+MOUNT+' .ids-fl{font-size:.82rem;color:var(--mut)}'+
 '#'+MOUNT+' .ids-pill{font-size:.75rem;font-weight:600;color:var(--teal);background:#e5efee;padding:4px 10px;border-radius:999px}'+
 '#'+MOUNT+' .ids-buy{margin-top:10px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}'+
