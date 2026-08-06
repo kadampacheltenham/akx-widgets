@@ -8,7 +8,7 @@
   var MOUNT = 'akx-ids-showcase';
   var SHEET_ID = '1YArubV8QgCvPUIIvHOHWhCN2fYLRz0DDPSRSHD_tSmY';
   var STATUS_TAB = 'Study Books';           /* columns: Key | Status (current / next / blank) */
-  var IMG = 'https://kadampacheltenham.github.io/akx-widgets/images/';
+  var IMG = 'https://cdn.jsdelivr.net/gh/kadampacheltenham/akx-widgets@main/images/';
 
   /* ---- baked-in book data (order here = default FP-then-TTP order) ---- */
   var BOOKS = [
