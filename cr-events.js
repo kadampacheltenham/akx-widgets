@@ -21,6 +21,7 @@
     'day retreat':    {tag:'Day retreat',    colour:'#227A72'},
     'silent day':     {tag:'Silent day',     colour:'#6A4A9C'},
     'free half-day':  {tag:'Free half-day',  colour:'#4FA35A', free:true},
+    'away day':       {tag:'Away day',       colour:'#2E9BB5'},
     'other':          {tag:'',               colour:'#C56B45'}
   };
   var DEFAULT_COLOUR = '#2A66A6';
@@ -190,7 +191,7 @@
     // event image (jpg or png)
     var evimg = ev['Event ID'] ? imgEl('evimg', bothExt(IMG+encodeURIComponent(ev['Event ID'].trim())), 'gone') : '';
 
-    var img = '<div class="img">'+evimg+'<span class="ph">event photo</span>'+chip
+    var img = '<div class="img"><span class="ph">event photo</span>'+evimg+chip
       + (tag? '<div class="type"><i></i>'+esc(tag)+'</div>':'')
       + av + '</div>';
 
