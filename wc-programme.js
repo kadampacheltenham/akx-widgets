@@ -1,4 +1,4 @@
-/* Akanishta — Talks & short courses widget.
+/* Akanishta &mdash; Talks & short courses widget.
    Reads a public Google Sheet (tabs "Talks & series" + "Class times") and renders flyer cards.
    Include with:  <div id="akx-programme"></div>
                   <script src="https://kadampacheltenham.github.io/akx-widgets/programme.js" defer></script>
@@ -11,9 +11,9 @@
   var DIRECTIONS_URL = '/visit-us';
   var IMG_BASE = 'https://kadampacheltenham.github.io/akx-widgets/images/'; // auto image by id: images/<id>.jpg
   var STYLE = String.raw`
-  #akx-programme{--ink:#2B2A28;--dteal:#2E7C7C;--lteal:#0c9d94;--coral:#E2886A;--blue:#22B8F0;--bluedk:#0E90CC;--coral2:#FF7A4D;--coraldk:#E85C2E;font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);max-width:1000px;margin:0 auto;}   /* lotus/content width — matches glance + calendars */
+  #akx-programme{--ink:#2B2A28;--dteal:#2E7C7C;--lteal:#0c9d94;--coral:#E2886A;--blue:#22B8F0;--bluedk:#0E90CC;--coral2:#FF7A4D;--coraldk:#E85C2E;font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);max-width:1000px;margin:0 auto;}   /* lotus/content width &mdash; matches glance + calendars */
   #akx-programme *{box-sizing:border-box;}
-  #akx-programme .pg-h{text-align:center;font-size:1.9rem;font-weight:600;color:#2A66A6;margin:0 0 6px;}   /* blue — site heading standard */
+  #akx-programme .pg-h{text-align:center;font-size:1.9rem;font-weight:600;color:#2A66A6;margin:0 0 6px;}   /* blue &mdash; site heading standard */
   #akx-programme .pg-lead{max-width:none;margin:0 auto 20px;padding:0 30px;text-align:left;color:#6f6a62;font-size:.98rem;line-height:1.55;}
   #akx-programme .pg-lead p{margin:0 0 10px;} #akx-programme .pg-lead p:last-child{margin:0;}
   #akx-programme .pg-msg{text-align:center;color:#8a857c;padding:24px;}
@@ -56,7 +56,7 @@
   .picker{padding:20px 30px 6px;border-top:1px solid #efe9df;margin-top:18px;}
   .picker.inline{display:flex;align-items:center;justify-content:flex-start;gap:14px;flex-wrap:wrap;}
   .picker.inline.center{justify-content:center;}
-  /* 'Choose a class' — solid pill, same height as the option buttons */
+  /* 'Choose a class' &mdash; solid pill, same height as the option buttons */
   .pk-chip{display:inline-flex;align-items:center;min-height:44px;font-size:.78rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:0 20px;border-radius:999px;margin:0 0 13px;color:#fff;background:var(--dteal);border:1.5px solid transparent;}
   .cc.talk .pk-chip{color:#fff;background:var(--blue);} .cc.course .pk-chip{color:#fff;background:var(--coral2);}
   .picker.inline .pk-chip{margin:0;}
@@ -96,8 +96,8 @@
   .cc-share .sh-lbl{font-size:.82rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#8a857c;margin-right:2px;}
   .cc.talk .cc-share .sh-lbl{color:var(--bluedk);} .cc.course .cc-share .sh-lbl{color:var(--coraldk);}
   .sh-btn{width:34px;height:34px;border-radius:50%;border:1px solid transparent;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;text-decoration:none;transition:background .15s,color .15s,border-color .15s;}
-  .cc.talk .sh-btn{background:var(--bluedk);color:#fff;border-color:var(--bluedk);} .cc.course .sh-btn{background:var(--coraldk);color:#fff;border-color:var(--coraldk);}
-  .cc.talk .sh-btn:hover{background:#fff;color:var(--bluedk);} .cc.course .sh-btn:hover{background:#fff;color:var(--coraldk);}
+  .cc.talk .sh-btn{background:var(--blue);color:#fff;border-color:var(--blue);} .cc.course .sh-btn{background:var(--coral2);color:#fff;border-color:var(--coral2);}
+  .cc.talk .sh-btn:hover{background:#fff;color:var(--blue);} .cc.course .sh-btn:hover{background:#fff;color:var(--coral2);}
   .sh-btn svg{width:16px;height:16px;}
   .sh-btn.copied,.cc.talk .sh-btn.copied,.cc.course .sh-btn.copied{background:#2C8A34;color:#fff;border-color:#2C8A34;}
   @media(max-width:640px){
@@ -107,7 +107,9 @@
     .detail{margin:14px 20px 4px;} .pane.on{grid-template-columns:1fr;}
     .d-price{flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:space-between;width:100%;gap:10px;}
     .d-price .pp{order:1;} .d-price .book{order:2;} .d-price .d-offer{order:3;flex-basis:100%;text-align:left;}
-    .tbc,.foot{margin-left:20px;margin-right:20px;padding-left:18px;padding-right:18px;} .foot{padding:8px 20px 22px;}
+    .tbc,.foot{margin-left:20px;margin-right:20px;padding-left:18px;padding-right:18px;} .foot{padding:8px 0 22px;}
+    /* discounts: full width (match the detail above) + label as a bar across the top */
+    .disc{flex-direction:column;} .disc-lbl{justify-content:flex-start;padding:9px 18px;} .disc-body{padding:12px 18px;}
     .cc-share{justify-content:flex-start;}
     /* --- title / intro breathing room --- */
     #akx-programme .pg-h{font-size:1.5rem;margin-bottom:14px;}
@@ -146,7 +148,7 @@
       .filter(function(o){return Object.keys(o).some(function(k){return o[k];});}); }
   function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
   function splitList(s){return (s||'').split(/[;,]|\r?\n/).map(function(x){return x.trim();}).filter(Boolean);}
-  function splitLines(s){return (s||'').split(/[;\n]|\r\n/).map(function(x){return x.trim();}).filter(Boolean);}  /* bullets: split on line-breaks/semicolons only — keep commas inside a bullet */
+  function splitLines(s){return (s||'').split(/[;\n]|\r\n/).map(function(x){return x.trim();}).filter(Boolean);}  /* bullets: split on line-breaks/semicolons only &mdash; keep commas inside a bullet */
   function tagClass(t){t=t.toLowerCase();
     if(/mini|series/.test(t))return'purple'; if(/beginn|start|open|free|welcome/.test(t))return'green';
     if(/talk/.test(t))return'blue'; if(/depth|study/.test(t))return'amber'; if(/enrol/.test(t))return'rose'; return'sand';}
@@ -222,7 +224,7 @@
     if(toEnd<=7) return 'Final week';
     return 'Drop in to join';
   }
-  // ---- left-header label by position: 1st = countdown / Current series; 2nd–3rd = Booking open|Upcoming; 4th+ = Upcoming ----
+  // ---- left-header label by position: 1st = countdown / Current series; 2nd&ndash;3rd = Booking open|Upcoming; 4th+ = Upcoming ----
   function bannerLabel(idx, classes, showFrom){
     var hasBooking = classes.some(function(cl){return cl.booking_url;});
     if(idx===0){
@@ -238,7 +240,7 @@
     if(idx===1 || idx===2) return hasBooking ? 'Booking open' : 'Upcoming';
     return 'Upcoming';
   }
-  // summary shown in the collapsed mobile bar (HTML) — talks list each date stacked; courses a 'from' date
+  // summary shown in the collapsed mobile bar (HTML) &mdash; talks list each date stacked; courses a 'from' date
   function summaryDates(isTalk, classes, showFrom){
     if(isTalk){
       var lines = classes.map(function(cl){
@@ -264,10 +266,10 @@
   }
   function pane(cl,i,on){
     var c=isCiren(cl.location), dates=splitList(cl.dates), n=dates.length;
-    var datesHtml = n>1 ? esc(n+' classes · '+dates.join(', ')) : (n===1 ? '<span class="d-lbl">Date:</span> '+esc(formatDate(dates[0])) : '');
+    var datesHtml = n>1 ? esc(n+' classes &middot; '+dates.join(', ')) : (n===1 ? '<span class="d-lbl">Date:</span> '+esc(formatDate(dates[0])) : '');
     var pp = cl.price_class ? '<span class="pp">'+esc(cl.price_class)+' / class</span>' : '';
     var offer = (cl.price_series && n>1) ? '<span class="d-offer">Special offer '+n+' classes only '+esc(cl.price_series)+'</span>' : '';
-    var book = cl.booking_url ? '<a class="book" href="'+esc(cl.booking_url)+'" target="_blank" rel="noopener">Book →</a>' : '';
+    var book = cl.booking_url ? '<a class="book" href="'+esc(cl.booking_url)+'" target="_blank" rel="noopener">Book &rarr;</a>' : '';
     return '<div class="pane'+(c?' ciren':'')+(on?' on':'')+'" data-i="'+i+'">'
       +'<div class="d-main">'
         +'<div class="d-loc'+(c?' ciren':'')+'"><svg viewBox="0 0 24 24" fill="'+(c?'#7AA84A':'#4E938C')+'">'+PIN+'</svg>'+esc(cl.location||'')+'<a class="dir" href="'+DIRECTIONS_URL+'">Get directions</a></div>'
@@ -280,7 +282,7 @@
   }
   function discFmt(s){ return esc(s).replace(/\s*\|\s*/g,'<span class="sep">|</span>'); }
   function shareRow(item){
-    var t=esc(item.title+' — Akanishta Kadampa Meditation Centre');
+    var t=esc(item.title+' &mdash; Akanishta Kadampa Meditation Centre');
     return '<div class="cc-share"><span class="sh-lbl">Share</span>'
       +'<button type="button" class="sh-btn" data-share="fb" title="Share on Facebook" aria-label="Share on Facebook">'+SH_FB+'</button>'
       +'<button type="button" class="sh-btn" data-share="x" data-text="'+t+'" title="Share on X" aria-label="Share on X">'+SH_X+'</button>'
@@ -305,7 +307,7 @@
       return '<span class="tag '+cls+'">'+esc(t)+'</span>';
     }).join('');
     var wte = splitLines(item.what_to_expect);
-    var wteHtml = wte.length ? '<div class="wte collapsed"><button class="wte-t">What to expect <span class="chev">▾</span></button><ul>'
+    var wteHtml = wte.length ? '<div class="wte collapsed"><button class="wte-t">What to expect <span class="chev">&#9662;</span></button><ul>'
         + wte.map(function(x){return '<li>'+esc(x)+'</li>';}).join('') + '</ul></div>' : '';
     var tlabel = bannerLabel(idx, classes, showFrom);
     var totalDates = classes.reduce(function(n,cl){return n+splitList(cl.dates).length;},0);
@@ -326,7 +328,7 @@
       +'</div>';
     var body='';
     if(classes.length===0){
-      body='<div class="tbc">Date &amp; venue to be confirmed — see the calendar below for the latest.</div>';
+      body='<div class="tbc">Date &amp; venue to be confirmed &mdash; see the calendar below for the latest.</div>';
     } else if(isTalk && classes.length===1){
       body='<div class="single"><div class="detail">'+pane(classes[0],0,true)+'</div></div>';
     } else {
@@ -341,9 +343,9 @@
     var sumD = summaryDates(isTalk, classes, showFrom);
     var sum = '<button type="button" class="cc-sum">'
         + '<span class="cc-sum-d">'+sumD+'</span>'
-        + '<span class="cc-sum-cta">Show more details <span class="chev">▾</span></span>'
+        + '<span class="cc-sum-cta">Show more details <span class="chev">&#9662;</span></span>'
       +'</button>';
-    var less = '<button type="button" class="cc-less"><span class="cc-sum-cta">Show less <span class="chev">▴</span></span></button>';
+    var less = '<button type="button" class="cc-less"><span class="cc-sum-cta">Show less <span class="chev">&#9652;</span></span></button>';
     var exp = '<div class="cc-exp">'+body+foot+less+'</div>';
     return '<div class="cc '+(isTalk?'talk':'course')+' mcol">'+banner+head+sum+exp+'</div>';
   }
@@ -387,7 +389,7 @@
       if(img){
         var apply=function(){ var col=titleColorFromImg(img); if(col) title.style.color=col; syncWte(cc); };
         if(img.complete && img.naturalWidth) apply();
-        img.addEventListener('load',apply);   // also fires after a .jpg→.png swap
+        img.addEventListener('load',apply);   // also fires after a .jpg&rarr;.png swap
       }
       syncWte(cc);   // no-image cards + initial state
     });
@@ -437,8 +439,8 @@
     var today=new Date(); today.setHours(0,0,0,0);
     var live = items.filter(function(it){ return isVisible(it, byId[it.id]||[], today); });
     var html='<h2 class="pg-h">Weekly Classes Programme</h2>'
-           +'<div class="pg-lead"><p>Below you\'ll find full details of the programme of weekly classes — including one-off public talks and short courses which run over a number of weeks. All these classes are drop-in and PAYG. If you choose to book online you\'ll have access to discounts such as bring a friend for half price, early bird pricing and 20% discount for booking a series, where these are available.</p></div>';
-    if(!live.length){ html+='<div class="pg-msg">Nothing scheduled just now — please check back soon.</div>'; }
+           +'<div class="pg-lead"><p>Below you\'ll find full details of the programme of weekly classes &mdash; including one-off public talks and short courses which run over a number of weeks. All these classes are drop-in and PAYG. If you choose to book online you\'ll have access to discounts such as bring a friend for half price, early bird pricing and 20% discount for booking a series, where these are available.</p></div>';
+    if(!live.length){ html+='<div class="pg-msg">Nothing scheduled just now &mdash; please check back soon.</div>'; }
     else {
       var cardsHtml = live.map(function(it,idx){ return card(it, byId[it.id]||[], idx); });
       html += cardsHtml.slice(0,4).join('');
@@ -455,14 +457,14 @@
     if(mount.getAttribute('data-akx-done')==='1') return;
     mount.setAttribute('data-akx-done','1');
     if(!document.getElementById('akx-programme-style')){var st=document.createElement('style');st.id='akx-programme-style';st.textContent=STYLE;document.head.appendChild(st);}
-    mount.innerHTML='<div class="pg-msg">Loading…</div>';
+    mount.innerHTML='<div class="pg-msg">Loading&hellip;</div>';
     Promise.all([
       fetch(csvUrl(TAB_ITEMS)).then(function(r){return r.text();}),
       fetch(csvUrl(TAB_CLASSES)).then(function(r){return r.text();})
     ]).then(function(res){
       var items=toObjs(parseCSV(res[0])), classes=toObjs(parseCSV(res[1]));
       render(mount, items, classes);
-    }).catch(function(e){ mount.innerHTML='<div class="pg-msg">Sorry — the programme couldn’t load just now.</div>'; console.warn('programme load failed',e); });
+    }).catch(function(e){ mount.innerHTML='<div class="pg-msg">Sorry &mdash; the programme couldn&rsquo;t load just now.</div>'; console.warn('programme load failed',e); });
   }
   if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{init();}
 })();
