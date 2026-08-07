@@ -9,7 +9,7 @@
   var MOUNT_ID = 'akx-events';
   var TAB_EVENTS='Events', TAB_TT='Timetables', TAB_TE='Teachers';
   var IMG  = 'https://kadampacheltenham.github.io/akx-widgets/images/';
-  var TIMG = IMG + 'teachers/';
+  var TIMG = IMG;   // teacher photos live in the same images/ folder
   var SHOW_HEADING = true;
 
   // Event Type -> tag / colour / behaviour
@@ -116,19 +116,30 @@
       return {label:label, amount:amount, pct:pctOf(amount)};
     }).filter(function(d){return d.label;}); }
 
-  // ---------- build one card ----------
-  function es/*noop*/(){}
-  function teacherPhoto(id, accent){
-    // rotate by day-of-year across id, id-2, id-3; cascade to lotus
-    var day=Math.floor((Date.now()/86400000));
-    var pick=day%3; var base=TIMG+encodeURIComponent(id);
-    var srcs=[base+'.jpg', base+'-2.jpg', base+'-3.jpg'];
-    var order=[srcs[pick], srcs[0], srcs[1], srcs[2]].filter(function(v,i,a){return a.indexOf(v)===i;});
-    var chain = order.map(function(s){return s;});
-    var onerr = "var l=['"+chain.slice(1).join("','")+"'];if(!this.dataset.i)this.dataset.i='0';var n=+this.dataset.i;if(n<l.length){this.dataset.i=n+1;this.src=l[n];}else{var w=this.closest('.avatar');w.classList.add('lotus');this.src='"+IMG+"lotus.png';}";
-    return '<span class="avatar"><img src="'+chain[0]+'" alt="" onerror=\"'+onerr+'\"></span>';
+  // ---------- images (accept .jpg or .png; cascade then fall back) ----------
+  function imgEl(cls, srcs, fb){
+    srcs = srcs.filter(Boolean);
+    var first = srcs[0] || '';
+    var rest  = srcs.slice(1).join('|');
+    var oe = "var a=(this.dataset.srcs||'').split('|').filter(Boolean);var i=+(this.dataset.i||0);"
+           + "if(i<a.length){this.dataset.i=i+1;this.src=a[i];return;}"
+           + (fb==='lotus'
+               ? "this.onerror=null;var w=this.closest('.avatar');if(w)w.classList.add('lotus');this.src='"+IMG+"lotus.png';"
+               : "this.remove();");
+    return '<img'+(cls?' class="'+cls+'"':'')+' src="'+first+'" data-srcs="'+rest+'" data-i="0" alt="" onerror="'+oe+'">';
   }
-  function lotusAvatar(){ return '<span class="avatar lotus"><img src="'+IMG+'lotus.png' + '" alt=""></span>'; }
+  function bothExt(base){ return [base+'.jpg', base+'.png']; }
+
+  function teacherPhoto(id){
+    // rotate by day across id, id-2, id-3 (jpg or png); cascade to lotus
+    var day=Math.floor((Date.now()/86400000));
+    var pick=day%3, base=TIMG+encodeURIComponent(id);
+    var bases=[base, base+'-2', base+'-3'];
+    var order=[bases[pick], bases[0], bases[1], bases[2]].filter(function(v,i,a){return a.indexOf(v)===i;});
+    var srcs=[]; order.forEach(function(b){ srcs=srcs.concat(bothExt(b)); });
+    return '<span class="avatar">'+imgEl('', srcs, 'lotus')+'</span>';
+  }
+  function lotusAvatar(){ return '<span class="avatar lotus"><img src="'+IMG+'lotus.png" alt=""></span>'; }
 
   function timetableHTML(schedule){
     var lines=splitLines(schedule); if(!lines.length) return '';
@@ -163,7 +174,7 @@
     var te = teMap[low(ev['Teacher ID'])];
     var teName = te ? te['Name'] : '';
     var teLink = te ? te['Link'] : '';
-    var av = (te && ev['Teacher ID']) ? teacherPhoto(ev['Teacher ID'].trim(), accent) : lotusAvatar();
+    var av = (te && ev['Teacher ID']) ? teacherPhoto(ev['Teacher ID'].trim()) : lotusAvatar();
 
     // timetable: explicit field, else the timetable named after the type/tag
     var ttName = ev['Timetable'] || tag;
@@ -176,8 +187,8 @@
       discs = discs.filter(function(x){ return !(/early\s*bird/i.test(x.label) && days<cut); }); }
     var maxPct = discs.reduce(function(m,x){return x.pct&&x.pct>m?x.pct:m;},0);
 
-    // image
-    var evimg = ev['Event ID'] ? '<img class="evimg" src="'+IMG+encodeURIComponent(ev['Event ID'].trim())+'.jpg" alt="" onerror="this.remove()">' : '';
+    // event image (jpg or png)
+    var evimg = ev['Event ID'] ? imgEl('evimg', bothExt(IMG+encodeURIComponent(ev['Event ID'].trim())), 'gone') : '';
 
     var img = '<div class="img">'+evimg+'<span class="ph">event photo</span>'+chip
       + (tag? '<div class="type"><i></i>'+esc(tag)+'</div>':'')
