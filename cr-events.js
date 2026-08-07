@@ -35,7 +35,8 @@
   #akx-events .card{position:relative;background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 10px 30px rgba(38,48,58,.08);display:flex;flex-direction:column;transition:transform .18s,box-shadow .18s;}
   #akx-events .card:hover{transform:translateY(-4px);box-shadow:0 18px 42px rgba(38,48,58,.13);}
   #akx-events .img{position:relative;height:190px;overflow:hidden;background:linear-gradient(135deg,var(--a2),var(--accent));}
-  #akx-events .img img.evimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
+  #akx-events .img.has-img{background-size:cover;background-position:center;}
+  #akx-events .img.has-img .ph{display:none;}
   #akx-events .img .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#ffffff66;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;}
   #akx-events .datechip{position:absolute;top:14px;left:14px;background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:13px;padding:7px 12px;text-align:center;line-height:1;box-shadow:0 4px 14px rgba(0,0,0,.28);z-index:3;}
   #akx-events .datechip .d{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:1.32rem;}
@@ -205,10 +206,9 @@
       discs = discs.filter(function(x){ return !(/early\s*bird/i.test(x.label) && days<cut); }); }
     var maxPct = discs.reduce(function(m,x){return x.pct&&x.pct>m?x.pct:m;},0);
 
-    // event image (jpg or png)
-    var evimg = ev['Event ID'] ? imgEl('evimg', bothExt(IMG+encodeURIComponent(ev['Event ID'].trim())), 'gone') : '';
-
-    var img = '<div class="img"><span class="ph">event photo</span>'+evimg+chip
+    // event image loaded as the panel BACKGROUND (so overlays always sit on top)
+    var imgbase = ev['Event ID'] ? IMG+encodeURIComponent(ev['Event ID'].trim()) : '';
+    var img = '<div class="img"'+(imgbase?' data-imgbase="'+imgbase+'"':'')+'><span class="ph">event photo</span>'+chip
       + (tag? '<div class="type"><i></i>'+esc(tag)+'</div>':'')
       + av + '</div>';
 
@@ -261,9 +261,22 @@
     if(!live.length){ html += '<div class="ev-msg">No upcoming events just now — please check back soon.</div>'; }
     else { html += '<div class="grid">'+live.map(function(e){return card(e,ttMap,teMap);}).join('')+'</div>'; }
     mount.innerHTML = html;
+    wireImages(mount);
     wireMore(mount);
     wireFold(mount);
     if(document.fonts&&document.fonts.ready){document.fonts.ready.then(function(){wireMore(mount);});}
+  }
+  function wireImages(mount){
+    mount.querySelectorAll('.img[data-imgbase]').forEach(function(el){
+      if(el.dataset.imgdone) return; el.dataset.imgdone='1';
+      var base=el.getAttribute('data-imgbase'), exts=['.jpg','.png'], i=0;
+      (function tryNext(){
+        if(i>=exts.length) return;
+        var url=base+exts[i++], im=new Image();
+        im.onload=function(){ el.style.backgroundImage='url("'+url+'")'; el.classList.add('has-img'); };
+        im.onerror=tryNext; im.src=url;
+      })();
+    });
   }
   function wireFold(mount){
     mount.querySelectorAll('.foldbtn').forEach(function(b){
