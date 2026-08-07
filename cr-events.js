@@ -136,9 +136,8 @@
   function bothExt(base){ return [base+'.jpg', base+'.png']; }
 
   function teacherPhoto(id){
-    // rotate by day across id, id-2, id-3 (jpg or png); cascade to lotus
-    var day=Math.floor((Date.now()/86400000));
-    var pick=day%3, base=TIMG+encodeURIComponent(id);
+    // random photo per card (id, id-2, id-3; jpg or png); cascade to lotus
+    var pick=Math.floor(Math.random()*3), base=TIMG+encodeURIComponent(id);
     var bases=[base, base+'-2', base+'-3'];
     var order=[bases[pick], bases[0], bases[1], bases[2]].filter(function(v,i,a){return a.indexOf(v)===i;});
     var srcs=[]; order.forEach(function(b){ srcs=srcs.concat(bothExt(b)); });
