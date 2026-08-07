@@ -67,6 +67,7 @@
   #akx-events .wte{margin:10px 0 2px;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;}
   #akx-events .wte li{position:relative;padding-left:20px;font-size:.93rem;line-height:1.5;}
   #akx-events .wte li:before{content:'';position:absolute;left:2px;top:8px;width:7px;height:7px;border-radius:50%;background:var(--accent);}
+  #akx-events details.savedrop summary{color:#B5771E;}
   #akx-events .savedrop .chips{margin-top:11px;display:flex;flex-wrap:wrap;gap:7px;}
   #akx-events .chip{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #EBD9AE;border-radius:999px;padding:5px 11px;font-size:.78rem;font-weight:600;color:#5c4a24;}
   #akx-events .chip b{color:#B5771E;font-weight:800;}
@@ -236,8 +237,8 @@
       + '<h3 class="ctitle">'+esc(ev['Title'])+'</h3>'
       + '<div class="meta">'+esc(ev['Time']||'')+metaTeacher+'</div>'
       + '<div class="loc">'+PIN+esc(loc)+'</div>'
-      + '<button type="button" class="foldbtn" aria-expanded="false">See details <span class="fchev">&#9662;</span></button>'
       + '<div class="fold">'+foldInner+'</div>'
+      + '<button type="button" class="foldbtn" aria-expanded="false">See details <span class="fchev">&#9662;</span></button>'
       + '</div>';
 
     var vars='--accent:'+accent+';--a2:'+shade(accent,0.30)+';';
