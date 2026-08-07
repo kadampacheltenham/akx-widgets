@@ -37,7 +37,7 @@
   #akx-events .img{position:relative;height:190px;overflow:hidden;background:linear-gradient(135deg,var(--a2),var(--accent));}
   #akx-events .img img.evimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
   #akx-events .img .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#ffffff66;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;}
-  #akx-events .datechip{position:absolute;top:14px;left:14px;background:#fff;border-radius:13px;padding:7px 12px;text-align:center;line-height:1;box-shadow:0 4px 12px rgba(0,0,0,.18);z-index:2;}
+  #akx-events .datechip{position:absolute;top:14px;left:14px;background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:13px;padding:7px 12px;text-align:center;line-height:1;box-shadow:0 4px 14px rgba(0,0,0,.28);z-index:3;}
   #akx-events .datechip .d{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:1.32rem;}
   #akx-events .datechip .m{font-size:.64rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--mut);margin-top:3px;}
   #akx-events .datechip .w{font-size:.6rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#2A66A6;margin-top:2px;}
