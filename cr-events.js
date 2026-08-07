@@ -51,7 +51,11 @@
   #akx-events .ctitle{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:1.4rem;line-height:1.14;margin:0 0 4px;color:var(--accent);}
   #akx-events .meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:.9rem;color:var(--mut);margin:0 0 2px;}
   #akx-events .meta a{font-weight:600;text-decoration:none;color:var(--accent);}
-  #akx-events .summary{font-size:.97rem;line-height:1.55;margin:10px 0 2px;}
+  #akx-events .loc{display:flex;align-items:center;gap:6px;font-size:.9rem;color:var(--mut);margin-top:3px;}
+  #akx-events .loc svg{width:14px;height:16px;flex:none;}
+  #akx-events .summary{font-size:.97rem;line-height:1.55;margin:16px 0 2px;}
+  #akx-events .summary.clamp{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+  #akx-events .morebtn{margin-top:5px;background:none;border:none;padding:0;cursor:pointer;font-weight:700;font-size:.85rem;color:var(--accent);}
   #akx-events details{border-top:1px solid var(--line);margin-top:12px;padding-top:10px;}
   #akx-events details summary{list-style:none;cursor:pointer;font-size:.78rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;display:flex;align-items:center;gap:8px;color:var(--accent);}
   #akx-events details summary::-webkit-details-marker{display:none;}
@@ -141,6 +145,7 @@
     return '<span class="avatar">'+imgEl('', srcs, 'lotus')+'</span>';
   }
   function lotusAvatar(){ return '<span class="avatar lotus"><img src="'+IMG+'lotus.png" alt=""></span>'; }
+  var PIN = '<svg viewBox="0 0 24 24" fill="#D8443A" aria-hidden="true"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.9-3.1-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/></svg>';
 
   function timetableHTML(schedule){
     var lines=splitLines(schedule); if(!lines.length) return '';
@@ -205,10 +210,16 @@
         ? '<a class="book" href="'+esc(ev['Booking link'])+'" target="_blank" rel="noopener">Book &rarr;</a>'
         : '<span class="dropin"><span class="dot"></span>Drop-in event</span>';
 
+    var loc = ev['Location'] || 'Akanishta Centre';
+    var sumHTML = ev['Summary']
+      ? '<div class="sumwrap"><p class="summary clamp">'+esc(ev['Summary'])+'</p><button type="button" class="morebtn" style="display:none">More</button></div>'
+      : '';
+
     var body = '<div class="body">'
       + '<h3 class="ctitle">'+esc(ev['Title'])+'</h3>'
       + '<div class="meta">'+esc(ev['Time']||'')+metaTeacher+'</div>'
-      + (ev['Summary']?'<p class="summary">'+esc(ev['Summary'])+'</p>':'')
+      + '<div class="loc">'+PIN+esc(loc)+'</div>'
+      + sumHTML
       + wteHTML(ev['What to expect'])
       + ttHTML
       + savings
@@ -222,6 +233,7 @@
   // ---------- render ----------
   function isVisible(ev, today){
     if(!ev['Title']) return false;
+    if(low(ev['Status'])==='draft') return false;
     var sf=parseDate(ev['Show from']); if(sf){sf.setHours(0,0,0,0); if(today<sf) return false;}
     var d=parseDate(ev['Date']); if(d){d.setHours(0,0,0,0); if(today>d) return false;}
     return true;
@@ -234,6 +246,17 @@
     if(!live.length){ html += '<div class="ev-msg">No upcoming events just now — please check back soon.</div>'; }
     else { html += '<div class="grid">'+live.map(function(e){return card(e,ttMap,teMap);}).join('')+'</div>'; }
     mount.innerHTML = html;
+    wireMore(mount);
+    if(document.fonts&&document.fonts.ready){document.fonts.ready.then(function(){wireMore(mount);});}
+  }
+  function wireMore(mount){
+    mount.querySelectorAll('.sumwrap').forEach(function(w){
+      var p=w.querySelector('.summary'), b=w.querySelector('.morebtn'); if(!p||!b) return;
+      var overflow = p.scrollHeight - p.clientHeight > 2;
+      b.style.display = overflow ? 'inline-block' : 'none';
+      if(b.dataset.wired) return; b.dataset.wired='1';
+      b.addEventListener('click',function(){ var clamped=p.classList.toggle('clamp'); b.textContent=clamped?'More':'Less'; });
+    });
   }
 
   function keyMap(objs, field){ var m={}; objs.forEach(function(o){var k=low(o[field]); if(k) m[k]=o;}); return m; }
