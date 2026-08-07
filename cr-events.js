@@ -80,8 +80,20 @@
   #akx-events .card.feature{grid-column:1 / -1;display:grid;grid-template-columns:300px 1fr;gap:0;border:1.5px solid #E7CE9A;box-shadow:0 14px 40px rgba(120,90,20,.14);}
   #akx-events .card.feature .img{height:auto;min-height:280px;}
   #akx-events .card.feature .ctitle{font-size:1.72rem;}
+  /* mobile fold */
+  #akx-events .foldbtn{display:none;}
   @media(max-width:760px){ #akx-events .card.feature{grid-template-columns:1fr;} #akx-events .card.feature .img{min-height:200px;} }
-  @media(max-width:640px){ #akx-events .grid{grid-template-columns:1fr;} #akx-events .avatar{width:66px;height:66px;} }
+  @media(max-width:640px){
+    #akx-events .grid{grid-template-columns:1fr;}
+    #akx-events .avatar{width:66px;height:66px;}
+    #akx-events .img{height:150px;}
+    #akx-events .foldbtn{display:flex;align-items:center;justify-content:space-between;width:100%;margin-top:14px;padding:11px 14px;border:1px solid var(--line);border-radius:12px;background:#fff;cursor:pointer;font-weight:700;font-size:.82rem;letter-spacing:.03em;text-transform:uppercase;color:var(--accent);}
+    #akx-events .foldbtn .fchev{transition:transform .2s;}
+    #akx-events .card.open .foldbtn .fchev{transform:rotate(180deg);}
+    #akx-events .fold{display:none;}
+    #akx-events .card.open .fold{display:block;}
+    #akx-events .card.open .img{height:190px;}
+  }
   `;
 
   // ---------- CSV ----------
@@ -214,15 +226,18 @@
       ? '<div class="sumwrap"><p class="summary clamp">'+esc(ev['Summary'])+'</p><button type="button" class="morebtn" style="display:none">More</button></div>'
       : '';
 
+    var foldInner = sumHTML
+      + wteHTML(ev['What to expect'])
+      + ttHTML
+      + savings
+      + '<div class="foot"><span class="fee">'+feeTxt+'</span>'+cta+'</div>';
+
     var body = '<div class="body">'
       + '<h3 class="ctitle">'+esc(ev['Title'])+'</h3>'
       + '<div class="meta">'+esc(ev['Time']||'')+metaTeacher+'</div>'
       + '<div class="loc">'+PIN+esc(loc)+'</div>'
-      + sumHTML
-      + wteHTML(ev['What to expect'])
-      + ttHTML
-      + savings
-      + '<div class="foot"><span class="fee">'+feeTxt+'</span>'+cta+'</div>'
+      + '<button type="button" class="foldbtn" aria-expanded="false">See details <span class="fchev">&#9662;</span></button>'
+      + '<div class="fold">'+foldInner+'</div>'
       + '</div>';
 
     var vars='--accent:'+accent+';--a2:'+shade(accent,0.30)+';';
@@ -246,7 +261,19 @@
     else { html += '<div class="grid">'+live.map(function(e){return card(e,ttMap,teMap);}).join('')+'</div>'; }
     mount.innerHTML = html;
     wireMore(mount);
+    wireFold(mount);
     if(document.fonts&&document.fonts.ready){document.fonts.ready.then(function(){wireMore(mount);});}
+  }
+  function wireFold(mount){
+    mount.querySelectorAll('.foldbtn').forEach(function(b){
+      if(b.dataset.wired) return; b.dataset.wired='1';
+      b.addEventListener('click',function(){
+        var card=b.closest('.card'); var open=card.classList.toggle('open');
+        b.setAttribute('aria-expanded', open?'true':'false');
+        b.firstChild.nodeValue = open ? 'Hide details ' : 'See details ';
+        if(open) wireMore(mount);
+      });
+    });
   }
   function wireMore(mount){
     mount.querySelectorAll('.sumwrap').forEach(function(w){
