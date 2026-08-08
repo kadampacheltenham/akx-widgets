@@ -10,6 +10,13 @@
   var LOTUS='https://static1.squarespace.com/static/6a5a0b51083f343e9628d66e/t/6a5ba67a42763156df7f1739/1784391290902/Transparent+Golden+Lotus.png';
   var NEW_UNTIL=new Date('2027-04-01T00:00:00+01:00');   /* "New" badge stays through March 2027 */
 
+  /* Directions: Apple Maps on iPhone/iPad, Google Maps everywhere else */
+  var MAPS_Q='59 Whaddon Road, Cheltenham GL52 5NE';
+  var _ua=(typeof navigator!=='undefined'&&navigator.userAgent)||'';
+  var IS_APPLE=/iphone|ipad|ipod|macintosh|mac os x/i.test(_ua);
+  var MAPS_URL=IS_APPLE?('https://maps.apple.com/?q='+encodeURIComponent(MAPS_Q)):('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(MAPS_Q));
+  var MAPS_LABEL=IS_APPLE?'Open in Apple Maps →':'Open in Google Maps →';
+
   var OPEN_FEEDS=[
     {key:'weekly',       id:'c_9e95a300a2d0f8775b28d30ebfe5eb816d8dc678d4dffbebbc09cd59d9208ffd@group.calendar.google.com'},
     {key:'weekend',      id:'c_687cfcac60ad1fa647cd2fb654774156e1e48fb2dcbcf5c40a72340e422a4b08@group.calendar.google.com'},
@@ -66,8 +73,8 @@
   +"#cr-swipe .fr-date{font-size:16.5px;color:#1D1D1F;font-weight:600;}"
   +"#cr-swipe .fr-time{font-size:15.5px;color:#2E7C7C;font-weight:600;white-space:nowrap;}"
   +"#cr-swipe .fr-opens{font-size:13px;color:#8a8a8a;margin:4px 0 0;}"
-  +"#cr-swipe .fr-dir{margin-top:18px;background:none;border:0;padding:0;color:#E2886A;font-weight:600;font-size:15px;cursor:pointer;font-family:inherit;}"
-  +"#cr-swipe .fr-dir:hover{color:#2A66A6;}"
+  +"#cr-swipe .fr-dir{margin-top:18px;background:none;border:0;padding:0;color:#2E9E4F;font-weight:600;font-size:15px;cursor:pointer;font-family:inherit;}"
+  +"#cr-swipe .fr-dir:hover{color:#237A3C;}"
   +"#cr-swipe .fr-addr{margin:10px 0 0;font-size:14px;color:#1D1D1F;line-height:1.6;}"
   +"#cr-swipe .fr-addr a{color:#2E7C7C;font-weight:500;}"
   +"@media(max-width:680px){"
@@ -187,11 +194,11 @@
         +'<div class="fr-copy">'+mark+'<h2 class="fr-h2">'+c.title+'</h2>'+desc+'</div>'
         +'<div class="fr-panel"><p class="fr-ptitle">Next dates</p><div class="fr-list" data-key="'+c.key+'"><p class="fr-opens">Loading…</p></div>'
         +'<button class="fr-dir" type="button">Get directions →</button>'
-        +'<p class="fr-addr" hidden>59 Whaddon Road,<br>Cheltenham GL52 5NE<br><a href="https://www.google.com/maps/search/?api=1&query=59+Whaddon+Road+Cheltenham+GL52+5NE" target="_blank" rel="noopener">Open in Google Maps →</a></p>'
+        +'<p class="fr-addr" hidden>59 Whaddon Road,<br>Cheltenham GL52 5NE<br><a href="'+MAPS_URL+'" target="_blank" rel="noopener">'+MAPS_LABEL+'</a></p>'
         +'</div></div></div></div>';
     }).join('');
     var dots=CARDS.map(function(c,i){return '<button aria-label="Card '+(i+1)+'"'+(i===0?' class="on"':'')+'></button>';}).join('');
-    root.innerHTML='<p class="sw-title">Getting Started Options</p><div class="sw-top">'+dots+'</div><div class="sw-track">'+slides+'</div>';
+    root.innerHTML='<p class="sw-title">Get Started Options</p><div class="sw-top">'+dots+'</div><div class="sw-track">'+slides+'</div>';
 
     if(new Date()>=NEW_UNTIL){ var nb=root.querySelector('.tag-new'); if(nb) nb.style.display='none'; }
 
