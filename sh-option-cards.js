@@ -1,18 +1,14 @@
-/* Akanishta — "Start Here" class cards. Swipeable cards for the Start Here page.
-   Dates + times pulled LIVE from the Google Calendars; the "Opens" time is derived
-   from the SAME feeds + logic as the When-to-Visit (opening times) widget, so the two
-   never drift apart. Embed with a stub:
+/* Akanishta — "Start Here" option cards (swipeable). Dates + times pulled LIVE from the
+   Google Calendars; the "Opens" time is derived from the SAME feeds + logic as the
+   When-to-Visit (opening times) widget. Self-healing: re-renders if Squarespace blanks
+   the block (Ajax/redraw). Embed:
        <div id="cr-swipe"></div>
-       <script src="https://kadampacheltenham.github.io/akx-widgets/sh-cards.js" defer></script>
-   Card copy is configured in CARDS below. */
+       <script src="https://kadampacheltenham.github.io/akx-widgets/sh-option-cards.js" defer></script> */
 (function(){
-  var root=document.getElementById('cr-swipe');
-  if(!root || root.dataset.akxDone==='1') return; root.dataset.akxDone='1';
-
   var KEY='AIzaSyAVm0epUASAL2aNbAN_aBmpDDPxoPJVOwA';
   var TZ='Europe/London';
   var LOTUS='https://static1.squarespace.com/static/6a5a0b51083f343e9628d66e/t/6a5ba67a42763156df7f1739/1784391290902/Transparent+Golden+Lotus.png';
-  var NEW_UNTIL=new Date('2027-04-01T00:00:00+01:00');   /* "New" badge stays ~6 months, through March 2027 */
+  var NEW_UNTIL=new Date('2027-04-01T00:00:00+01:00');
 
   var OPEN_FEEDS=[
     {key:'weekly',       id:'c_9e95a300a2d0f8775b28d30ebfe5eb816d8dc678d4dffbebbc09cd59d9208ffd@group.calendar.google.com'},
@@ -20,7 +16,7 @@
     {key:'prayers',      id:'c_7120941805c32581a9dca9a00783a100d6d53914fc8915ee8df40ae74d864504@group.calendar.google.com'},
     {key:'volunteering', id:'c_75691d6f7c1a31c8a4ad3bbdaa29431702ceeadcec440781106a4a76a29c1759@group.calendar.google.com'}
   ];
-  var DAY_FIXED={ 5:[{s:570,e:750}] };   /* Fri 9:30am–12:30pm fixed window (same as widget) */
+  var DAY_FIXED={ 5:[{s:570,e:750}] };
 
   var CARDS=[
     { key:'free', title:'15-minute Meditation', tag:'Free', lotus:1,
@@ -56,7 +52,7 @@
   +"#cr-swipe .fr-mark{display:flex;gap:10px;margin:0 0 18px;}"
   +"#cr-swipe .fr-mark img{height:50px;width:auto;opacity:.92;}"
   +"#cr-swipe .fr-mark.multi img{height:36px;}"
-  +"#cr-swipe .fr-head{display:flex;align-items:center;gap:12px;margin:0 0 14px;}"
+  +"#cr-swipe .fr-head{display:flex;flex-direction:column-reverse;align-items:flex-start;gap:10px;margin:0 0 14px;}"
   +"#cr-swipe .fr-head h2{font-size:29px;line-height:1.25;color:#2A66A6;font-weight:600;letter-spacing:-.01em;margin:0;}"
   +"#cr-swipe .tag{font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#fff;background:#E2886A;border-radius:999px;padding:4px 11px;white-space:nowrap;}"
   +"#cr-swipe .fr-copy p{font-size:16px;line-height:1.7;color:#1D1D1F;margin:0 0 14px;max-width:47ch;}"
@@ -72,15 +68,11 @@
   +"@media(max-width:680px){"
   +"#cr-swipe .fr-wrap{padding:26px 14px 44px;}"
   +"#cr-swipe .fr-in{flex-direction:column;align-items:flex-start;gap:26px;}"
-  +"#cr-swipe .fr-head{flex-direction:column-reverse;align-items:flex-start;gap:8px;}"
   +"#cr-swipe .fr-head h2{font-size:23px;}"
   +"#cr-swipe .fr-panel{width:100%;box-sizing:border-box;}"
   +"}";
-  if(!document.getElementById('sh-cards-css')){
-    var st=document.createElement('style'); st.id='sh-cards-css'; st.textContent=CSS; document.head.appendChild(st);
-  }
+  function ensureCSS(){ if(!document.getElementById('sh-option-cards-css')){ var st=document.createElement('style'); st.id='sh-option-cards-css'; st.textContent=CSS; (document.head||document.documentElement).appendChild(st); } }
 
-  var DOWS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   function disp(d){var f=new Intl.DateTimeFormat('en-GB',{timeZone:TZ,weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',hour12:false});var o={};f.formatToParts(d).forEach(function(p){o[p.type]=p.value;});var hh=(o.hour==='24')?0:+o.hour;return {wd:o.weekday,day:+o.day,mon:o.month,min:hh*60+(+o.minute)};}
   function ymdMin(d){var f=new Intl.DateTimeFormat('en-GB',{timeZone:TZ,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false});var o={};f.formatToParts(d).forEach(function(p){o[p.type]=p.value;});var hh=(o.hour==='24')?'00':o.hour;return {ymd:o.year+'-'+o.month+'-'+o.day,min:(+hh)*60+(+o.minute)};}
   function noonUTC(ymd){return new Date(ymd+'T12:00:00Z');}
@@ -136,27 +128,8 @@
       +'<p class="fr-opens">Opens '+hm(o)+' '+ap(o)+'</p></div>';
   }
 
-  var slides=CARDS.map(function(c){
-    var imgs=''; for(var i=0;i<c.lotus;i++){ imgs+='<img src="'+LOTUS+'" alt="">'; }
-    var mark='<div class="fr-mark'+(c.lotus>1?' multi':'')+'">'+imgs+'</div>';
-    var tag=c.tag?'<span class="tag'+(c.tagNew?' tag-new':'')+'">'+c.tag+'</span>':'';
-    var desc=c.desc.map(function(p){return '<p>'+p+'</p>';}).join('');
-    return '<div class="sw-slide"><div class="fr-wrap"><div class="fr-in">'
-      +'<div class="fr-copy">'+mark+'<div class="fr-head"><h2>'+c.title+'</h2>'+tag+'</div>'+desc+'</div>'
-      +'<div class="fr-panel"><p class="fr-ptitle">Next dates</p><div class="fr-list" data-key="'+c.key+'"><p class="fr-opens">Loading&hellip;</p></div></div>'
-      +'</div></div></div>';
-  }).join('');
-  var dots=CARDS.map(function(c,i){return '<button aria-label="Card '+(i+1)+'"'+(i===0?' class="on"':'')+'></button>';}).join('');
-  root.innerHTML='<div class="sw-top">'+dots+'</div><div class="sw-track">'+slides+'</div>';
-
-  if(new Date()>=NEW_UNTIL){ var nb=root.querySelector('.tag-new'); if(nb) nb.style.display='none'; }
-
-  var track=root.querySelector('.sw-track');
-  var dotEls=[].slice.call(root.querySelectorAll('.sw-top button'));
-  var slideEls=root.querySelectorAll('.sw-slide');
-  dotEls.forEach(function(d,i){ d.addEventListener('click',function(){ slideEls[i].scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'}); }); });
-  track.addEventListener('scroll',function(){ var i=Math.round(track.scrollLeft/track.clientWidth); dotEls.forEach(function(d,k){ d.classList.toggle('on',k===i); }); },{passive:true});
-
+  var DATA=null;
+  var fetching=false;
   function feedUrl(id){
     var now=new Date();
     var tMin=new Date(now.getTime()-24*3600e3).toISOString();
@@ -165,24 +138,13 @@
       +'/events?singleEvents=true&orderBy=startTime&maxResults=250&key='+KEY
       +'&timeMin='+encodeURIComponent(tMin)+'&timeMax='+encodeURIComponent(tMax);
   }
-  function fill(key,list){
-    var el=root.querySelector('.fr-list[data-key="'+key+'"]'); if(!el)return;
-    el.innerHTML=list.length?list.slice(0,3).map(row).join(''):'<p class="fr-opens">Next dates coming soon.</p>';
-  }
-  Promise.all(OPEN_FEEDS.map(function(f){
-    return fetch(feedUrl(f.id)).then(function(r){return r.json();})
-      .then(function(j){return {key:f.key, items:(j&&j.items)||[]};})
-      .catch(function(){return {key:f.key, items:[]};});
-  })).then(function(res){
-    res.forEach(function(r){ ingest(r.items, r.key); });
-    var weeklyRes=null; res.forEach(function(r){ if(r.key==='weekly')weeklyRes=r; });
-    var weekly=((weeklyRes&&weeklyRes.items)||[]).filter(function(x){return x.start&&x.start.dateTime;});
-    CARDS.forEach(function(c){
-      var list=weekly.filter(function(x){return c.match.test(x.summary||'');});
-      if(c.fromYmd){ list=list.filter(function(x){return ymdMin(new Date(x.start.dateTime)).ymd>=c.fromYmd;}); }
-      fill(c.key, list);
-    });
-  }).catch(function(){
-    CARDS.forEach(function(c){ var el=root.querySelector('.fr-list[data-key="'+c.key+'"]'); if(el)el.innerHTML='<p class="fr-opens">See our calendar for dates.</p>'; });
-  });
-})();
+  function loadData(then){
+    if(DATA){ then&&then(); return; }
+    if(fetching){ return; } fetching=true;
+    Promise.all(OPEN_FEEDS.map(function(f){
+      return fetch(feedUrl(f.id)).then(function(r){return r.json();})
+        .then(function(j){return {key:f.key, items:(j&&j.items)||[]};})
+        .catch(function(){return {key:f.key, items:[]};});
+    })).then(function(res){
+      res.forEach(function(r){ ingest(r.items, r.key); });
+      var weeklyRes=null; res.forEach(function(r){
