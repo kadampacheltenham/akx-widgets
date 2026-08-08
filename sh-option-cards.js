@@ -40,20 +40,21 @@
 
   var CSS=
    "#cr-swipe{font-family:'Inter',-apple-system,Segoe UI,Roboto,sans-serif;}"
-  +"#cr-swipe .sw-top{background:#FBF6ED;display:flex;justify-content:center;gap:8px;padding:18px 0 6px;}"
+  +"#cr-swipe .sw-title{text-align:center;color:#E2886A;font-weight:600;font-size:1.3rem;letter-spacing:.01em;margin:0;padding:30px 20px 2px;background:#FBF6ED;}"
+  +"#cr-swipe .sw-top{background:#FBF6ED;display:flex;justify-content:center;gap:8px;padding:14px 0 6px;}"
   +"#cr-swipe .sw-top button{width:8px;height:8px;border-radius:50%;border:0;padding:0;background:#D8CFBB;cursor:pointer;transition:background .2s;}"
   +"#cr-swipe .sw-top button.on{background:#E2886A;}"
   +"#cr-swipe .sw-track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;}"
   +"#cr-swipe .sw-track::-webkit-scrollbar{display:none;}"
   +"#cr-swipe .sw-slide{flex:0 0 100%;scroll-snap-align:center;}"
   +"#cr-swipe .fr-wrap{background:#FBF6ED;padding:34px 28px 58px;box-sizing:border-box;height:100%;}"
-  +"#cr-swipe .fr-in{max-width:880px;margin:0 auto;display:flex;gap:56px;align-items:center;}"
+  +"#cr-swipe .fr-in{max-width:880px;margin:0 auto;display:flex;gap:56px;align-items:flex-start;}"
   +"#cr-swipe .fr-copy{flex:1 1 56%;}"
-  +"#cr-swipe .fr-mark{display:flex;gap:10px;margin:0 0 18px;}"
-  +"#cr-swipe .fr-mark img{height:50px;width:auto;opacity:.92;}"
-  +"#cr-swipe .fr-mark.multi img{height:36px;}"
-  +"#cr-swipe .fr-head{display:flex;flex-direction:column-reverse;align-items:flex-start;gap:10px;margin:0 0 14px;}"
-  +"#cr-swipe .fr-head h2{font-size:29px;line-height:1.25;color:#2A66A6;font-weight:600;letter-spacing:-.01em;margin:0;}"
+  +"#cr-swipe .fr-mark{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin:0 0 16px;}"
+  +"#cr-swipe .fr-mark img{height:75px;width:auto;opacity:.92;}"
+  +"#cr-swipe .fr-mark.multi img{height:54px;}"
+  +"#cr-swipe .fr-mark .tag{margin-left:6px;}"
+  +"#cr-swipe .fr-h2{font-size:29px;line-height:1.25;color:#2A66A6;font-weight:600;letter-spacing:-.01em;margin:0 0 12px;}"
   +"#cr-swipe .tag{font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#fff;background:#E2886A;border-radius:999px;padding:4px 11px;white-space:nowrap;}"
   +"#cr-swipe .fr-copy p{font-size:16px;line-height:1.7;color:#1D1D1F;margin:0 0 14px;max-width:47ch;}"
   +"#cr-swipe .fr-copy p:last-child{margin-bottom:0;}"
@@ -65,10 +66,14 @@
   +"#cr-swipe .fr-date{font-size:16.5px;color:#1D1D1F;font-weight:600;}"
   +"#cr-swipe .fr-time{font-size:15.5px;color:#2E7C7C;font-weight:600;white-space:nowrap;}"
   +"#cr-swipe .fr-opens{font-size:13px;color:#8a8a8a;margin:4px 0 0;}"
+  +"#cr-swipe .fr-dir{margin-top:18px;background:none;border:0;padding:0;color:#E2886A;font-weight:600;font-size:15px;cursor:pointer;font-family:inherit;}"
+  +"#cr-swipe .fr-dir:hover{color:#2A66A6;}"
+  +"#cr-swipe .fr-addr{margin:10px 0 0;font-size:14px;color:#1D1D1F;line-height:1.6;}"
+  +"#cr-swipe .fr-addr a{color:#2E7C7C;font-weight:500;}"
   +"@media(max-width:680px){"
   +"#cr-swipe .fr-wrap{padding:26px 14px 44px;}"
   +"#cr-swipe .fr-in{flex-direction:column;align-items:flex-start;gap:26px;}"
-  +"#cr-swipe .fr-head h2{font-size:23px;}"
+  +"#cr-swipe .fr-h2{font-size:23px;}"
   +"#cr-swipe .fr-panel{width:100%;box-sizing:border-box;}"
   +"}";
   function ensureCSS(){ if(!document.getElementById('sh-option-cards-css')){ var st=document.createElement('style'); st.id='sh-option-cards-css'; st.textContent=CSS; (document.head||document.documentElement).appendChild(st); } }
@@ -175,16 +180,18 @@
     ensureCSS();
     var slides=CARDS.map(function(c){
       var imgs=''; for(var i=0;i<c.lotus;i++){ imgs+='<img src="'+LOTUS+'" alt="">'; }
-      var mark='<div class="fr-mark'+(c.lotus>1?' multi':'')+'">'+imgs+'</div>';
       var tag=c.tag?'<span class="tag'+(c.tagNew?' tag-new':'')+'">'+c.tag+'</span>':'';
+      var mark='<div class="fr-mark'+(c.lotus>1?' multi':'')+'">'+imgs+tag+'</div>';
       var desc=c.desc.map(function(p){return '<p>'+p+'</p>';}).join('');
       return '<div class="sw-slide"><div class="fr-wrap"><div class="fr-in">'
-        +'<div class="fr-copy">'+mark+'<div class="fr-head"><h2>'+c.title+'</h2>'+tag+'</div>'+desc+'</div>'
-        +'<div class="fr-panel"><p class="fr-ptitle">Next dates</p><div class="fr-list" data-key="'+c.key+'"><p class="fr-opens">Loading…</p></div></div>'
-        +'</div></div></div>';
+        +'<div class="fr-copy">'+mark+'<h2 class="fr-h2">'+c.title+'</h2>'+desc+'</div>'
+        +'<div class="fr-panel"><p class="fr-ptitle">Next dates</p><div class="fr-list" data-key="'+c.key+'"><p class="fr-opens">Loading…</p></div>'
+        +'<button class="fr-dir" type="button">Get directions →</button>'
+        +'<p class="fr-addr" hidden>59 Whaddon Road,<br>Cheltenham GL52 5NE<br><a href="https://www.google.com/maps/search/?api=1&query=59+Whaddon+Road+Cheltenham+GL52+5NE" target="_blank" rel="noopener">Open in Google Maps →</a></p>'
+        +'</div></div></div></div>';
     }).join('');
     var dots=CARDS.map(function(c,i){return '<button aria-label="Card '+(i+1)+'"'+(i===0?' class="on"':'')+'></button>';}).join('');
-    root.innerHTML='<div class="sw-top">'+dots+'</div><div class="sw-track">'+slides+'</div>';
+    root.innerHTML='<p class="sw-title">Getting Started Options</p><div class="sw-top">'+dots+'</div><div class="sw-track">'+slides+'</div>';
 
     if(new Date()>=NEW_UNTIL){ var nb=root.querySelector('.tag-new'); if(nb) nb.style.display='none'; }
 
@@ -193,6 +200,8 @@
     var slideEls=root.querySelectorAll('.sw-slide');
     dotEls.forEach(function(d,i){ d.addEventListener('click',function(){ slideEls[i].scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'}); }); });
     track.addEventListener('scroll',function(){ var i=Math.round(track.scrollLeft/track.clientWidth); dotEls.forEach(function(d,k){ d.classList.toggle('on',k===i); }); },{passive:true});
+
+    [].slice.call(root.querySelectorAll('.fr-dir')).forEach(function(btn){ btn.addEventListener('click',function(){ var a=btn.nextElementSibling; if(a) a.hidden=!a.hidden; }); });
 
     fillLists(root);
     if(!DATA){ loadData(function(){ document.querySelectorAll('#cr-swipe').forEach(function(rt){ fillLists(rt); }); }); }
