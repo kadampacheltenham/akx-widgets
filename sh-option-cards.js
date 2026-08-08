@@ -8,7 +8,7 @@
   var KEY='AIzaSyAVm0epUASAL2aNbAN_aBmpDDPxoPJVOwA';
   var TZ='Europe/London';
   var LOTUS='https://static1.squarespace.com/static/6a5a0b51083f343e9628d66e/t/6a5ba67a42763156df7f1739/1784391290902/Transparent+Golden+Lotus.png';
-  var NEW_UNTIL=new Date('2027-04-01T00:00:00+01:00');
+  var NEW_UNTIL=new Date('2027-04-01T00:00:00+01:00');   /* "New" badge stays through March 2027 */
 
   var OPEN_FEEDS=[
     {key:'weekly',       id:'c_9e95a300a2d0f8775b28d30ebfe5eb816d8dc678d4dffbebbc09cd59d9208ffd@group.calendar.google.com'},
@@ -16,7 +16,7 @@
     {key:'prayers',      id:'c_7120941805c32581a9dca9a00783a100d6d53914fc8915ee8df40ae74d864504@group.calendar.google.com'},
     {key:'volunteering', id:'c_75691d6f7c1a31c8a4ad3bbdaa29431702ceeadcec440781106a4a76a29c1759@group.calendar.google.com'}
   ];
-  var DAY_FIXED={ 5:[{s:570,e:750}] };
+  var DAY_FIXED={ 5:[{s:570,e:750}] };   /* Fri 9:30am–12:30pm fixed window (same as widget) */
 
   var CARDS=[
     { key:'free', title:'15-minute Meditation', tag:'Free', lotus:1,
@@ -73,6 +73,7 @@
   +"}";
   function ensureCSS(){ if(!document.getElementById('sh-option-cards-css')){ var st=document.createElement('style'); st.id='sh-option-cards-css'; st.textContent=CSS; (document.head||document.documentElement).appendChild(st); } }
 
+  /* ---- date/time helpers ---- */
   function disp(d){var f=new Intl.DateTimeFormat('en-GB',{timeZone:TZ,weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',hour12:false});var o={};f.formatToParts(d).forEach(function(p){o[p.type]=p.value;});var hh=(o.hour==='24')?0:+o.hour;return {wd:o.weekday,day:+o.day,mon:o.month,min:hh*60+(+o.minute)};}
   function ymdMin(d){var f=new Intl.DateTimeFormat('en-GB',{timeZone:TZ,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false});var o={};f.formatToParts(d).forEach(function(p){o[p.type]=p.value;});var hh=(o.hour==='24')?'00':o.hour;return {ymd:o.year+'-'+o.month+'-'+o.day,min:(+hh)*60+(+o.minute)};}
   function noonUTC(ymd){return new Date(ymd+'T12:00:00Z');}
@@ -80,6 +81,7 @@
   function ap(min){return min<720?'am':'pm';}
   function range(s,e){return ap(s)===ap(e)?(hm(s)+' – '+hm(e)+' '+ap(s)):(hm(s)+' '+ap(s)+' – '+hm(e)+' '+ap(e));}
 
+  /* ---- opening-hours derivation (same logic as When-to-Visit) ---- */
   var byDate={};
   function bufFor(e,wd){
     var n=e.name||'';
@@ -128,7 +130,8 @@
       +'<p class="fr-opens">Opens '+hm(o)+' '+ap(o)+'</p></div>';
   }
 
-  var DATA=null;
+  /* ---- data (fetched once, cached) ---- */
+  var DATA=null;          /* {free:[ev..], simply:[ev..], weekly:[ev..]} */
   var fetching=false;
   function feedUrl(id){
     var now=new Date();
@@ -147,4 +150,63 @@
         .catch(function(){return {key:f.key, items:[]};});
     })).then(function(res){
       res.forEach(function(r){ ingest(r.items, r.key); });
-      var weeklyRes=null; res.forEach(function(r){
+      var weeklyRes=null; res.forEach(function(r){ if(r.key==='weekly')weeklyRes=r; });
+      var weekly=((weeklyRes&&weeklyRes.items)||[]).filter(function(x){return x.start&&x.start.dateTime;});
+      DATA={};
+      CARDS.forEach(function(c){
+        var list=weekly.filter(function(x){return c.match.test(x.summary||'');});
+        if(c.fromYmd){ list=list.filter(function(x){return ymdMin(new Date(x.start.dateTime)).ymd>=c.fromYmd;}); }
+        DATA[c.key]=list.slice(0,3);
+      });
+      fetching=false; then&&then();
+    }).catch(function(){ fetching=false; DATA={}; then&&then(); });
+  }
+
+  /* ---- render (idempotent + self-healing) ---- */
+  function fillLists(root){
+    CARDS.forEach(function(c){
+      var el=root.querySelector('.fr-list[data-key="'+c.key+'"]'); if(!el)return;
+      var list=DATA?DATA[c.key]:null;
+      if(!DATA){ el.innerHTML='<p class="fr-opens">Loading…</p>'; return; }
+      el.innerHTML=(list&&list.length)?list.map(row).join(''):'<p class="fr-opens">See our calendar for dates.</p>';
+    });
+  }
+  function build(root){
+    ensureCSS();
+    var slides=CARDS.map(function(c){
+      var imgs=''; for(var i=0;i<c.lotus;i++){ imgs+='<img src="'+LOTUS+'" alt="">'; }
+      var mark='<div class="fr-mark'+(c.lotus>1?' multi':'')+'">'+imgs+'</div>';
+      var tag=c.tag?'<span class="tag'+(c.tagNew?' tag-new':'')+'">'+c.tag+'</span>':'';
+      var desc=c.desc.map(function(p){return '<p>'+p+'</p>';}).join('');
+      return '<div class="sw-slide"><div class="fr-wrap"><div class="fr-in">'
+        +'<div class="fr-copy">'+mark+'<div class="fr-head"><h2>'+c.title+'</h2>'+tag+'</div>'+desc+'</div>'
+        +'<div class="fr-panel"><p class="fr-ptitle">Next dates</p><div class="fr-list" data-key="'+c.key+'"><p class="fr-opens">Loading…</p></div></div>'
+        +'</div></div></div>';
+    }).join('');
+    var dots=CARDS.map(function(c,i){return '<button aria-label="Card '+(i+1)+'"'+(i===0?' class="on"':'')+'></button>';}).join('');
+    root.innerHTML='<div class="sw-top">'+dots+'</div><div class="sw-track">'+slides+'</div>';
+
+    if(new Date()>=NEW_UNTIL){ var nb=root.querySelector('.tag-new'); if(nb) nb.style.display='none'; }
+
+    var track=root.querySelector('.sw-track');
+    var dotEls=[].slice.call(root.querySelectorAll('.sw-top button'));
+    var slideEls=root.querySelectorAll('.sw-slide');
+    dotEls.forEach(function(d,i){ d.addEventListener('click',function(){ slideEls[i].scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'}); }); });
+    track.addEventListener('scroll',function(){ var i=Math.round(track.scrollLeft/track.clientWidth); dotEls.forEach(function(d,k){ d.classList.toggle('on',k===i); }); },{passive:true});
+
+    fillLists(root);
+    if(!DATA){ loadData(function(){ document.querySelectorAll('#cr-swipe').forEach(function(rt){ fillLists(rt); }); }); }
+  }
+  function render(){
+    var root=document.getElementById('cr-swipe');
+    if(!root) return;
+    if(root.querySelector('.sw-track')) return;   /* already built — don't loop */
+    build(root);
+  }
+
+  /* run now, and re-run whenever Squarespace redraws / blanks the block */
+  render();
+  var mo=new MutationObserver(function(){ render(); });
+  try{ mo.observe(document.documentElement,{childList:true,subtree:true}); }catch(e){}
+  if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded',render); }
+})();
