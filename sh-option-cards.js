@@ -3,7 +3,10 @@
    When-to-Visit (opening times) widget. Self-healing: re-renders if Squarespace blanks
    the block (Ajax/redraw). Embed:
        <div id="cr-swipe"></div>
-       <script src="https://kadampacheltenham.github.io/akx-widgets/sh-option-cards.js" defer></script> */
+       <script src="https://kadampacheltenham.github.io/akx-widgets/sh-option-cards.js" defer></script>
+   NOTE: renders as a CONTAINED, ROUNDED card (max-width 720px) to match the meditation
+   cards. For the rounding/gutters to read, put the block in a section with a pale/white
+   background (not full cream). */
 (function(){
   var KEY='AIzaSyAVm0epUASAL2aNbAN_aBmpDDPxoPJVOwA';
   var TZ='Europe/London';
@@ -37,51 +40,61 @@
       desc:[
         'Reduce stress and cultivate inner peace with these practical 30-minute meditation classes, led by an experienced meditator.',
         'Drop in on a Monday — no booking, no experience needed. Everyone’s welcome.'
-      ] },
+      ],
+      price:[['£5'],['Students & U25','£3.50'],['Free for members']] },
     { key:'weekly', title:'Weekly Meditation Classes', tag:'Main class', lotus:3,
       match:/(monday evening|tuesday morning)\s+meditation\s+class/i,
       desc:[
         'Go deeper with our two main weekly classes. Each is engaging and often well attended — a relaxation meditation, a talk, a longer meditation, then discussion, questions and personal takeaways. Everybody welcome.'
-      ] }
+      ],
+      price:[['£10'],['Students & U25','£7'],['Free for members']] }
   ];
 
   var CSS=
-   "#cr-swipe{font-family:'Inter',-apple-system,Segoe UI,Roboto,sans-serif;}"
-  +"#cr-swipe .sw-title{text-align:center;color:#E2886A;font-weight:600;font-size:1.3rem;letter-spacing:.01em;margin:0;padding:30px 20px 2px;background:#FBF6ED;}"
-  +"#cr-swipe .sw-top{background:#FBF6ED;display:flex;justify-content:center;gap:8px;padding:14px 0 6px;}"
+   "#cr-swipe{font-family:'Inter',-apple-system,Segoe UI,Roboto,sans-serif;max-width:720px;margin:0 auto;display:block;}"
+  +"#cr-swipe .sw-card{background:#FBF6ED;border-radius:18px;overflow:hidden;box-shadow:0 1px 6px rgba(29,29,31,.06);}"
+  +"#cr-swipe .sw-title{text-align:center;color:#E2886A;font-weight:600;font-size:1.3rem;letter-spacing:.01em;margin:0;padding:30px 20px 2px;background:transparent;}"
+  +"#cr-swipe .sw-top{display:flex;justify-content:center;gap:8px;padding:14px 0 6px;background:transparent;}"
   +"#cr-swipe .sw-top button{width:8px;height:8px;border-radius:50%;border:0;padding:0;background:#D8CFBB;cursor:pointer;transition:background .2s;}"
   +"#cr-swipe .sw-top button.on{background:#E2886A;}"
   +"#cr-swipe .sw-track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;}"
   +"#cr-swipe .sw-track::-webkit-scrollbar{display:none;}"
   +"#cr-swipe .sw-slide{flex:0 0 100%;scroll-snap-align:center;}"
-  +"#cr-swipe .fr-wrap{background:#FBF6ED;padding:34px 28px 58px;box-sizing:border-box;height:100%;}"
-  +"#cr-swipe .fr-in{max-width:880px;margin:0 auto;display:flex;gap:56px;align-items:flex-start;}"
-  +"#cr-swipe .fr-copy{flex:1 1 56%;}"
+  +"#cr-swipe .fr-wrap{background:transparent;padding:20px 30px 38px;box-sizing:border-box;height:100%;}"
+  +"#cr-swipe .fr-in{margin:0;display:flex;gap:34px;align-items:flex-start;}"
+  +"#cr-swipe .fr-copy{flex:1 1 54%;min-width:0;}"
   +"#cr-swipe .fr-mark{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin:0 0 16px;}"
-  +"#cr-swipe .fr-mark img{height:75px;width:auto;opacity:.92;}"
-  +"#cr-swipe .fr-mark.multi img{height:54px;}"
+  +"#cr-swipe .fr-mark img{height:66px;width:auto;opacity:.92;}"
+  +"#cr-swipe .fr-mark.multi img{height:48px;}"
   +"#cr-swipe .fr-mark .tag{margin-left:6px;}"
-  +"#cr-swipe .fr-h2{font-size:29px;line-height:1.25;color:#2A66A6;font-weight:600;letter-spacing:-.01em;margin:0 0 12px;}"
+  +"#cr-swipe .fr-h2{font-size:26px;line-height:1.25;color:#2A66A6;font-weight:600;letter-spacing:-.01em;margin:0 0 12px;}"
   +"#cr-swipe .tag{font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#fff;background:#E2886A;border-radius:999px;padding:4px 11px;white-space:nowrap;}"
-  +"#cr-swipe .fr-copy p{font-size:16px;line-height:1.7;color:#1D1D1F;margin:0 0 14px;max-width:47ch;}"
+  +"#cr-swipe .fr-copy p{font-size:15.5px;line-height:1.7;color:#1D1D1F;margin:0 0 12px;}"
   +"#cr-swipe .fr-copy p:last-child{margin-bottom:0;}"
-  +"#cr-swipe .fr-panel{flex:1 1 38%;background:#fff;border-radius:18px;padding:30px 32px;box-shadow:0 1px 4px rgba(29,29,31,.05);}"
-  +"#cr-swipe .fr-ptitle{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#2A66A6;font-weight:700;margin:0 0 16px;}"
-  +"#cr-swipe .fr-day{padding:12px 0;border-bottom:1px solid #F2ECDD;}"
+  +"#cr-swipe .fr-price{margin:18px 0 0;font-size:14.5px;line-height:1.7;color:#5b5b5b;}"
+  +"#cr-swipe .fr-price strong{color:#1D1D1F;font-weight:600;}"
+  +"#cr-swipe .fr-price .sep{color:#CBBFA6;margin:0 9px;}"
+  +"#cr-swipe .fr-panel{flex:1 1 46%;background:#fff;border-radius:14px;padding:24px 26px;box-shadow:0 1px 4px rgba(29,29,31,.05);box-sizing:border-box;}"
+  +"#cr-swipe .fr-ptitle{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#2A66A6;font-weight:700;margin:0 0 14px;}"
+  +"#cr-swipe .fr-day{padding:11px 0;border-bottom:1px solid #F2ECDD;}"
   +"#cr-swipe .fr-day:last-child{border-bottom:none;padding-bottom:0;}"
-  +"#cr-swipe .fr-line{display:flex;justify-content:space-between;align-items:baseline;gap:14px;}"
-  +"#cr-swipe .fr-date{font-size:16.5px;color:#1D1D1F;font-weight:600;}"
-  +"#cr-swipe .fr-time{font-size:15.5px;color:#2E7C7C;font-weight:600;white-space:nowrap;}"
+  +"#cr-swipe .fr-line{display:flex;justify-content:space-between;align-items:baseline;gap:12px;}"
+  +"#cr-swipe .fr-date{font-size:16px;color:#1D1D1F;font-weight:600;}"
+  +"#cr-swipe .fr-time{font-size:15px;color:#2E7C7C;font-weight:600;white-space:nowrap;}"
   +"#cr-swipe .fr-opens{font-size:13px;color:#8a8a8a;margin:4px 0 0;}"
-  +"#cr-swipe .fr-dir{margin-top:18px;background:none;border:0;padding:0;color:#2E9E4F;font-weight:600;font-size:15px;cursor:pointer;font-family:inherit;}"
+  +"#cr-swipe .fr-dir{margin-top:16px;background:none;border:0;padding:0;color:#2E9E4F;font-weight:600;font-size:15px;cursor:pointer;font-family:inherit;}"
   +"#cr-swipe .fr-dir:hover{color:#237A3C;}"
   +"#cr-swipe .fr-addr{margin:10px 0 0;font-size:14px;color:#1D1D1F;line-height:1.6;}"
   +"#cr-swipe .fr-addr a{color:#2E7C7C;font-weight:500;}"
+  +"#cr-swipe .fr-nav{display:flex;justify-content:flex-end;gap:10px;margin:18px 0 0;}"
+  +"#cr-swipe .fr-nav button{width:36px;height:36px;border-radius:50%;border:1px solid #E4DAC6;background:#fff;color:#2A66A6;font-size:17px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,opacity .15s;}"
+  +"#cr-swipe .fr-nav button:hover{background:#FBF6ED;}"
+  +"#cr-swipe .fr-nav button[disabled]{opacity:.3;cursor:default;}"
   +"@media(max-width:680px){"
-  +"#cr-swipe .fr-wrap{padding:26px 14px 44px;}"
-  +"#cr-swipe .fr-in{flex-direction:column;align-items:flex-start;gap:26px;}"
-  +"#cr-swipe .fr-h2{font-size:23px;}"
-  +"#cr-swipe .fr-panel{width:100%;box-sizing:border-box;}"
+  +"#cr-swipe .fr-wrap{padding:20px 16px 34px;}"
+  +"#cr-swipe .fr-in{flex-direction:column;align-items:stretch;gap:24px;}"
+  +"#cr-swipe .fr-h2{font-size:22px;}"
+  +"#cr-swipe .fr-panel{width:100%;}"
   +"}";
   function ensureCSS(){ if(!document.getElementById('sh-option-cards-css')){ var st=document.createElement('style'); st.id='sh-option-cards-css'; st.textContent=CSS; (document.head||document.documentElement).appendChild(st); } }
 
@@ -143,7 +156,7 @@
   }
 
   /* ---- data (fetched once, cached) ---- */
-  var DATA=null;          /* {free:[ev..], simply:[ev..], weekly:[ev..]} */
+  var DATA=null;
   var fetching=false;
   function feedUrl(id){
     var now=new Date();
@@ -175,6 +188,13 @@
   }
 
   /* ---- render (idempotent + self-healing) ---- */
+  function priceHtml(price){
+    if(!price) return '';
+    var parts=price.map(function(seg){
+      return seg.length>1 ? (seg[0]+' <strong>'+seg[1]+'</strong>') : '<strong>'+seg[0]+'</strong>';
+    });
+    return '<div class="fr-price">'+parts.join('<span class="sep">|</span>')+'</div>';
+  }
   function fillLists(root){
     CARDS.forEach(function(c){
       var el=root.querySelector('.fr-list[data-key="'+c.key+'"]'); if(!el)return;
@@ -185,30 +205,39 @@
   }
   function build(root){
     ensureCSS();
-    var slides=CARDS.map(function(c){
-      var imgs=''; for(var i=0;i<c.lotus;i++){ imgs+='<img src="'+LOTUS+'" alt="">'; }
+    var last=CARDS.length-1;
+    var slides=CARDS.map(function(c,i){
+      var imgs=''; for(var k=0;k<c.lotus;k++){ imgs+='<img src="'+LOTUS+'" alt="">'; }
       var tag=c.tag?'<span class="tag'+(c.tagNew?' tag-new':'')+'">'+c.tag+'</span>':'';
       var mark='<div class="fr-mark'+(c.lotus>1?' multi':'')+'">'+imgs+tag+'</div>';
       var desc=c.desc.map(function(p){return '<p>'+p+'</p>';}).join('');
+      var price=priceHtml(c.price);
+      var nav='<div class="fr-nav">'
+        +'<button class="fr-prev" type="button" aria-label="Previous card"'+(i===0?' disabled':'')+'>&larr;</button>'
+        +'<button class="fr-next" type="button" aria-label="Next card"'+(i===last?' disabled':'')+'>&rarr;</button></div>';
       return '<div class="sw-slide"><div class="fr-wrap"><div class="fr-in">'
-        +'<div class="fr-copy">'+mark+'<h2 class="fr-h2">'+c.title+'</h2>'+desc+'</div>'
+        +'<div class="fr-copy">'+mark+'<h2 class="fr-h2">'+c.title+'</h2>'+desc+price+'</div>'
         +'<div class="fr-panel"><p class="fr-ptitle">Next dates</p><div class="fr-list" data-key="'+c.key+'"><p class="fr-opens">Loading…</p></div>'
         +'<button class="fr-dir" type="button">Get directions →</button>'
         +'<p class="fr-addr" hidden>59 Whaddon Road,<br>Cheltenham GL52 5NE<br><a href="'+MAPS_URL+'" target="_blank" rel="noopener">'+MAPS_LABEL+'</a></p>'
+        +nav
         +'</div></div></div></div>';
     }).join('');
     var dots=CARDS.map(function(c,i){return '<button aria-label="Card '+(i+1)+'"'+(i===0?' class="on"':'')+'></button>';}).join('');
-    root.innerHTML='<p class="sw-title">Get Started Options</p><div class="sw-top">'+dots+'</div><div class="sw-track">'+slides+'</div>';
+    root.innerHTML='<div class="sw-card"><p class="sw-title">Get Started Options</p><div class="sw-top">'+dots+'</div><div class="sw-track">'+slides+'</div></div>';
 
     if(new Date()>=NEW_UNTIL){ var nb=root.querySelector('.tag-new'); if(nb) nb.style.display='none'; }
 
     var track=root.querySelector('.sw-track');
     var dotEls=[].slice.call(root.querySelectorAll('.sw-top button'));
     var slideEls=root.querySelectorAll('.sw-slide');
-    dotEls.forEach(function(d,i){ d.addEventListener('click',function(){ slideEls[i].scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'}); }); });
+    function goTo(i){ if(i<0||i>=slideEls.length)return; slideEls[i].scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'}); }
+    dotEls.forEach(function(d,i){ d.addEventListener('click',function(){ goTo(i); }); });
     track.addEventListener('scroll',function(){ var i=Math.round(track.scrollLeft/track.clientWidth); dotEls.forEach(function(d,k){ d.classList.toggle('on',k===i); }); },{passive:true});
 
     [].slice.call(root.querySelectorAll('.fr-dir')).forEach(function(btn){ btn.addEventListener('click',function(){ var a=btn.nextElementSibling; if(a) a.hidden=!a.hidden; }); });
+    [].slice.call(root.querySelectorAll('.fr-prev')).forEach(function(btn,i){ btn.addEventListener('click',function(){ goTo(i-1); }); });
+    [].slice.call(root.querySelectorAll('.fr-next')).forEach(function(btn,i){ btn.addEventListener('click',function(){ goTo(i+1); }); });
 
     fillLists(root);
     if(!DATA){ loadData(function(){ document.querySelectorAll('#cr-swipe').forEach(function(rt){ fillLists(rt); }); }); }
@@ -216,11 +245,10 @@
   function render(){
     var root=document.getElementById('cr-swipe');
     if(!root) return;
-    if(root.querySelector('.sw-track')) return;   /* already built — don't loop */
+    if(root.querySelector('.sw-track')) return;
     build(root);
   }
 
-  /* run now, and re-run whenever Squarespace redraws / blanks the block */
   render();
   var mo=new MutationObserver(function(){ render(); });
   try{ mo.observe(document.documentElement,{childList:true,subtree:true}); }catch(e){}
