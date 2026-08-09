@@ -86,7 +86,7 @@
   +"#cr-swipe .fr-dir:hover{color:#237A3C;}"
   +"#cr-swipe .fr-addr{margin:10px 0 0;font-size:14px;color:#1D1D1F;line-height:1.6;}"
   +"#cr-swipe .fr-addr a{color:#2E7C7C;font-weight:500;}"
-  +"#cr-swipe .fr-nav{display:flex;justify-content:flex-end;gap:10px;margin:18px 0 0;}"
+  +"#cr-swipe .fr-nav{display:flex;justify-content:flex-end;gap:10px;margin:12px 0 0;padding-top:12px;border-top:1px solid #F2ECDD;}"
   +"#cr-swipe .fr-nav button{width:36px;height:36px;border-radius:50%;border:1px solid #E4DAC6;background:#fff;color:#2A66A6;font-size:17px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,opacity .15s;}"
   +"#cr-swipe .fr-nav button:hover{background:#FBF6ED;}"
   +"#cr-swipe .fr-nav button[disabled]{opacity:.3;cursor:default;}"
@@ -218,9 +218,9 @@
       return '<div class="sw-slide"><div class="fr-wrap"><div class="fr-in">'
         +'<div class="fr-copy">'+mark+'<h2 class="fr-h2">'+c.title+'</h2>'+desc+price+'</div>'
         +'<div class="fr-panel"><p class="fr-ptitle">Next dates</p><div class="fr-list" data-key="'+c.key+'"><p class="fr-opens">Loading…</p></div>'
+        +nav
         +'<button class="fr-dir" type="button">Get directions →</button>'
         +'<p class="fr-addr" hidden>59 Whaddon Road,<br>Cheltenham GL52 5NE<br><a href="'+MAPS_URL+'" target="_blank" rel="noopener">'+MAPS_LABEL+'</a></p>'
-        +nav
         +'</div></div></div></div>';
     }).join('');
     var dots=CARDS.map(function(c,i){return '<button aria-label="Card '+(i+1)+'"'+(i===0?' class="on"':'')+'></button>';}).join('');
