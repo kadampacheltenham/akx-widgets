@@ -4,12 +4,12 @@
  if(!document.getElementById('akx-prayers-font')){var _l=document.createElement('link');_l.id='akx-prayers-font';_l.rel='stylesheet';_l.href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Cormorant+Garamond:wght@500;600&display=swap';document.head.appendChild(_l);}
  ROOT.innerHTML = '' + String.raw`<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
 <style>
-#akx-prayers{--coral:#E2886A;--coral-d:#D2775B;--cream:#FBF6ED;--page:#FDFBF6;--ink:#1D1D1F;--teal:#2E7C7C;--catcol:#4A6B66;--gold:#C69A3E;--goldsoft:#D2B472;--line:#EDE4D3;--soft:#8A8072;--faint:#AFA694;font-family:'Inter',sans-serif;color:var(--ink);display:block;max-width:860px;margin:0 auto;-webkit-font-smoothing:antialiased}
+#akx-prayers{--coral:#E2886A;--coral-d:#D2775B;--cream:#FBF6ED;--page:#FDFBF6;--ink:#1D1D1F;--teal:#2E7C7C;--catcol:#4A6B66;--gold:#C69A3E;--goldsoft:#D2B472;--line:#EDE4D3;--soft:#8A8072;--faint:#AFA694;font-family:'Inter',sans-serif;color:var(--ink);display:block;max-width:1040px;margin:0 auto;-webkit-font-smoothing:antialiased}
 #akx-prayers *{box-sizing:border-box;margin:0;padding:0}
 #akx-prayers button{touch-action:manipulation;-webkit-tap-highlight-color:rgba(0,0,0,0);font-family:'Inter',sans-serif}
 #akx-prayers .banner{position:relative;overflow:hidden;background:linear-gradient(115deg,#FBF6ED 0%,#F9EEDF 55%,#F6E3D3 100%);border-radius:26px;box-shadow:0 3px 20px rgba(29,29,31,.06);display:grid;grid-template-columns:1fr 240px;gap:28px;align-items:center;padding:48px 52px}
 #akx-prayers .eyebrow{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:18px}
-#akx-prayers .banner p{color:var(--soft);font-size:14.5px;line-height:1.65;max-width:440px;margin-top:20px}
+#akx-prayers .banner p{color:var(--soft);font-size:14.5px;line-height:1.65;max-width:520px;margin-top:20px}
 #akx-prayers .bigbtn{display:inline-flex;align-items:center;gap:12px;border:none;cursor:pointer;background:var(--coral);color:#fff;font-weight:600;font-size:19px;padding:17px 32px;border-radius:999px;box-shadow:0 8px 22px rgba(226,136,106,.35);transition:background .18s}
 #akx-prayers .bigbtn:hover{background:var(--coral-d)}
 #akx-prayers .photo{width:240px;height:240px;border-radius:50%;object-fit:cover;display:block;-webkit-mask-image:radial-gradient(circle closest-side,#000 82%,transparent 99%);mask-image:radial-gradient(circle closest-side,#000 82%,transparent 99%)}
@@ -18,7 +18,7 @@
 #akx-prayers .reveal:hover{background:var(--cream)}
 #akx-prayers .scrim{position:fixed;inset:0;background:rgba(29,29,31,.32);opacity:0;pointer-events:none;transition:opacity .3s;z-index:40;cursor:pointer}
 #akx-prayers .scrim.show{opacity:1;pointer-events:auto}
-#akx-prayers .dialog{position:fixed;left:50%;top:50%;transform:translate(-50%,-46%) scale(.98);width:min(480px,calc(100vw - 28px));max-height:calc(100vh - 40px);overflow:auto;background:#FFFDF8;border-radius:24px;box-shadow:0 24px 70px rgba(29,29,31,.22);padding:34px 34px 28px;opacity:0;pointer-events:none;z-index:50;transition:opacity .3s,transform .3s}
+#akx-prayers .dialog{position:fixed;left:50%;top:50%;transform:translate(-50%,-46%) scale(.98);width:min(600px,calc(100vw - 32px));max-height:calc(100vh - 40px);overflow:auto;background:#FFFDF8;border-radius:24px;box-shadow:0 24px 70px rgba(29,29,31,.22);padding:34px 34px 28px;opacity:0;pointer-events:none;z-index:50;transition:opacity .3s,transform .3s}
 #akx-prayers .dialog.show{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
 #akx-prayers .dhead{display:flex;align-items:center;gap:13px;margin-bottom:20px}
 #akx-prayers .dhead .ico{width:44px;height:44px;border-radius:50%;background:var(--cream);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
