@@ -1,8 +1,8 @@
 (function(){
  var ROOT=document.getElementById('akx-prayers');
  if(!ROOT||ROOT.dataset.done) return; ROOT.dataset.done='1';
- if(!document.getElementById('akx-prayers-font')){var _l=document.createElement('link');_l.id='akx-prayers-font';_l.rel='stylesheet';_l.href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Cormorant+Garamond:wght@500;600&display=swap';document.head.appendChild(_l);}
- ROOT.innerHTML = '' + String.raw`<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+ if(!document.getElementById('akx-prayers-font')){var _l=document.createElement('link');_l.id='akx-prayers-font';_l.rel='stylesheet';_l.href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Cormorant+Garamond:wght@500;600;700&display=swap';document.head.appendChild(_l);}
+ ROOT.innerHTML = '' + String.raw`<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 #akx-prayers{--coral:#E2886A;--coral-d:#D2775B;--cream:#FBF6ED;--page:#FDFBF6;--ink:#1D1D1F;--teal:#2E7C7C;--catcol:#4A6B66;--gold:#C69A3E;--goldsoft:#D2B472;--line:#EDE4D3;--soft:#8A8072;--faint:#AFA694;font-family:'Inter',sans-serif;color:var(--ink);display:block;max-width:1040px;margin:0 auto;-webkit-font-smoothing:antialiased}
 #akx-prayers *{box-sizing:border-box;margin:0;padding:0}
@@ -22,7 +22,7 @@
 #akx-prayers .dialog.show{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
 #akx-prayers .dhead{display:flex;align-items:center;gap:13px;margin-bottom:20px}
 #akx-prayers .dhead .ico{width:44px;height:44px;border-radius:50%;background:var(--cream);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
-#akx-prayers .dhead h3{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:25px;color:var(--catcol)}
+#akx-prayers .dhead h3{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:25px;color:var(--catcol)}
 #akx-prayers .close{position:absolute;top:16px;right:16px;background:none;border:none;cursor:pointer;color:var(--faint);padding:6px;line-height:0}
 #akx-prayers label{display:block;font-size:13px;font-weight:600;color:#5E5748;margin-bottom:6px}
 #akx-prayers label .opt{font-weight:400;color:var(--faint)}
@@ -38,12 +38,12 @@
 #akx-prayers .dfoot{text-align:center;font-size:11.5px;color:var(--faint);margin-top:13px;line-height:1.6}
 #akx-prayers .dpanel{display:none;text-align:center;padding:6px 2px 4px}
 #akx-prayers .dpanel.show{display:block}
-#akx-prayers .dpanel h3{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:25px;margin-bottom:10px;color:var(--catcol)}
+#akx-prayers .dpanel h3{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:25px;margin-bottom:10px;color:var(--catcol)}
 #akx-prayers .dpanel p{font-size:14.5px;line-height:1.7;color:var(--soft)}
 #akx-prayers .ghost{display:inline-block;background:none;border:1.5px solid var(--line);color:var(--teal);border-radius:999px;font-weight:600;font-size:14px;padding:11px 26px;cursor:pointer;margin-top:20px}
 #akx-prayers .ghost:hover{background:var(--cream)}
-#akx-prayers .ccat{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:19px;line-height:1.3;color:var(--catcol)}
-#akx-prayers .ccatnote{font-size:10.5px;color:var(--faint);margin-top:2px;padding-bottom:9px;border-bottom:1px solid var(--line);margin-bottom:10px}
+#akx-prayers .ccat{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:19px;line-height:1.3;color:var(--catcol)}
+#akx-prayers .ccatnote{font-size:10.5px;color:var(--faint);margin-top:2px;margin-bottom:8px}
 #akx-prayers .cmonth{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);font-weight:600;margin:10px 2px 4px}
 #akx-prayers .centry{display:flex;align-items:center;padding:3px 2px}
 #akx-prayers .centry .hm{width:26px;height:26px;flex:0 0 auto;margin-right:10px}
@@ -51,6 +51,7 @@
 #akx-prayers .centry .cm{color:var(--gold)}
 #akx-prayers .centry .dt{font-size:10.5px;color:var(--faint);white-space:nowrap;flex:0 0 auto;margin-left:auto;padding-left:12px;font-variant-numeric:tabular-nums}
 #akx-prayers .pcat{margin-bottom:20px}
+#akx-prayers .pcat + .pcat{border-top:1px solid var(--line);padding-top:18px}
 #akx-prayers .loadmsg{font-size:13px;color:var(--faint);text-align:center;padding:16px 0}
 @media(max-width:720px){
  #akx-prayers .banner{grid-template-columns:1fr;padding:34px 24px;text-align:center}
