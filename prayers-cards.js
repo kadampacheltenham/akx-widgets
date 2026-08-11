@@ -63,6 +63,7 @@
   +"#akx-prayers-cards .pc-card{position:relative;background:#fff;border:1px solid #efeadf;border-radius:22px;box-shadow:0 10px 34px rgba(0,0,0,.07);display:flex;gap:34px;align-items:flex-start;padding:30px 34px;}"
   +"#akx-prayers-cards .pc-tag{position:absolute;top:16px;left:18px;z-index:3;background:#E2886A;color:#fff;font-size:.7rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:5px 12px;border-radius:999px;text-decoration:none;white-space:nowrap;line-height:1.15;box-shadow:0 3px 10px rgba(226,136,106,.38);}"
   +"#akx-prayers-cards .pc-tag:hover{background:#D2775B;}"
+  +"#akx-prayers-cards .pc-tag.up{background:#EBA98D;box-shadow:0 3px 10px rgba(226,136,106,.28);}"
   +"#akx-prayers-cards .pc-disc{flex:0 0 46%;width:46%;aspect-ratio:1/1;border-radius:50%;overflow:hidden;background:radial-gradient(circle at 50% 42%,#F3EFF7,#E7DEEF);box-shadow:0 0 0 7px rgba(126,92,168,.10);}"
   +"#akx-prayers-cards .pc-disc img{width:100%;height:100%;object-fit:cover;display:block;}"
   +"#akx-prayers-cards .pc-disc.fig img{object-fit:contain;transform:scale(1.04);}"
@@ -107,7 +108,7 @@
       var slide=document.createElement('div'); slide.className='pc-slide';
       var card=document.createElement('div'); card.className='pc-card';
       if(TITLECOL[c.abbr]) card.style.setProperty('--cc', TITLECOL[c.abbr]);
-      var tag=(ci===0 && c._next) ? '<a class="pc-tag" href="#calendar">Next prayers</a>' : '';
+      var tag=c._tag ? '<a class="pc-tag'+(c._tag==='Upcoming'?' up':'')+'" href="#calendar">'+c._tag+'</a>' : '';
       card.innerHTML=
         tag+'<div class="pc-disc'+(c.fig?' fig':'')+'"><img src="'+IMG+c.img+'" alt="'+esc((c.title||'').replace(/<[^>]+>/g,''))+'" referrerpolicy="no-referrer"></div>'
         +'<div class="pc-body">'
@@ -180,10 +181,13 @@
           }
         });
       });
-      CARDS.forEach(function(c){ var n=nextByAbbr[c.abbr]; c.nextStr = n? fmtNext(n) : ''; c._next = n? n.date : null; });
-      var lead=null, best=null;
-      CARDS.forEach(function(c){ if(c._next && (!best || c._next<best)){ best=c._next; lead=c; } });
-      var order = lead ? [lead].concat(CARDS.filter(function(c){return c!==lead;})) : CARDS.slice();
+      CARDS.forEach(function(c){ var n=nextByAbbr[c.abbr]; c.nextStr = n? fmtNext(n) : ''; c._next = n? n.date : null; c._tag=null; });
+      var dated=CARDS.filter(function(c){return c._next;}).sort(function(a,b){return a._next-b._next;});
+      var lead=dated[0]||null, second=dated[1]||null;
+      if(lead) lead._tag='Next prayers';
+      if(second) second._tag='Upcoming';
+      var used=[]; if(lead)used.push(lead); if(second)used.push(second);
+      var order = used.concat(CARDS.filter(function(c){return used.indexOf(c)<0;}));
       cb(order);
     }).catch(function(){ cb(CARDS.slice()); });
   }
