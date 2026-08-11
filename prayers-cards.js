@@ -71,7 +71,7 @@
   +"#akx-prayers-cards .pc-see{font-style:italic;font-weight:600;color:var(--blue);}"
   +"#akx-prayers-cards .pc-see a{color:inherit;text-decoration:underline;}"
   +"#akx-prayers-cards .pc-link{color:var(--purple);text-decoration:underline;font-weight:600;}"
-  +"#akx-prayers-cards .pc-clip{display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;-webkit-line-clamp:3;}"
+  +"#akx-prayers-cards .pc-clip{display:block;}"
   +"#akx-prayers-cards .pc-card.open .pc-desc.pc-clip{-webkit-line-clamp:unset;display:block;}"
   +"#akx-prayers-cards .pc-more{max-height:0;overflow:hidden;transition:max-height .35s ease;}#akx-prayers-cards .pc-card.open .pc-more{max-height:680px;}"
   +"#akx-prayers-cards .pc-wexp{margin-top:14px;padding-top:14px;border-top:1px dashed #e6e0d5;}"
@@ -81,7 +81,7 @@
   +"#akx-prayers-cards .pc-card{flex-direction:column;align-items:center;text-align:center;padding:26px 22px 24px;}"
   +"#akx-prayers-cards .pc-disc{width:210px;height:210px;aspect-ratio:auto;flex:none;margin-bottom:18px;}"
   +"#akx-prayers-cards .pc-freq{justify-content:center;}#akx-prayers-cards .pc-body{width:100%;}"
-  +"#akx-prayers-cards .pc-desc{text-align:left;font-size:1rem;}#akx-prayers-cards .pc-clip{-webkit-line-clamp:1;}"
+  +"#akx-prayers-cards .pc-desc{text-align:left;font-size:1rem;}#akx-prayers-cards .pc-clip{display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;-webkit-line-clamp:2;}"
   +"#akx-prayers-cards .pc-wexp{text-align:left;}"
   +"#akx-prayers-cards .pc-prev{left:-6px;}#akx-prayers-cards .pc-next{right:-6px;}#akx-prayers-cards .pc-nav{width:38px;height:38px;font-size:1.1rem;}"
   +"}";
@@ -123,16 +123,19 @@
 
     var idx=0, cards=track.querySelectorAll('.pc-card');
     function height(){ view.style.height=cards[idx].offsetHeight+'px'; }
+    function placeNav(){ var disc=cards[idx].querySelector('.pc-disc'); if(!disc) return;
+      var dr=disc.getBoundingClientRect(), cr=caro.getBoundingClientRect();
+      var y=(dr.top-cr.top)+dr.height/2; prev.style.top=y+'px'; next.style.top=y+'px'; }
     function paint(){
       track.style.transform='translateX(-'+(idx*100)+'%)';
       dots.querySelectorAll('i').forEach(function(d,i){ d.classList.toggle('on',i===idx); });
-      prev.disabled=idx===0; next.disabled=idx===order.length-1; height();
+      prev.disabled=idx===0; next.disabled=idx===order.length-1; height(); placeNav();
     }
     function go(i){ idx=Math.max(0,Math.min(order.length-1,i)); paint(); }
     prev.onclick=function(){go(idx-1);}; next.onclick=function(){go(idx+1);};
     track.querySelectorAll('.pc-rm').forEach(function(b){ b.onclick=function(){
       var card=b.closest('.pc-card'); var open=card.classList.toggle('open');
-      b.childNodes[0].nodeValue=open?'Show less ':'Read more '; setTimeout(height,360);
+      b.childNodes[0].nodeValue=open?'Show less ':'Read more '; setTimeout(function(){ height(); placeNav(); },360);
     };});
     root.querySelectorAll('a[href^="#"]').forEach(function(a){ a.addEventListener('click',function(e){
       var id=a.getAttribute('href').slice(1); var t=document.getElementById(id);
@@ -143,9 +146,9 @@
     view.addEventListener('pointermove',function(e){ if(x0!==null) dx=e.clientX-x0; });
     view.addEventListener('pointerup',function(){ if(x0!==null){ if(dx<-45)go(idx+1); else if(dx>45)go(idx-1); } x0=null; });
     view.addEventListener('pointerleave',function(){ x0=null; });
-    window.addEventListener('resize',height);
-    track.querySelectorAll('img').forEach(function(im){ im.addEventListener('load',height); });
-    paint(); setTimeout(height,150);
+    window.addEventListener('resize',function(){ height(); placeNav(); });
+    track.querySelectorAll('img').forEach(function(im){ im.addEventListener('load',function(){ height(); placeNav(); }); });
+    paint(); setTimeout(function(){ height(); placeNav(); },150);
   }
 
   /* ---- calendar: match #ABBR tags, find each puja's next date, float soonest to front ---- */
