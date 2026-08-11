@@ -51,7 +51,7 @@
   ];
 
   var CSS=
-   "#cr-swipe{font-family:'Inter',-apple-system,Segoe UI,Roboto,sans-serif;max-width:720px;margin:0 auto;display:block;}"
+   "#cr-swipe{font-family:'Inter',-apple-system,Segoe UI,Roboto,sans-serif;max-width:1040px;margin:0 auto;display:block;}"
   +"#cr-swipe .sw-card{background:#FBF6ED;border-radius:18px;overflow:hidden;box-shadow:0 1px 6px rgba(29,29,31,.06);}"
   +"#cr-swipe .sw-title{text-align:center;color:#E2886A;font-weight:600;font-size:1.3rem;letter-spacing:.01em;margin:0;padding:30px 20px 2px;background:transparent;}"
   +"#cr-swipe .sw-top{display:flex;justify-content:center;gap:8px;padding:14px 0 6px;background:transparent;}"
