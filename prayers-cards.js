@@ -1,4 +1,4 @@
-/* Akanishta — Prayers & Pujas cards (swipe carousel, calendar-aware).
+/* Akanishta - Prayers & Pujas cards (swipe carousel, calendar-aware).
    Embed with:
      <div id="akx-prayers-cards"></div>
      <script src="https://kadampacheltenham.github.io/akx-widgets/prayers-cards.js" defer></script>
@@ -43,6 +43,7 @@
       more:'<b>What to expect:</b> Extensive chanted practice to remove obstacles, create favourable conditions, and renew commitments. There&rsquo;s a tea break halfway through to stretch your legs. Feel free to drop in for just part of the prayers if you don&rsquo;t have time to join the whole event. The prayers include a <i>tsog</i> offering, a special food offering to enlightened beings &mdash; if you wish, you can bring a small vegetarian offering (of food or non-alcoholic drink). There&rsquo;s often a get-together afterwards, with food and a cuppa. <span class="pc-see">See <a href="#calendar">calendar</a> below for when it&rsquo;s on next.</span>' }
   ];
 
+  var TITLECOL={PFWP:'#2A6E6A',HJ:'#8A5A22',Tara:'#2F6A46',WFJ:'#9E4E2C',POWA:'#2C5E92',OSG:'#8C6320',VY:'#8E2B2B',MD:'#9E4E2C'};
   var CLOCK='<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>';
 
   var CSS=""
@@ -59,16 +60,18 @@
   +"#akx-prayers-cards .pc-dots{display:flex;gap:8px;justify-content:center;margin-top:18px;flex-wrap:wrap;}"
   +"#akx-prayers-cards .pc-dots i{width:8px;height:8px;border-radius:50%;background:#d8d2ca;cursor:pointer;transition:all .25s;}"
   +"#akx-prayers-cards .pc-dots i.on{background:var(--purple);width:22px;border-radius:5px;}"
-  +"#akx-prayers-cards .pc-card{background:#fff;border:1px solid #efeadf;border-radius:22px;box-shadow:0 10px 34px rgba(0,0,0,.07);display:flex;gap:34px;align-items:flex-start;padding:30px 34px;}"
+  +"#akx-prayers-cards .pc-card{position:relative;background:#fff;border:1px solid #efeadf;border-radius:22px;box-shadow:0 10px 34px rgba(0,0,0,.07);display:flex;gap:34px;align-items:flex-start;padding:30px 34px;}"
+  +"#akx-prayers-cards .pc-tag{position:absolute;top:16px;left:18px;z-index:3;background:#E2886A;color:#fff;font-size:.7rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:5px 12px;border-radius:999px;text-decoration:none;white-space:nowrap;line-height:1.15;box-shadow:0 3px 10px rgba(226,136,106,.38);}"
+  +"#akx-prayers-cards .pc-tag:hover{background:#D2775B;}"
   +"#akx-prayers-cards .pc-disc{flex:0 0 46%;width:46%;aspect-ratio:1/1;border-radius:50%;overflow:hidden;background:radial-gradient(circle at 50% 42%,#F3EFF7,#E7DEEF);box-shadow:0 0 0 7px rgba(126,92,168,.10);}"
   +"#akx-prayers-cards .pc-disc img{width:100%;height:100%;object-fit:cover;display:block;}"
   +"#akx-prayers-cards .pc-disc.fig img{object-fit:contain;transform:scale(1.04);}"
   +"#akx-prayers-cards .pc-body{flex:1 1 auto;min-width:0;}"
-  +"#akx-prayers-cards .pc-ti{font-size:1.5rem;font-weight:600;color:var(--blue);margin:0 0 6px;line-height:1.2;}"
+  +"#akx-prayers-cards .pc-ti{font-size:1.5rem;font-weight:600;color:var(--cc,#2A66A6);margin:0 0 6px;line-height:1.2;}"
   +"#akx-prayers-cards .pc-freq{display:flex;align-items:center;gap:8px;color:var(--purple);font-weight:500;font-size:.98rem;margin:0 0 3px;}"
   +"#akx-prayers-cards .pc-next{color:var(--muted);font-size:.9rem;margin:0 0 14px;}#akx-prayers-cards .pc-next b{color:var(--purple);font-weight:600;}"
   +"#akx-prayers-cards .pc-desc{color:var(--muted);font-size:1.06rem;line-height:1.72;margin:0;}"
-  +"#akx-prayers-cards .pc-see{font-style:italic;font-weight:600;color:var(--blue);}"
+  +"#akx-prayers-cards .pc-see{font-style:italic;font-weight:400;color:var(--cc,#2A66A6);}"
   +"#akx-prayers-cards .pc-see a{color:inherit;text-decoration:underline;}"
   +"#akx-prayers-cards .pc-link{color:var(--purple);text-decoration:underline;font-weight:600;}"
   +"#akx-prayers-cards .pc-clip{display:block;}"
@@ -80,6 +83,7 @@
   +"@media(max-width:720px){"
   +"#akx-prayers-cards .pc-card{flex-direction:column;align-items:center;text-align:center;padding:26px 22px 24px;}"
   +"#akx-prayers-cards .pc-disc{width:210px;height:210px;aspect-ratio:auto;flex:none;margin-bottom:18px;}"
+  +"#akx-prayers-cards .pc-tag{top:14px;left:50%;transform:translateX(-50%);white-space:normal;text-align:center;max-width:64px;padding:5px 10px;}"
   +"#akx-prayers-cards .pc-freq{justify-content:center;}#akx-prayers-cards .pc-body{width:100%;}"
   +"#akx-prayers-cards .pc-desc{text-align:left;font-size:1rem;}#akx-prayers-cards .pc-clip{display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;-webkit-line-clamp:2;}"
   +"#akx-prayers-cards .pc-wexp{text-align:left;}"
@@ -99,11 +103,13 @@
     var caro=root.querySelector('.pc-caro');
     var view=document.createElement('div'); view.className='pc-view';
     var track=document.createElement('div'); track.className='pc-track';
-    order.forEach(function(c){
+    order.forEach(function(c,ci){
       var slide=document.createElement('div'); slide.className='pc-slide';
       var card=document.createElement('div'); card.className='pc-card';
+      if(TITLECOL[c.abbr]) card.style.setProperty('--cc', TITLECOL[c.abbr]);
+      var tag=(ci===0 && c._next) ? '<a class="pc-tag" href="#calendar">Next prayers</a>' : '';
       card.innerHTML=
-        '<div class="pc-disc'+(c.fig?' fig':'')+'"><img src="'+IMG+c.img+'" alt="'+esc((c.title||'').replace(/<[^>]+>/g,''))+'" referrerpolicy="no-referrer"></div>'
+        tag+'<div class="pc-disc'+(c.fig?' fig':'')+'"><img src="'+IMG+c.img+'" alt="'+esc((c.title||'').replace(/<[^>]+>/g,''))+'" referrerpolicy="no-referrer"></div>'
         +'<div class="pc-body">'
         +'<h3 class="pc-ti">'+c.title+'</h3>'
         +'<div class="pc-freq">'+CLOCK+' '+c.freq+'</div>'
