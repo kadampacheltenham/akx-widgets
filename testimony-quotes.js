@@ -16,8 +16,8 @@
 (function () {
   "use strict";
 
-  var TEST_CSV  = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT_bF_xgfc8pBMdRX-OD_JMO3iZ6OAdZoWdpbg9gokENzmCB-kHorN0ED3RJ3eWZ06BSxME5IUpxLWI/pub?gid=1176818478&single=true&output=csv";
-  var QUOTE_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT_bF_xgfc8pBMdRX-OD_JMO3iZ6OAdZoWdpbg9gokENzmCB-kHorN0ED3RJ3eWZ06BSxME5IUpxLWI/pub?gid=693990413&single=true&output=csv";
+  var TEST_CSV  = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTo4B-CZ-2i-oU1WllTO6iXl-P4oWNZlwkCqkJzEUgTgOTCRFK6OLFNAqjYNh5JqutjZ-VjWLoVdmfv/pub?gid=1228099353&single=true&output=csv";
+  var QUOTE_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTo4B-CZ-2i-oU1WllTO6iXl-P4oWNZlwkCqkJzEUgTgOTCRFK6OLFNAqjYNh5JqutjZ-VjWLoVdmfv/pub?gid=1944319509&single=true&output=csv";
   var IMG_BASE  = "https://kadampacheltenham.github.io/akx-widgets/images/testimonies/";
 
   var TEST_STYLES  = ["t1", "t4"];   // in-use testimony styles
@@ -25,18 +25,39 @@
 
   var VGKGR = "Geshe Kelsang Gyatso"; // default author when a book is present
 
-  // Book title -> Tharpa UK link (extend as needed)
-  var BOOKS = {
-    "how to transform your life": "https://tharpa.com/uk/how-to-transform-your-life",
-    "joyful path of good fortune": "https://tharpa.com/uk/joyful-path-of-good-fortune",
-    "universal compassion": "https://tharpa.com/uk/universal-compassion",
-    "the new eight steps to happiness": "https://tharpa.com/uk/the-new-eight-steps-to-happiness",
-    "the new heart of wisdom": "https://tharpa.com/uk/the-new-heart-of-wisdom",
-    "meaningful to behold": "https://tharpa.com/uk/meaningful-to-behold",
-    "how to understand the mind": "https://tharpa.com/uk/how-to-understand-the-mind",
-    "ocean of nectar": "https://tharpa.com/uk/ocean-of-nectar",
-    "essence of vajrayana": "https://tharpa.com/uk/essence-of-vajrayana"
-  };
+  // [ code, full title, Tharpa UK url ] — type the CODE (or the full title) in the sheet 'book' cell
+  var BOOKS = [
+    ["HTTYL","How to Transform Your Life","https://tharpa.com/uk/how-to-transform-your-life"],
+    ["HTUM","How to Understand the Mind","https://tharpa.com/uk/how-to-understand-the-mind"],
+    ["JPGF","Joyful Path of Good Fortune","https://tharpa.com/uk/joyful-path-of-good-fortune"],
+    ["MOD","The Mirror of Dharma with Additions","https://tharpa.com/uk/the-mirror-of-dharma-with-additions"],
+    ["NHW","The New Heart of Wisdom","https://tharpa.com/uk/the-new-heart-of-wisdom"],
+    ["MB","Modern Buddhism","https://tharpa.com/uk/modern-buddhism"],
+    ["TGP","Tantric Grounds and Paths","https://tharpa.com/uk/festival-shop/tharpa-items/tantric-grounds-and-paths"],
+    ["NGDL","The New Guide to Dakini Land","https://tharpa.com/uk/the-new-guide-to-dakini-land"],
+    ["EOV","Essence of Vajrayana","https://tharpa.com/uk/essence-of-vajrayana"],
+    ["OIM","The Oral Instructions of Mahamudra","https://tharpa.com/uk/catalog/product/view/id/2454/s/the-oral-instructions-of-mahamudra/category/78/"],
+    ["GTM","Great Treasury of Merit","https://tharpa.com/uk/great-treasury-of-merit"],
+    ["NESH","The New Eight Steps to Happiness","https://tharpa.com/uk/the-new-eight-steps-to-happiness"],
+    ["ITB","Introduction to Buddhism","https://tharpa.com/uk/introduction-to-buddhism"],
+    ["SOHP","How to Solve Our Human Problems","https://tharpa.com/uk/how-to-solve-our-human-problems"],
+    ["MTB","Meaningful to Behold","https://tharpa.com/uk/meaningful-to-behold"],
+    ["GBWL","Guide to the Bodhisattva's Way of Life","https://tharpa.com/uk/guide-to-the-bodhisattvas-way-of-life"],
+    ["BV","The Bodhisattva Vow","https://tharpa.com/uk/the-bodhisattva-vow"],
+    ["UC","Universal Compassion","https://tharpa.com/uk/universal-compassion"],
+    ["NMH","The New Meditation Handbook","https://tharpa.com/uk/the-new-meditation-handbook"],
+    ["LMDJ","Living Meaningfully, Dying Joyfully","https://tharpa.com/uk/living-meaningfully-dying-joyfully"],
+    ["ON","Ocean of Nectar","https://tharpa.com/uk/ocean-of-nectar"],
+    ["HJ","Heart Jewel","https://tharpa.com/uk/heart-jewel-book"],
+    ["CLB","Clear Light of Bliss","https://tharpa.com/uk/festival-shop/tharpa-items/clear-light-of-bliss"],
+    ["MT","Mahamudra Tantra","https://tharpa.com/uk/mahamudra-tantra"]
+  ];
+  function norm(s){ return String(s||"").toLowerCase().replace(/[’‘]/g,"'").trim(); }
+  var _byCode={}, _byTitle={};
+  BOOKS.forEach(function(b){ _byCode[norm(b[0])]={t:b[1],u:b[2]}; _byTitle[norm(b[1])]={t:b[1],u:b[2]}; });
+  function resolveBook(x){ var k=norm(x); return _byCode[k]||_byTitle[k]||null; }
+  // attribution shorthands -> full display name
+  var ATTR_SHORT={ "vg":"Geshe Kelsang Gyatso","gkg":"Geshe Kelsang Gyatso","vgkgr":"Geshe Kelsang Gyatso","gkgr":"Geshe Kelsang Gyatso" };
 
   // Baked-in fallbacks so a fetch failure never leaves an empty block
   var FALLBACK = {
@@ -137,12 +158,14 @@
     return cache[url];
   }
 
+  // active column: Yes/blank = shown, No = hidden (dropdown-friendly)
+  var HIDDEN={ "no":1,"n":1,"false":1,"hide":1,"hidden":1,"0":1,"off":1 };
+
   // choose the item for a block: page-preferred but never exclusive
   function pickItem(items, page, seed){
     var active=items.filter(function(it){
-      if(String(it.active||"").trim()!=="") return false;      // active blank = live
-      if("quote" in it && !String(it.quote||"").trim()) return false;
-      if("name" in it && !String(it.quote||"").trim()) return false;
+      if(HIDDEN[String(it.active||"").trim().toLowerCase()]) return false;  // hidden
+      if(!String(it.quote||"").trim()) return false;                        // needs quote text
       return true;
     });
     if(!active.length) return null;
@@ -178,15 +201,19 @@
   }
 
   function attrHTML(item){
-    var name=String(item.attribution||"").trim();
-    var book=String(item.book||"").trim();
-    if(!name && book) name=VGKGR;                    // book present, author blank => VGKGR
+    var raw=String(item.attribution||"").trim();
+    var bookRaw=String(item.book||"").trim();
+    var b=resolveBook(bookRaw);
+    var name;
+    if(ATTR_SHORT[norm(raw)]) name=ATTR_SHORT[norm(raw)];   // VG/GKG => Geshe Kelsang Gyatso
+    else if(!raw && bookRaw) name=VGKGR;                    // any book => Geshe Kelsang Gyatso
+    else name=raw;                                          // Buddha / other teacher, as typed
     var out="";
     if(name) out+='<span class="q-attr">'+esc(name)+'</span>';
-    if(book){
-      var url=BOOKS[book.toLowerCase()];
-      var label='— <em>'+esc(book)+'</em>';
-      out+= (name?'<br>':'') + (url? '<a class="q-book" href="'+esc(url)+'" target="_blank" rel="noopener">'+label+'</a>' : '<span class="q-book" style="border:none">'+label+'</span>');
+    if(b){
+      out+=(name?'<br>':'')+'<a class="q-book" href="'+esc(b.u)+'" target="_blank" rel="noopener">— <em>'+esc(b.t)+'</em></a>';
+    } else if(bookRaw){
+      out+=(name?'<br>':'')+'<span class="q-book" style="border:none">— <em>'+esc(bookRaw)+'</em></span>';
     }
     return out;
   }
