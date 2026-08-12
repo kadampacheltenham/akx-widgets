@@ -25,9 +25,11 @@
     ".rmt-sub{font-size:.85rem;margin:0;color:#6b7a8d;line-height:1.4;}" +
     ".rmt-body{display:flex;flex-direction:column;gap:8px;}" +
     ".rmt-row{display:grid;grid-template-columns:88px 1fr auto;gap:12px;align-items:center;background:#FBF6ED;border:1px solid #efe6d4;border-radius:12px;padding:12px 14px;}" +
+    ".rmt-row.rmt-urgent{background:#FCEBEA;border-color:#E6B0AA;border-left:4px solid #C0392B;padding-left:11px;}" +
     ".rmt-date{font-size:.78rem;color:#8a7a5c;font-weight:600;line-height:1.25;}" +
     ".rmt-mid{min-width:0;}" +
     ".rmt-issue{font-size:.95rem;font-weight:600;color:#243b53;}" +
+    ".rmt-flag{display:inline-block;font-size:.66rem;font-weight:800;color:#fff;background:#C0392B;padding:2px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:.03em;margin-right:8px;vertical-align:middle;}" +
     ".rmt-floor{font-size:.8rem;color:#6b7a8d;margin-top:2px;}" +
     ".rmt-badge{font-size:.72rem;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap;text-transform:uppercase;letter-spacing:.02em;}" +
     ".rmt-empty,.rmt-loading,.rmt-err{font-size:.9rem;color:#6b7a8d;padding:14px 0;text-align:center;}" +
@@ -89,18 +91,42 @@
     return (s || "").replace(/[&<>]/g, function (c) { return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c]; });
   }
 
+  var CLOSED_SHOW_DAYS = 45; // closed items stay on the list this many days after closing
+
+  function daysSince(s) {
+    if (!s) return null;
+    var d = new Date(String(s).replace(" ", "T"));
+    if (isNaN(d)) return null;
+    return (Date.now() - d.getTime()) / 86400000;
+  }
+
+  function isUrgent(r) {
+    var flag = String(r[4] || "").trim().toLowerCase();
+    var issue = String(r[1] || "").trim().toLowerCase();
+    return flag === "yes" || issue === "fire or safety concern";
+  }
+
   function render(rows) {
     var body = document.getElementById("rmt-body");
     if (!body) return;
-    var data = rows.slice(1).filter(function (r) { return r && (r[1] || "").trim() !== ""; });
-    if (!data.length) { body.innerHTML = '<p class="rmt-empty">No open reports at the moment. 🌱</p>'; return; }
+    var data = rows.slice(1).filter(function (r) {
+      if (!r || (r[1] || "").trim() === "") return false;
+      if ((r[3] || "").trim().toLowerCase() === "closed") {
+        var age = daysSince(r[5]);           // column N = Closed date
+        if (age !== null && age > CLOSED_SHOW_DAYS) return false;
+      }
+      return true;
+    });
+    if (!data.length) { body.innerHTML = '<p class="rmt-empty">No reports to show right now. 🌱</p>'; return; }
     var html = "";
     data.forEach(function (r) {
       var date = fmtDate(r[0]), issue = esc(r[1]), floor = esc(r[2]), status = (r[3] || "Submitted").trim();
+      var closed = status.toLowerCase() === "closed";
+      var urgent = !closed && isUrgent(r);   // don't red-flag once resolved
       var col = COLOURS[status.toLowerCase()] || ["#eee", "#555"];
-      html += '<div class="rmt-row">' +
+      html += '<div class="rmt-row' + (urgent ? ' rmt-urgent' : '') + '">' +
         '<div class="rmt-date">' + esc(date) + '</div>' +
-        '<div class="rmt-mid"><div class="rmt-issue">' + issue + '</div>' + (floor ? '<div class="rmt-floor">' + floor + '</div>' : '') + '</div>' +
+        '<div class="rmt-mid"><div class="rmt-issue">' + (urgent ? '<span class="rmt-flag">Urgent</span>' : '') + issue + '</div>' + (floor ? '<div class="rmt-floor">' + floor + '</div>' : '') + '</div>' +
         '<span class="rmt-badge" style="background:' + col[0] + ';color:' + col[1] + '">' + esc(status) + '</span>' +
       '</div>';
     });
