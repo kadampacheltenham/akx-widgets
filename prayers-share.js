@@ -8,7 +8,7 @@
 #akx-prayers *{box-sizing:border-box;margin:0;padding:0}
 #akx-prayers button{touch-action:manipulation;-webkit-tap-highlight-color:rgba(0,0,0,0);font-family:'Inter',sans-serif}
 #akx-prayers .banner{position:relative;overflow:hidden;background:linear-gradient(115deg,#FBF6ED 0%,#F9EEDF 55%,#F6E3D3 100%);border-radius:26px;box-shadow:0 3px 20px rgba(29,29,31,.06);display:grid;grid-template-columns:1fr 240px;gap:28px;align-items:center;padding:48px 52px}
-#akx-prayers .eyebrow{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:18px}
+#akx-prayers .eyebrow{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:#A97E24;font-weight:600;margin-bottom:18px}#akx-prayers .ebbr{display:none}
 #akx-prayers .banner p{color:var(--soft);font-size:14.5px;line-height:1.65;max-width:520px;margin-top:20px}
 #akx-prayers .bigbtn{display:inline-flex;align-items:center;gap:12px;border:none;cursor:pointer;background:var(--coral);color:#fff;font-weight:600;font-size:19px;padding:17px 32px;border-radius:999px;box-shadow:0 8px 22px rgba(226,136,106,.35);transition:background .18s}
 #akx-prayers .bigbtn:hover{background:var(--coral-d)}
@@ -54,9 +54,13 @@
 #akx-prayers .pcat + .pcat{border-top:1px solid var(--line);padding-top:18px}
 #akx-prayers .loadmsg{font-size:13px;color:var(--faint);text-align:center;padding:16px 0}
 @media(max-width:720px){
- #akx-prayers .banner{grid-template-columns:1fr;padding:34px 24px;text-align:center}
- #akx-prayers .banner p{margin-left:auto;margin-right:auto}
- #akx-prayers .photo{width:180px;height:180px;margin:0 auto;order:-1}
+ #akx-prayers .banner{grid-template-columns:1fr;padding:34px 24px;text-align:center;justify-items:center}
+ #akx-prayers .bcopy{display:contents}
+ #akx-prayers .eyebrow{order:1;margin-bottom:14px}
+ #akx-prayers .photo{width:180px;height:180px;margin:0 auto 4px;order:2}
+ #akx-prayers .bigbtn{order:3;margin-top:14px}
+ #akx-prayers .banner p{order:4;margin-left:auto;margin-right:auto}
+ #akx-prayers .ebbr{display:block}
  #akx-prayers .bigbtn{font-size:17px;padding:15px 26px}
  #akx-prayers .lbl-desk{display:none}
  #akx-prayers input,#akx-prayers select{font-size:16px}
@@ -67,7 +71,7 @@
 
 <div class="banner">
  <div class="bcopy">
-  <div class="eyebrow">In times of Worry, suffering &amp; tragedy</div>
+  <div class="eyebrow">In times of Worry,<br class="ebbr"> suffering &amp; tragedy</div>
   <button class="bigbtn" id="akxOpen"><svg width="22" height="22" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 9c-1.6 3.2-1.6 12.5-1.6 15.2 0 1 .7 1.8 1.6 1.8s1.6-.8 1.6-1.8c0-2.7 0-12-1.6-15.2z" fill="#fff"/><path d="M18.4 12c-2.2 1.1-4.9 4.4-5.4 9.2-.2 1.7-.2 3.6 1.1 4.2 1.1.5 2.4-.2 3-1.2" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/><path d="M21.6 12c2.2 1.1 4.9 4.4 5.4 9.2.2 1.7.2 3.6-1.1 4.2-1.1.5-2.4-.2-3-1.2" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/></svg>Share your prayers</button>
   <p>Add the name of someone who is sick, suffering or passed away (including pets and animals) and we will hold them in our prayers. Names are read out at the beginning of some weekly and monthly prayers.</p>
  </div>
