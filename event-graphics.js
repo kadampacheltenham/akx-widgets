@@ -26,18 +26,20 @@
 
   // ---- aliases: whatever the two sheets' Event Type dropdowns say -> canonical ----
   var ALIAS = {
-    "talk":"talk", "public talk":"talk", "one-off talk":"talk", "one off talk":"talk",
+    "talk":"talk", "public talk":"talk", "public talks":"talk",
+    "one-off talk":"talk", "one off talk":"talk",
     "course":"course", "short course":"course", "day course":"course",
     "half-day course":"course", "half day course":"course",
     "retreat":"retreat", "day retreat":"retreat", "half-day retreat":"retreat",
     "half day retreat":"retreat", "meditation":"retreat", "drop-in":"retreat",
     "drop in":"retreat", "class":"retreat", "evening class":"retreat",
-    "free":"free", "free taster":"free", "taster":"free",
+    "free":"free", "free event":"free", "free events":"free",
     "free half-day":"free", "free half day":"free",
-    "silent day":"study", "silent":"study", "study":"study", "in-depth":"study",
-    "fp":"study", "ttp":"study", "foundation programme":"study",
+    "in-depth":"study", "in depth":"study", "in-depth event":"study", "in depth event":"study",
+    "silent day":"study", "silent":"study",
+    "study":"study", "fp":"study", "ttp":"study", "foundation programme":"study",
     "teacher training":"study", "teacher training programme":"study",
-    "special":"special", "special event":"special"
+    "special":"special", "special event":"special", "special events":"special"
   };
 
   function typeOf(x){ var k=String(x||"").trim().toLowerCase(); return ALIAS[k] || (TYPES[k]?k:"") ; }
