@@ -35,7 +35,7 @@
      feed: which calendar to match against (omit = static, no live dates).
      Match key is feed + day + time. tag = a plain neutral word-label. ---- */
   var EVENTS=[
-    {day:'Mon',time:'12:30',name:'Simply Meditate',dur:'30 min',loc:'chelt',tag:'Get started',
+    {day:'Mon',time:'12:30',name:'Simply Meditate',dur:'30 min',loc:'chelt',feed:'weekly',tag:'Get started',
      sum:'Reduce stress and cultivate inner peace|Come as you are|Check term dates above or calendar below',
      cta:{label:'Get directions &rarr;',url:DIR_CH,ext:1}},
     {day:'Mon',time:'18:30',name:'Evening meditation class',dur:'75 min',loc:'chelt',feed:'weekly',tag:'Drop-in welcome',oh:'5:45&ndash;6:15 pm',
@@ -108,6 +108,7 @@
   #akx-glance .nextline b{color:#1f6b5f;font-weight:600;}
   #akx-glance .nchip{display:inline-block;font-family:'Inter',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:#fff;padding:2px 8px;border-radius:999px;margin-right:6px;vertical-align:middle;}
   #akx-glance .nchip.talk{background:#C56B45;}
+  #akx-glance .nchip.new{background:#4FA35A;}
   #akx-glance .nstatic{color:#9a948b;font-style:italic;font-family:'Inter',sans-serif;font-size:.82rem;}
   #akx-glance .oh{grid-area:oh;display:flex;align-items:center;gap:10px;background:#FBF6ED;color:#5c6773;border:1px solid #EFE7D6;border-radius:8px;padding:7px 12px;font-size:.84rem;line-height:1.4;}
   #akx-glance .oh-pill{flex:none;font-family:'Inter',sans-serif;font-weight:800;font-size:.62rem;letter-spacing:.07em;text-transform:uppercase;color:#8a6d2f;background:#EFE3C8;border-radius:999px;padding:3px 9px;}
@@ -183,10 +184,15 @@
     var d=NEXT[k]; if(!d) return '';                         /* not loaded yet */
     var it=d.items||[];
     if(!it.length) return '<span class="nstatic">Resumes next term &mdash; see calendar</span>';
-    var f=it[0];
-    var head = f.talk
-      ? '<span class="nchip talk">Talk</span> <b>'+f.date+'</b>'+(f.title?' &mdash; '+esc(f.title):'')
-      : '<span class="nlbl">Next</span> <b>'+f.date+'</b>'+(f.title?' &mdash; '+esc(f.title):'');
+    var f=it[0], head;
+    if(f.talk){
+      head='<span class="nchip talk">Talk</span> <b>'+f.date+'</b>'+(f.title?' &mdash; '+esc(f.title):'');
+    } else {
+      var future = f.start && (Date.parse(f.start) > Date.now());   /* class not started yet */
+      var chip = f.isnew ? '<span class="nchip new">New</span> ' : '';
+      var word = (f.isnew && future) ? 'Starts' : 'Next';           /* a launching class reads "Starts" */
+      head = chip+'<span class="nlbl">'+word+'</span> <b>'+f.date+'</b>'+(f.title?' &mdash; '+esc(f.title):'');
+    }
     if(k==='weekend' && isMobile) return head;               /* mobile weekend: one date + title */
     return head+(it[1]?', then <b>'+it[1].date+'</b>':'');   /* second date in the same green */
   }
@@ -291,6 +297,7 @@
   function fmtHM(s,allDay){if(allDay)return'all';return new Intl.DateTimeFormat('en-GB',{timeZone:TZ,hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(s));}
   function fmtNice(s,allDay){return new Intl.DateTimeFormat('en-GB',{timeZone:TZ,weekday:'short',day:'numeric',month:'short'}).format(new Date(s)).replace(',','');}
   function isTalk(t){return /\[talk\]/i.test(t||'');}
+  function isNew(t){return /\[new\]/i.test(t||'');}
   function cleanTitle(t){return (t||'').replace(/\s*\[[^\]]*\]\s*/g,' ').replace(/\s{2,}/g,' ').trim();}
 
   function apiUrl(id,tMin,tMax){
@@ -315,10 +322,10 @@
       if(!e.feed) return;
       var k=mkeyOf(e), arr=byFeed[e.feed]||[], items;
       if(e.feed==='weekend'){
-        items=arr.slice(0,2).map(function(x){return {date:x.nice,title:cleanTitle(x.summary),talk:isTalk(x.summary),start:x.start};});
+        items=arr.slice(0,2).map(function(x){return {date:x.nice,title:cleanTitle(x.summary),talk:isTalk(x.summary),isnew:isNew(x.summary),start:x.start};});
       }else{
         items=arr.filter(function(x){return x.day===e.day && x.time===e.time;}).slice(0,2)
-          .map(function(x){return {date:x.nice,title:isTalk(x.summary)?cleanTitle(x.summary):'',talk:isTalk(x.summary),start:x.start};});
+          .map(function(x){return {date:x.nice,title:isTalk(x.summary)?cleanTitle(x.summary):'',talk:isTalk(x.summary),isnew:isNew(x.summary),start:x.start};});
       }
       NEXT[k]={items:items};
     });
