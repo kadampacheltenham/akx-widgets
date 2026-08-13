@@ -463,11 +463,13 @@
     var today=new Date(); today.setHours(0,0,0,0);
     var live = items.filter(function(it){ return isVisible(it, byId[it.id]||[], today); });
     var html='<h2 class="pg-h">Weekly Classes Programme</h2>'
-           +'<div class="pg-lead"><p>Below you\'ll find full details of the programme of weekly classes &mdash; including one-off public talks and short courses which run over a number of weeks. All these classes are drop-in and PAYG. If you choose to book online you\'ll have access to discounts such as bring a friend for half price, early bird pricing and 20% discount for booking a series, where these are available.</p></div>';
+           +'<div class="pg-lead"><p>Below you\'ll find full details of the programme of weekly classes &mdash; including one-off public talks and short courses which run over a number of weeks. If you choose to book online you\'ll have access to discounts such as bring a friend for half price, early bird pricing and 20% discount for booking a series, where these are available.</p></div>';
     if(!live.length){ html+='<div class="pg-msg">Nothing scheduled just now &mdash; please check back soon.</div>'; }
     else {
       var cardsHtml = live.map(function(it,idx){ return card(it, byId[it.id]||[], idx); });
-      html += cardsHtml.slice(0,4).join('');
+      var TQ = '<div style="max-width:1000px;margin:24px auto;"><div class="akx-tq" data-type="testimony" data-page="classes"></div></div>';
+      var head4 = cardsHtml.slice(0,4);
+      html += head4[0] + TQ + head4.slice(1).join('');   // rotating testimonial after the first card
       if(cardsHtml.length>4){
         html += '<div class="pg-more" id="pgMore">'+cardsHtml.slice(4).join('')+'</div>'
               + '<button type="button" class="pg-showall" id="pgShowAll">Show all '+cardsHtml.length+' events &darr;</button>';
