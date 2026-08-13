@@ -18,7 +18,7 @@
                  <script src="https://kadampacheltenham.github.io/akx-widgets/wc-glance.js" defer></script> */
 (function(){
   var MOUNT_ID='akx-glance';
-  var OH_INVITE='New? Let us welcome you and show you around before the class.';
+  var OH_INVITE='Let us welcome you and show you around before the class.';
   var DIR_CH='https://maps.google.com/?q=59+Whaddon+Road,+Cheltenham';
   var DIR_CI='https://maps.google.com/?q=Cirencester';   /* TODO: exact Cirencester venue address */
 
