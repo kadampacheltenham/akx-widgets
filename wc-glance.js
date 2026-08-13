@@ -188,7 +188,7 @@
       ? '<span class="nchip talk">Talk</span> <b>'+f.date+'</b>'+(f.title?' &mdash; '+esc(f.title):'')
       : '<span class="nlbl">Next</span> <b>'+f.date+'</b>'+(f.title?' &mdash; '+esc(f.title):'');
     if(k==='weekend' && isMobile) return head;               /* mobile weekend: one date + title */
-    return head+(it[1]?', then '+it[1].date:'');
+    return head+(it[1]?', then <b>'+it[1].date+'</b>':'');   /* second date in the same green */
   }
 
   /* ================= row builders ================= */
