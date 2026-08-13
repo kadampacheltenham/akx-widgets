@@ -462,7 +462,7 @@
     var byId={}; classes.forEach(function(cl){ if(cl.id){ (byId[cl.id]=byId[cl.id]||[]).push(cl); } });
     var today=new Date(); today.setHours(0,0,0,0);
     var live = items.filter(function(it){ return isVisible(it, byId[it.id]||[], today); });
-    var html='<h2 class="pg-h">Weekly Classes Programme</h2>'
+    var html='<h2 class="pg-h">Talks &amp; Short Courses</h2>'
            +'<div class="pg-lead"><p>Below you\'ll find full details of the programme of weekly classes &mdash; including one-off public talks and short courses which run over a number of weeks. If you choose to book online you\'ll have access to discounts such as bring a friend for half price, early bird pricing and 20% discount for booking a series, where these are available.</p></div>';
     if(!live.length){ html+='<div class="pg-msg">Nothing scheduled just now &mdash; please check back soon.</div>'; }
     else {
