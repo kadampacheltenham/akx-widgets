@@ -254,13 +254,46 @@
 
   function keyOf(el){ return ((el.getAttribute("data-type")||"").toLowerCase())+"|"+((el.getAttribute("data-page")||"").toLowerCase().trim()); }
 
-  function start(){
+  // Hydrate every .akx-tq stub currently on the page that hasn't been done yet.
+  // Safe to call repeatedly (dynamically-injected stubs, e.g. the testimonial the
+  // Weekly Classes widget adds after its async fetch, get picked up on re-scan).
+  function scan(){
     injectCSS();
-    var nodes=[].slice.call(document.querySelectorAll(".akx-tq"));
-    var total={}; nodes.forEach(function(el){ var k=keyOf(el); total[k]=(total[k]||0)+1; });
+    var all=[].slice.call(document.querySelectorAll(".akx-tq"));
+    var pending=all.filter(function(el){ return el.getAttribute("data-tq-done")!=="1"; });
+    if(!pending.length) return;
+    var total={}; all.forEach(function(el){ var k=keyOf(el); total[k]=(total[k]||0)+1; });
     var seen={};
-    nodes.forEach(function(el){ var k=keyOf(el); var i=(seen[k]||0); seen[k]=i+1; fill(el, i, total[k]>1); });
+    all.forEach(function(el){
+      var k=keyOf(el); var i=(seen[k]||0); seen[k]=i+1;
+      if(el.getAttribute("data-tq-done")==="1") return;
+      el.setAttribute("data-tq-done","1");
+      fill(el, i, total[k]>1);
+    });
   }
+
+  var mo=null;
+  function startObserver(){
+    if(mo || typeof MutationObserver==="undefined") return;
+    var root=document.body||document.documentElement;
+    if(!root) return;
+    mo=new MutationObserver(function(muts){
+      for(var i=0;i<muts.length;i++){
+        var added=muts[i].addedNodes;
+        for(var j=0;j<added.length;j++){
+          var n=added[j];
+          if(!n || n.nodeType!==1) continue;
+          if((n.classList && n.classList.contains("akx-tq")) || (n.querySelector && n.querySelector(".akx-tq"))){ scan(); return; }
+        }
+      }
+    });
+    mo.observe(root,{childList:true,subtree:true});
+  }
+
+  function start(){ scan(); startObserver(); }
+
+  // Expose a manual re-scan so widgets can hydrate stubs right after injecting them.
+  window.AKX_TQ = { rescan: scan };
 
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",start);
   else start();
