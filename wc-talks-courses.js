@@ -25,7 +25,7 @@
   #akx-programme .pg-lead{max-width:none;margin:0 auto 20px;padding:0 30px;text-align:left;color:#6f6a62;font-size:.98rem;line-height:1.55;}
   #akx-programme .pg-lead p{margin:0 0 10px;} #akx-programme .pg-lead p:last-child{margin:0;}
   #akx-programme .pg-msg{text-align:center;color:#8a857c;padding:24px;}
-  #akx-programme .pg-more{display:none;} #akx-programme .pg-more.on{display:block;}
+  #akx-programme .pg-more{display:block;} #akx-programme .pg-item{display:none;} #akx-programme .pg-item.on{display:block;}
   #akx-programme .pg-showall{display:block;margin:2px auto 6px;background:none;border:none;cursor:pointer;font-size:.92rem;font-weight:700;letter-spacing:.02em;color:#8a857c;padding:10px 16px;}
   #akx-programme .pg-showall:hover{color:#2A66A6;}
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Oswald:wght@500;600;700&display=swap');
@@ -467,7 +467,7 @@
       if(href) window.open(href,'_blank','noopener');
     });});
     // show-all (5th event onward)
-    var sa=root.querySelector('#pgShowAll'); if(sa){ sa.addEventListener('click',function(){ var m=root.querySelector('#pgMore'); if(m)m.classList.add('on'); sa.style.display='none'; }); }
+    var sa=root.querySelector('#pgShowAll'); if(sa){ sa.addEventListener('click',function(){ var hid=root.querySelectorAll('.pg-item:not(.on)'); for(var i=0;i<2&&i<hid.length;i++){hid[i].classList.add('on');} if(root.querySelectorAll('.pg-item:not(.on)').length===0){sa.style.display='none';} }); }
     root.querySelectorAll('.cc').forEach(function(cc){
       cc.querySelectorAll('.tab-btn').forEach(function(btn){btn.addEventListener('click',function(){
         var i=btn.getAttribute('data-i');
@@ -488,11 +488,11 @@
     else {
       var cardsHtml = live.map(function(it,idx){ return card(it, byId[it.id]||[], idx); });
       var TQ = '<div style="max-width:1000px;margin:24px auto;"><div class="akx-tq" data-type="testimony" data-page="classes"></div></div>';
-      var head4 = cardsHtml.slice(0,4);
-      html += head4[0] + TQ + head4.slice(1).join('');   // rotating testimonial after the first card
-      if(cardsHtml.length>4){
-        html += '<div class="pg-more" id="pgMore">'+cardsHtml.slice(4).join('')+'</div>'
-              + '<button type="button" class="pg-showall" id="pgShowAll">Show all '+cardsHtml.length+' events &darr;</button>';
+      var head3 = cardsHtml.slice(0,3);
+      html += head3[0] + TQ + head3.slice(1).join('');   // show 3 cards, rotating testimonial after the first
+      if(cardsHtml.length>3){
+        html += '<div class="pg-more" id="pgMore">'+cardsHtml.slice(3).map(function(c){return '<div class="pg-item">'+c+'</div>';}).join('')+'</div>'
+              + '<button type="button" class="pg-showall" id="pgShowAll">Show more &darr;</button>';
       }
     }
     mount.innerHTML=html;
