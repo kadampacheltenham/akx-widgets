@@ -1,7 +1,8 @@
-/* Akanishta &mdash; Week at a Glance widget (v5)
-   - Title/intro styled like Weekly Classes Programme
-   - Amber term-dates banner (calendar-banner style, no warning icon)
-   - Open House strip UNDER the tags on Mon eve + Fri taster (yellow)
+/* Akanishta &mdash; Week at a Glance widget (v6)
+   - Quiet sign-posting: TERM DATES + OPEN HOUSE now use the cream+sand "pill" style
+     (matches the AT THE WEEKEND wayfinder). Open house = "OPEN HOUSE" pill + bold time.
+   - Day shown ONCE per day: when a day has 2+ events, the weekday label appears on the
+     first row only; later same-day rows show just the time (aligned in the day column).
    - Desktop: full table with Details expand
    - Mobile (<=640px): collapsed 'teaser' + filter tabs; rows TAP TO EXPAND (summary + link)
    Include with: <div id="akx-glance"></div>
@@ -55,8 +56,6 @@
 
   var PIN_CH='<svg viewBox="0 0 24 24" fill="#C8102E"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/></svg>';
   var PIN_CI='<svg viewBox="0 0 24 24" fill="#6DBE45"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/></svg>';
-  var CAL_ICON='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B8860B" stroke-width="2" stroke-linecap="round"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg>';
-  var DOOR='&#128682;';
 
   var STYLE=String.raw`
   @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&display=swap');
@@ -66,9 +65,9 @@
   #akx-glance .wag{max-width:1000px;margin:0 auto;}
   #akx-glance .wag-h{text-align:center;font-size:1.9rem;font-weight:600;color:#2A66A6;margin:0 0 6px;}
   #akx-glance .wag-lead{margin:0 auto 18px;padding:0 30px;text-align:left;color:#6f6a62;font-size:.98rem;line-height:1.55;}
-  #akx-glance .wag-term{display:flex;gap:12px;align-items:flex-start;background:#FDF3E3;color:#6E5212;border:1px solid #F1E0C2;border-radius:12px;padding:15px 18px;margin:0 0 20px;font-size:1rem;line-height:1.55;}
-  #akx-glance .wag-term .cal{flex:none;margin-top:3px;}
-  #akx-glance .wag-term .line{display:block;} #akx-glance .wag-term b{font-weight:700;} #akx-glance .wag-term .ht{color:#957c3c;}
+  #akx-glance .wag-term{display:flex;gap:14px;align-items:flex-start;background:#FBF6ED;color:#5c6773;border:1px solid #EFE7D6;border-radius:12px;padding:15px 18px;margin:0 0 20px;font-size:1rem;line-height:1.55;}
+  #akx-glance .wag-pill{flex:none;align-self:flex-start;margin-top:1px;font-family:'Inter',sans-serif;font-weight:800;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:#8a6d2f;background:#EFE3C8;border-radius:999px;padding:6px 13px;}
+  #akx-glance .wag-term .line{display:block;} #akx-glance .wag-term b{font-weight:700;color:#26303A;} #akx-glance .wag-term .ht{color:#8a8175;}
 
   #akx-glance .toolbar{display:flex;justify-content:flex-end;margin:0 0 8px;}
   #akx-glance .xall{background:none;border:1.5px solid #dcd6ca;border-radius:999px;padding:6px 15px;font-size:.82rem;font-weight:600;color:var(--teal);cursor:pointer;}
@@ -87,8 +86,9 @@
   #akx-glance .det{grid-area:det;align-self:center;border:1.5px solid #d9e3e0;background:#fff;color:var(--teal);font-size:.8rem;font-weight:700;padding:6px 12px;border-radius:999px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;}
   #akx-glance .det .chev{font-size:.66rem;transition:transform .2s;}
   #akx-glance .r.open .det{background:#EEF5F3;border-color:#bcd8d2;} #akx-glance .r.open .det .chev{transform:rotate(180deg);}
-  #akx-glance .oh{grid-area:oh;display:flex;align-items:center;gap:8px;background:#FFF4CC;color:#6E5212;border:1px solid #F0DFA3;border-left:3px solid #E0A82E;border-radius:8px;padding:7px 12px;font-size:.84rem;line-height:1.4;}
-  #akx-glance .oh .oh-ico{font-size:.95rem;flex:none;} #akx-glance .oh b{font-weight:700;color:#4A3908;}
+  #akx-glance .oh{grid-area:oh;display:flex;align-items:center;gap:10px;background:#FBF6ED;color:#5c6773;border:1px solid #EFE7D6;border-radius:8px;padding:7px 12px;font-size:.84rem;line-height:1.4;}
+  #akx-glance .oh-pill{flex:none;font-family:'Inter',sans-serif;font-weight:800;font-size:.62rem;letter-spacing:.07em;text-transform:uppercase;color:#8a6d2f;background:#EFE3C8;border-radius:999px;padding:3px 9px;}
+  #akx-glance .oh b{font-weight:700;color:#26303A;}
   #akx-glance .rd{display:none;padding:0 20px 16px 90px;}
   #akx-glance .r.open .rd{display:block;}
   #akx-glance .rd .sum{font-size:.93rem;color:#5A5A5A;line-height:1.55;margin-bottom:12px;} #akx-glance .rd .sum .sep{color:#cfc8bc;padding:0 6px;}
@@ -125,8 +125,9 @@
   #akx-glance .mrd .msum{font-size:.82rem;color:#5A5A5A;line-height:1.5;margin-bottom:10px;} #akx-glance .mrd .msum .sep{color:#cfc8bc;padding:0 5px;}
   #akx-glance .mcta{display:inline-block;background:#E4F1E7;color:#0B7A3B;border:1px solid #C4E1CC;font-weight:600;font-size:.8rem;text-decoration:none;padding:7px 14px;border-radius:999px;}
   #akx-glance .mcta.coral{background:#F8E8DF;color:#B85C37;border-color:#EDCDBD;}
-  #akx-glance .oh-m{margin-top:7px;display:flex;gap:7px;align-items:center;background:#FFF4CC;color:#6E5212;border:1px solid #F0DFA3;border-left:3px solid #E0A82E;border-radius:7px;padding:6px 9px;font-size:.75rem;line-height:1.35;}
-  #akx-glance .oh-m b{font-weight:700;color:#4A3908;}
+  #akx-glance .oh-m{margin-top:7px;display:flex;gap:8px;align-items:center;background:#FBF6ED;color:#5c6773;border:1px solid #EFE7D6;border-radius:7px;padding:6px 9px;font-size:.75rem;line-height:1.35;}
+  #akx-glance .oh-m .oh-pill{padding:2px 8px;font-size:.58rem;}
+  #akx-glance .oh-m b{font-weight:700;color:#26303A;}
   #akx-glance .m-list.teaser{cursor:pointer;}
   #akx-glance .mrow.ghost{opacity:.5;} #akx-glance .mrow.ghost2{opacity:.22;}
   #akx-glance .m-fade{position:absolute;left:0;right:0;bottom:0;height:155px;background:linear-gradient(to bottom,rgba(255,255,255,0),#fff 80%);pointer-events:none;}
@@ -146,10 +147,10 @@
   function sumHTML(s){return s.split('|').map(function(x,i){return (i?'<span class="sep">|</span>':'')+x;}).join('');}
   function ctaAttrs(e){return 'href="'+e.cta.url+'"'+(e.cta.ext?' target="_blank" rel="noopener"':'');}
 
-  function desktopRow(e){
-    var oh=e.oh?'<div class="oh"><span class="oh-ico">'+DOOR+'</span><span><b>Open House '+e.oh+'</b> &mdash; '+OH_INVITE+'</span></div>':'';
+  function desktopRow(e,hideDay){
+    var oh=e.oh?'<div class="oh"><span class="oh-pill">Open House</span><span><b>'+e.oh+'</b> &mdash; '+OH_INVITE+'</span></div>':'';
     return '<div class="r"><div class="rh">'
-      +'<div class="dt"><span class="day">'+e.day+'</span><span class="time">'+e.time+'</span></div>'
+      +'<div class="dt">'+(hideDay?'':'<span class="day">'+e.day+'</span>')+'<span class="time">'+e.time+'</span></div>'
       +'<span class="nm">'+e.name+(e.dur?' <span class="dur">('+e.dur+')</span>':'')+'</span>'
       +'<span class="meta">'+tagsHTML(e)+locHTML(e)+'</span>'
       +'<button class="det">Details <span class="chev">&#9662;</span></button>'
@@ -157,14 +158,14 @@
       +'</div><div class="rd"><div class="sum">'+sumHTML(e.sum)+'</div>'
       +'<a class="cta'+(e.cta.coral?' coral':'')+'" '+ctaAttrs(e)+'>'+e.cta.label+'</a></div></div>';
   }
-  function mobileRow(e,cls,expandable){
+  function mobileRow(e,cls,expandable,hideDay){
     var dur=e.dur?' <span class="dur" style="color:#9a948b;font-weight:500;font-size:.8rem">('+e.dur+')</span>':'';
-    var oh=e.oh?'<div class="oh-m">'+DOOR+' <span><b>Open House '+e.oh+'</b> &mdash; '+OH_INVITE+'</span></div>':'';
+    var oh=e.oh?'<div class="oh-m"><span class="oh-pill">Open House</span><span><b>'+e.oh+'</b> &mdash; '+OH_INVITE+'</span></div>':'';
     var chev=expandable?'<button class="mchev"><span class="c">&#9662;</span></button>':'';
     var det=expandable?'<div class="mrd"><div class="msum">'+sumHTML(e.sum)+'</div>'
       +'<a class="mcta'+(e.cta.coral?' coral':'')+'" '+ctaAttrs(e)+'>'+e.cta.label+'</a></div>':'';
     return '<div class="mrow'+(cls?' '+cls:'')+(expandable?' mx':'')+'">'
-      +'<div><div class="mday">'+e.day+'</div><div class="mtime">'+e.time+'</div></div>'
+      +'<div>'+(hideDay?'':'<div class="mday">'+e.day+'</div>')+'<div class="mtime">'+e.time+'</div></div>'
       +'<div class="mbody"><div class="mname">'+e.name+dur+'</div>'
       +'<div class="msub">'+keyTagHTML(e)+locHTML(e)+'</div>'+oh+det+'</div>'
       +chev+'</div>';
@@ -182,8 +183,8 @@
 
   function headerHTML(){
     return '<h2 class="wag-h">Week at a Glance</h2>'
-      +'<div class="wag-lead">Here&rsquo;s the week at a glance &mdash; all our weekly classes and events. Tap an event to expand for more details. Please check the programme, or the calendar, as we do take breaks and not every class runs every week.</div>'
-      +'<div class="wag-term">'+CAL_ICON+'<div>'
+      +'<div class="wag-lead">Here&rsquo;s an overview of all weekly classes and events. Tap an event to expand for more details. Please check the programme, or the calendar below, as we take breaks and not every class runs every week.</div>'
+      +'<div class="wag-term"><span class="wag-pill">Term dates</span><div>'
       +'<span class="line"><b>Autumn Term:</b> 22 Aug &ndash; 15 Dec <span class="ht">(half-term 8&ndash;15 Oct)</span></span>'
       +'<span class="line"><b>Spring Term:</b> from 2 Jan 2027</span>'
       +'</div></div>';
@@ -194,7 +195,7 @@
       +headerHTML()
       +'<div class="wag-desktop">'
         +'<div class="toolbar"><button class="xall">Expand all &#9662;</button></div>'
-        +'<div class="tbl">'+EVENTS.map(desktopRow).join('')+'</div>'
+        +'<div class="tbl">'+EVENTS.map(function(e,i){return desktopRow(e, i>0 && EVENTS[i-1].day===e.day);}).join('')+'</div>'
       +'</div>'
       +'<div class="wag-mobile">'
         +'<div class="m-tabs">'+TABS.map(function(t){return '<button class="m-tab">'+t+'</button>';}).join('')+'</div>'
@@ -208,14 +209,14 @@
     root.querySelectorAll('.m-tab').forEach(function(b){b.classList.toggle('on',state && b.textContent===state);});
     if(!state){ /* teaser: first event, two ghosts, fade + nudge; tap to reveal All */
       list.className='m-list teaser';
-      list.innerHTML=mobileRow(EVENTS[0])+mobileRow(EVENTS[1],'ghost')+mobileRow(EVENTS[2],'ghost2')
+      list.innerHTML=mobileRow(EVENTS[0])+mobileRow(EVENTS[1],'ghost',false,EVENTS[0].day===EVENTS[1].day)+mobileRow(EVENTS[2],'ghost2',false,EVENTS[1].day===EVENTS[2].day)
         +'<div class="m-fade"></div><div class="m-nudge"><span>&uarr; Pick a filter to explore</span></div>';
       list.onclick=function(){renderMobile(root,'All');};
       return;
     }
     list.className='m-list'; list.onclick=null;
     var rows=EVENTS.filter(function(e){return match(e,state);});
-    list.innerHTML=(rows.length?rows.map(function(e){return mobileRow(e,null,true);}).join('')
+    list.innerHTML=(rows.length?rows.map(function(e,i){return mobileRow(e,null,true, i>0 && rows[i-1].day===e.day);}).join('')
       :'<div class="m-empty">Nothing in this filter.</div>')
       +'<div class="m-reset">&#8634; Reset</div>';
     list.querySelectorAll('.mrow.mx').forEach(function(row){
