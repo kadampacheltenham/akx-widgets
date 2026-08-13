@@ -1,11 +1,15 @@
-/* Akanishta &mdash; Weekly Classes programme widget (talks / courses / free / in-depth / special).
+/* Akanishta &mdash; TALKS & SHORT COURSES widget (the programme of talks / courses / free / in-depth / special).
+   (Was wc-programme.js &mdash; renamed to wc-talks-courses.js so "programme" can't be confused with the page/section.)
    Reads a public Google Sheet (tabs "Talks & series" + "Class times") and renders flyer cards.
    The event TYPE (col C) sets colour + motif via the shared taxonomy in event-graphics.js.
+   The graphic square is a mini-poster (Fable recipe): type label (Inter) + title (Fraunces) + date line (mono),
+   over the type colour; a real photo (sheet "graphic" col or images/<id>.jpg) covers it, poster text sits on top.
+   Banner names the length for courses; discounts show as one quiet line; teacher name links in ink (not teal).
    Include with:  <div id="akx-programme"></div>
                   <script src="https://kadampacheltenham.github.io/akx-widgets/event-graphics.js" defer></script>
-                  <script src="https://kadampacheltenham.github.io/akx-widgets/wc-programme.js" defer></script>
+                  <script src="https://kadampacheltenham.github.io/akx-widgets/wc-talks-courses.js" defer></script>
    (event-graphics.js must load first so window.AKX_GFX exists; a local fallback keeps
-    the colours right even if it doesn't.)
+    the colours right even if it doesn't. Mount id stays #akx-programme — internal only.)
 */
 (function(){
   var SHEET_ID = '1YArubV8QgCvPUIIvHOHWhCN2fYLRz0DDPSRSHD_tSmY';
@@ -17,7 +21,7 @@
   var STYLE = String.raw`
   #akx-programme{--ink:#2B2A28;--dteal:#2E7C7C;--lteal:#0c9d94;--coral:#E2886A;--blue:#22B8F0;--bluedk:#0E90CC;--coral2:#FF7A4D;--coraldk:#E85C2E;font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);max-width:1000px;margin:0 auto;}   /* lotus/content width &mdash; matches glance + calendars */
   #akx-programme *{box-sizing:border-box;}
-  #akx-programme .pg-h{text-align:center;font-size:1.9rem;font-weight:600;color:#2A66A6;margin:0 0 6px;}   /* blue &mdash; site heading standard */
+  #akx-programme .pg-h{text-align:center;font-family:'Fraunces',Georgia,serif;font-size:1.9rem;font-weight:600;color:#2A66A6;margin:0 0 6px;}   /* Fraunces serif blue &mdash; site sub-heading standard */
   #akx-programme .pg-lead{max-width:none;margin:0 auto 20px;padding:0 30px;text-align:left;color:#6f6a62;font-size:.98rem;line-height:1.55;}
   #akx-programme .pg-lead p{margin:0 0 10px;} #akx-programme .pg-lead p:last-child{margin:0;}
   #akx-programme .pg-msg{text-align:center;color:#8a857c;padding:24px;}
@@ -40,6 +44,12 @@
   .gfx img{width:100%;height:100%;object-fit:cover;display:block;}
   .gfx img.byid{position:absolute;inset:0;z-index:1;}
   .gfx .motif{position:absolute;top:50%;left:50%;width:150%;height:150%;transform:translate(-50%,-50%);opacity:.20;pointer-events:none;}
+  /* mini-poster text (Fable recipe): type label + title + date, over the type colour or a photo */
+  .gfx .gtxt{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;padding:16px;color:#fff;background:linear-gradient(to top,rgba(0,0,0,.30),rgba(0,0,0,0) 46%);pointer-events:none;}
+  .gfx .glabel{font-family:'Inter',system-ui,sans-serif;font-weight:700;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;opacity:.92;}
+  .gfx .gtitle{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:1.14rem;line-height:1.1;margin-top:auto;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+  .gfx .gdate{font-family:'SFMono-Regular',Consolas,'Roboto Mono',Menlo,monospace;font-weight:500;font-size:.58rem;letter-spacing:.02em;opacity:.85;margin-top:7px;}
+  @media(min-width:641px){ #akx-programme .cc-head .ctitle{display:none;} }  /* desktop: the poster carries the title */
   .ctitle{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:1.62rem;line-height:1.12;color:var(--ink);margin:0 0 12px;}
   .tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:13px;}
   .tag{font-size:.69rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:4px 11px;border-radius:999px;}
@@ -76,7 +86,7 @@
   .d-loc{font-size:.9rem;font-weight:700;display:inline-flex;align-items:center;gap:4px;margin-bottom:6px;color:#3f7e78;} .d-loc.ciren{color:#5B8C1A;} .d-loc svg{width:12px;height:12px;}
   .d-loc .dir{color:#8a857c;font-weight:500;text-decoration:underline;margin-left:6px;font-size:.82rem;}
   .d-tt{font-weight:700;font-size:1.1rem;} .d-tt .dur{font-weight:500;color:#8a857c;font-size:.92rem;}
-  .d-meta{font-size:.95rem;color:var(--ink);margin-top:4px;} .d-meta a{color:var(--lteal);font-weight:700;text-decoration:underline;}
+  .d-meta{font-size:.95rem;color:var(--ink);margin-top:4px;} .d-meta a{color:var(--ink);font-weight:700;text-decoration:underline;text-decoration-color:rgba(0,0,0,.28);text-underline-offset:3px;}
   .d-dates{font-size:.95rem;color:var(--ink);margin-top:4px;}   /* same weight & colour as the 'with' line */
   .d-dates .d-lbl{font-weight:700;}
   .d-price{padding:18px 22px;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:9px;min-width:170px;background:#fbfaf7;}
@@ -89,10 +99,10 @@
   /* mobile summary bar + bottom 'Show less' (both hidden on desktop) */
   .cc-sum,.cc-less{display:none;}
   .foot{padding:8px 30px 26px;}
-  .disc{display:flex;align-items:stretch;background:#FBF6ED;border:1px solid #EFE7D6;border-radius:12px;overflow:hidden;font-size:.92rem;color:var(--ink);line-height:1.5;margin-bottom:14px;} .disc .sep{color:#cdbf9e;padding:0 8px;}
-  .disc-lbl{display:flex;align-items:center;color:#fff;font-weight:800;letter-spacing:.03em;padding:14px 16px;white-space:nowrap;}
-  .cc .disc-lbl{background:var(--type);}
-  .disc-body{padding:14px 18px;}
+  .disc{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;background:#FBF6ED;border:1px solid #EFE7D6;border-radius:10px;padding:11px 16px;font-size:.92rem;color:#5c6773;line-height:1.5;margin-bottom:14px;}
+  .disc .disc-star{color:#B5771E;font-size:1rem;flex:none;line-height:1;}
+  .disc b{color:#26303A;font-weight:700;}
+  .disc .sep{color:#cdbf9e;padding:0 5px;}
   /* social share row */
   .cc-share{display:flex;align-items:center;gap:9px;justify-content:flex-end;}
   .cc-share .sh-lbl{font-size:.82rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#8a857c;margin-right:2px;}
@@ -111,7 +121,7 @@
     .d-price .pp{order:1;} .d-price .book{order:2;} .d-price .d-offer{order:3;flex-basis:100%;text-align:left;}
     .tbc,.foot{margin-left:20px;margin-right:20px;padding-left:18px;padding-right:18px;} .foot{padding:8px 0 22px;}
     /* discounts: full width (match the detail above) + label as a bar across the top */
-    .disc{flex-direction:column;} .disc-lbl{justify-content:flex-start;padding:9px 18px;} .disc-body{padding:12px 18px;}
+    #akx-programme .gfx .gtxt{display:none;}  /* mobile: square too small for the poster text; title shows in the body */
     .cc-share{justify-content:flex-start;}
     /* --- title / intro breathing room --- */
     #akx-programme .pg-h{font-size:1.5rem;margin-bottom:14px;}
@@ -303,6 +313,7 @@
     +'</div>';
   }
   function discFmt(s){ return esc(s).replace(/\s*\|\s*/g,'<span class="sep">|</span>'); }
+  function discInline(s){ return esc(s).replace(/\s*\|\s*/g,'<span class="sep">&middot;</span>'); }
   function shareRow(item){
     var t=esc(item.title+' &mdash; Akanishta Kadampa Meditation Centre');
     return '<div class="cc-share"><span class="sh-lbl">Share</span>'
@@ -318,13 +329,23 @@
     var isTalk = (type==='talk');
     var showFrom = parseFullDate(item.show_from);
     var motif = gfxMotif(item.type);          // faint white type-motif behind the box
+    var totalDates = classes.reduce(function(n,cl){return n+splitList(cl.dates).length;},0);
+    var typeLabel = isTalk ? ((classes.length>1||totalDates>1) ? 'Public Talks' : 'Public Talk') : theme.label;
+    // mini-poster (Fable recipe): type label + title + one date line, from the first class
+    var pDate='';
+    if(classes[0]){ var _d0=splitList(classes[0].dates)[0];
+      pDate=(shortDay(classes[0].day)+' '+(classes[0].time||'')).trim().toUpperCase()
+           +(_d0?' &middot; '+(isTalk?'':'FROM ')+shortDMY(_d0):''); }
+    var poster='<div class="gtxt"><span class="glabel">'+esc(typeLabel)+'</span>'
+      +'<span class="gtitle">'+esc(item.title)+'</span>'
+      +(pDate?'<span class="gdate">'+pDate+'</span>':'')+'</div>';
     var gfx;
-    if(item.graphic){                         // explicit URL in the sheet wins (photo overlays the type tile)
-      gfx = '<div class="gfx">'+motif+'<img class="byid" src="'+esc(item.graphic)+'" alt="" onerror="this.remove()"></div>';
-    } else if(item.id){                        // else try images/<id>.jpg, then .png; if none, the coded type tile shows
-      gfx = '<div class="gfx">'+motif+'<img class="byid" crossorigin="anonymous" src="'+IMG_BASE+encodeURIComponent(item.id)+'.jpg" alt="" onerror="if(this.dataset.tried){this.remove()}else{this.dataset.tried=1;this.src=this.src.replace(/\\.jpg$/,\'.png\')}"></div>';
+    if(item.graphic){                         // explicit URL wins; photo covers the tile, poster text sits over it
+      gfx = '<div class="gfx">'+motif+'<img class="byid" src="'+esc(item.graphic)+'" alt="" onerror="this.remove()">'+poster+'</div>';
+    } else if(item.id){                        // else try images/<id>.jpg, then .png; if none, the coded poster shows
+      gfx = '<div class="gfx">'+motif+'<img class="byid" crossorigin="anonymous" src="'+IMG_BASE+encodeURIComponent(item.id)+'.jpg" alt="" onerror="if(this.dataset.tried){this.remove()}else{this.dataset.tried=1;this.src=this.src.replace(/\\.jpg$/,\'.png\')}">'+poster+'</div>';
     } else {
-      gfx = '<div class="gfx">'+motif+'</div>';
+      gfx = '<div class="gfx">'+motif+poster+'</div>';
     }
     var tags = splitList(item.tags).map(function(t,i){
       var cls = TAG_CYCLE[i % TAG_CYCLE.length];
@@ -334,11 +355,10 @@
     var wteHtml = wte.length ? '<div class="wte collapsed"><button class="wte-t">What to expect <span class="chev">&#9662;</span></button><ul>'
         + wte.map(function(x){return '<li>'+esc(x)+'</li>';}).join('') + '</ul></div>' : '';
     var tlabel = bannerLabel(idx, classes, showFrom);
-    var totalDates = classes.reduce(function(n,cl){return n+splitList(cl.dates).length;},0);
-    var typeLabel = isTalk ? ((classes.length>1||totalDates>1) ? 'Public Talks' : 'Public Talk') : theme.label;
+    var lenLabel = (!isTalk && totalDates>1) ? ' &middot; '+totalDates+' weeks' : '';   // length in the banner (courses)
     var banner = '<div class="cc-banner">'
         + (tlabel ? '<span class="cc-when"><span class="cc-dot"></span>'+esc(tlabel)+'</span>' : '')
-        + '<span class="cc-type">'+typeLabel+'</span>'
+        + '<span class="cc-type">'+typeLabel+lenLabel+'</span>'
       +'</div>';
     var head = '<div class="cc-top">'+gfx
         +'<div class="cc-head">'
@@ -361,7 +381,7 @@
           + classes.map(function(cl,i){return pill(cl,i,i===0,isTalk);}).join('') + '</div></div>'
           + '<div class="detail">'+classes.map(function(cl,i){return pane(cl,i,i===0);}).join('')+'</div>';
     }
-    var discHtml = item.discount_note ? '<div class="disc"><span class="disc-lbl">DISCOUNTS</span><span class="disc-body">'+discFmt(item.discount_note.replace(/^\s*discounts?\s*:\s*/i,''))+'</span></div>' : '';
+    var discHtml = item.discount_note ? '<div class="disc"><span class="disc-star">&#9733;</span> <b>Discounts available</b> &mdash; <span>'+discInline(item.discount_note.replace(/^\s*discounts?\s*:\s*/i,''))+'</span></div>' : '';
     var foot = '<div class="foot">'+discHtml+shareRow(item)+'</div>';
     // mobile collapse: top summary (dates + Show more) when collapsed; a 'Show less' control at the BOTTOM when expanded
     var sumD = summaryDates(isTalk, classes, showFrom);
@@ -463,7 +483,7 @@
     var today=new Date(); today.setHours(0,0,0,0);
     var live = items.filter(function(it){ return isVisible(it, byId[it.id]||[], today); });
     var html='<h2 class="pg-h">Talks &amp; Short Courses</h2>'
-           +'<div class="pg-lead"><p>Below you\'ll find full details of the programme of weekly classes &mdash; including one-off public talks and short courses which run over a number of weeks. If you choose to book online you\'ll have access to discounts such as bring a friend for half price, early bird pricing and 20% discount for booking a series, where these are available.</p></div>';
+           +'<div class="pg-lead"><p>Here\'s the upcoming programme of talks, short courses &amp; special events. All events are drop-in &mdash; except special events. If you choose to book online you\'ll have access to discounts such as student pricing, bring a friend for half price, early bird pricing and 20% discount for booking a series, where these are available.</p></div>';
     if(!live.length){ html+='<div class="pg-msg">Nothing scheduled just now &mdash; please check back soon.</div>'; }
     else {
       var cardsHtml = live.map(function(it,idx){ return card(it, byId[it.id]||[], idx); });
