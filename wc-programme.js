@@ -1,7 +1,11 @@
-/* Akanishta &mdash; Talks & short courses widget.
+/* Akanishta &mdash; Weekly Classes programme widget (talks / courses / free / in-depth / special).
    Reads a public Google Sheet (tabs "Talks & series" + "Class times") and renders flyer cards.
+   The event TYPE (col C) sets colour + motif via the shared taxonomy in event-graphics.js.
    Include with:  <div id="akx-programme"></div>
-                  <script src="https://kadampacheltenham.github.io/akx-widgets/programme.js" defer></script>
+                  <script src="https://kadampacheltenham.github.io/akx-widgets/event-graphics.js" defer></script>
+                  <script src="https://kadampacheltenham.github.io/akx-widgets/wc-programme.js" defer></script>
+   (event-graphics.js must load first so window.AKX_GFX exists; a local fallback keeps
+    the colours right even if it doesn't.)
 */
 (function(){
   var SHEET_ID = '1YArubV8QgCvPUIIvHOHWhCN2fYLRz0DDPSRSHD_tSmY';
@@ -25,18 +29,17 @@
   #akx-programme .cc:last-child{margin-bottom:0;}
   /* two-tone banner: darker timing segment (left) then the type */
   .cc-banner{display:flex;align-items:stretch;color:#fff;font-weight:800;font-size:.82rem;letter-spacing:.05em;text-transform:uppercase;}
-  .cc.talk .cc-banner{background:var(--blue);} .cc.course .cc-banner{background:var(--coral2);}
+  .cc .cc-banner{background:var(--type);}
   .cc-when{display:flex;align-items:center;gap:7px;padding:11px 20px;}
-  .cc.talk .cc-when{background:var(--bluedk);} .cc.course .cc-when{background:var(--coraldk);}
+  .cc .cc-when{background:var(--typedk);}
   .cc-dot{width:7px;height:7px;border-radius:50%;background:#fff;opacity:.92;flex:none;}
   .cc-type{display:flex;align-items:center;padding:11px 20px;}
   .cc-top{display:grid;grid-template-columns:190px 1fr;grid-template-areas:"gfx head" "gfx body";column-gap:24px;row-gap:0;align-items:start;padding:28px 30px 4px;}
   .cc-head{grid-area:head;} .cc-body{grid-area:body;}
-  .gfx{grid-area:gfx;width:190px;height:190px;border-radius:14px;overflow:hidden;flex:none;position:relative;background:linear-gradient(150deg,#2E7C7C,#245f5f);}
+  .gfx{grid-area:gfx;width:190px;height:190px;border-radius:14px;overflow:hidden;flex:none;position:relative;background:var(--type);}
   .gfx img{width:100%;height:100%;object-fit:cover;display:block;}
   .gfx img.byid{position:absolute;inset:0;z-index:1;}
-  .gfx .ring{position:absolute;border:2px solid rgba(255,255,255,.24);border-radius:50%;}
-  .gfx .r1{width:150px;height:150px;right:-34px;bottom:-34px;} .gfx .r2{width:96px;height:96px;right:26px;bottom:26px;border-color:rgba(255,255,255,.16);}
+  .gfx .motif{position:absolute;top:50%;left:50%;width:150%;height:150%;transform:translate(-50%,-50%);opacity:.20;pointer-events:none;}
   .ctitle{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:1.62rem;line-height:1.12;color:var(--ink);margin:0 0 12px;}
   .tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:13px;}
   .tag{font-size:.69rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:4px 11px;border-radius:999px;}
@@ -46,27 +49,26 @@
   .desc{font-size:1rem;line-height:1.6;color:var(--ink);margin:0 0 14px;}
   .wte{margin-bottom:2px;}
   .wte-t{background:none;border:none;padding:0;cursor:pointer;font-size:1rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--dteal);display:inline-flex;align-items:center;gap:8px;}
-  .cc.talk .wte-t{color:var(--bluedk);} .cc.course .wte-t{color:var(--coraldk);}
+  .cc .wte-t{color:var(--typedk);}
   .wte-t .chev{font-size:1.3rem;font-weight:900;line-height:1;transition:transform .2s;}
   .wte.collapsed .wte-t .chev{transform:rotate(-90deg);}
   .wte ul{margin:10px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px;}
   .wte.collapsed ul{display:none;}
   .wte li{font-size:1rem;color:var(--ink);padding-left:20px;position:relative;line-height:1.55;}
-  .wte li:before{content:'';position:absolute;left:2px;top:8px;width:7px;height:7px;border-radius:50%;background:var(--coral);}
+  .wte li:before{content:'';position:absolute;left:2px;top:8px;width:7px;height:7px;border-radius:50%;background:var(--type);}
   .picker{padding:20px 30px 6px;border-top:1px solid #efe9df;margin-top:18px;}
   .picker.inline{display:flex;align-items:center;justify-content:flex-start;gap:14px;flex-wrap:wrap;}
   .picker.inline.center{justify-content:center;}
   /* 'Choose a class' &mdash; solid pill, same height as the option buttons */
   .pk-chip{display:inline-flex;align-items:center;min-height:44px;font-size:.78rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:0 20px;border-radius:999px;margin:0 0 13px;color:#fff;background:var(--dteal);border:1.5px solid transparent;}
-  .cc.talk .pk-chip{color:#fff;background:var(--blue);} .cc.course .pk-chip{color:#fff;background:var(--coral2);}
+  .cc .pk-chip{color:#fff;background:var(--type);}
   .picker.inline .pk-chip{margin:0;}
   .tabs{display:flex;gap:10px;flex-wrap:wrap;}
   .picker.inline .tabs{flex:0 1 auto;} .picker.inline.center .tabs{justify-content:center;}
   .tab-btn{flex:0 0 auto;min-height:44px;border:1.5px solid #e2ddd2;background:#fff;color:var(--ink);font-size:.9rem;font-weight:600;padding:0 16px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap;}
   .tab-btn .pin{width:9px;height:9px;border-radius:50%;background:#4E938C;} .tab-btn.ciren .pin{background:#7AA84A;}
   .tab-btn.on{font-weight:800;}
-  .cc.talk .tab-btn.on{background:#E3F1FB;border-color:#9AD0EF;color:#1276B4;}
-  .cc.course .tab-btn.on{background:#FBECE3;border-color:#F2C4AA;color:#C55A24;}
+  .cc .tab-btn.on{background:var(--tint);border-color:var(--tintbd);color:var(--tintink);}
   .detail{margin:16px 30px 8px;border:1px solid #eee7dd;border-radius:14px;overflow:hidden;}
   .single .detail{margin-top:6px;}
   .pane{display:none;grid-template-columns:1fr auto;} .pane.on{display:grid;}
@@ -80,26 +82,26 @@
   .d-price{padding:18px 22px;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:9px;min-width:170px;background:#fbfaf7;}
   .d-price .pp{font-weight:700;font-size:1.02rem;}
   .d-offer{border-radius:8px;padding:6px 12px;font-size:.78rem;font-weight:700;line-height:1.3;text-align:center;border:1px solid transparent;}
-  .cc.talk .d-offer{background:#E4F1FB;color:#1F6FB0;border-color:#C4E1F5;} .cc.course .d-offer{background:#FCEAE1;color:#C25A2E;border-color:#F5D4C4;}
-  .book{color:#fff;font-weight:700;font-size:.9rem;text-decoration:none;padding:0 22px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;white-space:nowrap;background:var(--coral);}
-  .cc.talk .book{background:var(--bluedk);} .cc.course .book{background:var(--coraldk);}
+  .cc .d-offer{background:var(--tint);color:var(--tintink);border-color:var(--tintbd);}
+  .book{color:#fff;font-weight:700;font-size:.9rem;text-decoration:none;padding:0 22px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;white-space:nowrap;background:var(--type);}
+  .cc .book{background:var(--typedk);}
   .tbc{margin:14px 30px 4px;padding:14px 18px;background:#FBF6ED;border:1px solid #EFE7D6;border-radius:12px;font-size:.92rem;color:#6f6a62;}
   /* mobile summary bar + bottom 'Show less' (both hidden on desktop) */
   .cc-sum,.cc-less{display:none;}
   .foot{padding:8px 30px 26px;}
   .disc{display:flex;align-items:stretch;background:#FBF6ED;border:1px solid #EFE7D6;border-radius:12px;overflow:hidden;font-size:.92rem;color:var(--ink);line-height:1.5;margin-bottom:14px;} .disc .sep{color:#cdbf9e;padding:0 8px;}
   .disc-lbl{display:flex;align-items:center;color:#fff;font-weight:800;letter-spacing:.03em;padding:14px 16px;white-space:nowrap;}
-  .cc.talk .disc-lbl{background:var(--blue);} .cc.course .disc-lbl{background:var(--coral2);}
+  .cc .disc-lbl{background:var(--type);}
   .disc-body{padding:14px 18px;}
   /* social share row */
   .cc-share{display:flex;align-items:center;gap:9px;justify-content:flex-end;}
   .cc-share .sh-lbl{font-size:.82rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#8a857c;margin-right:2px;}
-  .cc.talk .cc-share .sh-lbl{color:var(--bluedk);} .cc.course .cc-share .sh-lbl{color:var(--coraldk);}
+  .cc .cc-share .sh-lbl{color:var(--typedk);}
   .sh-btn{width:34px;height:34px;border-radius:50%;border:1px solid transparent;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;text-decoration:none;transition:background .15s,color .15s,border-color .15s;}
-  .cc.talk .sh-btn{background:var(--blue);color:#fff;border-color:var(--blue);} .cc.course .sh-btn{background:var(--coral2);color:#fff;border-color:var(--coral2);}
-  .cc.talk .sh-btn:hover{background:#fff;color:var(--blue);} .cc.course .sh-btn:hover{background:#fff;color:var(--coral2);}
+  .cc .sh-btn{background:var(--typedk);color:#fff;border-color:var(--typedk);}
+  .cc .sh-btn:hover{background:#fff;color:var(--typedk);}
   .sh-btn svg{width:16px;height:16px;}
-  .sh-btn.copied,.cc.talk .sh-btn.copied,.cc.course .sh-btn.copied{background:#2C8A34;color:#fff;border-color:#2C8A34;}
+  .sh-btn.copied{background:#2C8A34;color:#fff;border-color:#2C8A34;}
   @media(max-width:640px){
     .cc-top{grid-template-columns:110px 1fr;grid-template-areas:"gfx head" "body body";column-gap:14px;row-gap:12px;padding:22px 20px 4px;} .gfx{width:110px;height:110px;} .ctitle{font-size:1.34rem;margin-bottom:9px;} .cc-head .tags{margin-bottom:0;}
     .picker{padding:16px 20px 4px;}
@@ -118,7 +120,7 @@
     .cc .cc-sum{display:flex;align-items:center;justify-content:space-between;gap:12px;width:calc(100% - 40px);margin:2px 20px 22px;padding:15px 20px;border:1px solid #e5ddcf;border-radius:12px;background:#fbfaf7;cursor:pointer;font-family:inherit;text-align:left;-webkit-appearance:none;}
     .cc-sum-d{display:flex;flex-direction:column;gap:3px;font-weight:700;font-size:.92rem;flex:none;}
     .cc-sum-line{white-space:nowrap;}
-    .cc.talk .cc-sum-d{color:#1276B4;} .cc.course .cc-sum-d{color:#C55A24;}
+    .cc .cc-sum-d{color:var(--tintink);}
     .cc-sum-cta{display:inline-flex;align-items:center;gap:7px;font-size:.8rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:#2B2A28;white-space:nowrap;}
     .cc-sum-cta .chev{font-size:1rem;font-weight:900;transition:transform .2s;}
     /* condensed = header/image/title/tags + summary only; description + detail live behind the one toggle */
@@ -153,6 +155,26 @@
     if(/mini|series/.test(t))return'purple'; if(/beginn|start|open|free|welcome/.test(t))return'green';
     if(/talk/.test(t))return'blue'; if(/depth|study/.test(t))return'amber'; if(/enrol/.test(t))return'rose'; return'sand';}
   var TAG_CYCLE=['blue','purple','green','amber','teal'];   // three tags, each a different colour (talks + courses)
+  // ---- event-type taxonomy: single source of truth is window.AKX_GFX (event-graphics.js loaded first).
+  //      The local fallback keeps the right colours even if that module didn't load. ----
+  var GFX_FALLBACK={
+    talk:   {colour:'#C56B45',dk:'#A44E2E',tint:'#FBECE3',tintbd:'#F2C4AA',tintink:'#C05A2E',label:'Public Talk'},
+    course: {colour:'#2A66A6',dk:'#1E4C7C',tint:'#E3F1FB',tintbd:'#9AD0EF',tintink:'#1F6FB0',label:'Short Course'},
+    free:   {colour:'#4FA35A',dk:'#3C8146',tint:'#E7F3E1',tintbd:'#B9DCA9',tintink:'#3B8B2E',label:'Free Event'},
+    study:  {colour:'#6A4A9C',dk:'#52397A',tint:'#ECE4F7',tintbd:'#C9B6E8',tintink:'#6A38B0',label:'In-depth'},
+    special:{colour:'#B5771E',dk:'#8E5C14',tint:'#F6E9CE',tintbd:'#E4C48A',tintink:'#8E5C14',label:'Special Event'},
+    retreat:{colour:'#227A72',dk:'#185B54',tint:'#D5EFEC',tintbd:'#A6D9D2',tintink:'#1E6E66',label:'Retreat'}
+  };
+  var GFX_ALIAS={'talk':'talk','public talk':'talk','public talks':'talk','one-off talk':'talk',
+    'short course':'course','course':'course','day course':'course','half-day course':'course',
+    'free event':'free','free events':'free','free':'free',
+    'in-depth':'study','in-depth event':'study','in depth event':'study','study':'study','silent day':'study',
+    'special event':'special','special events':'special','special':'special','retreat':'retreat','day retreat':'retreat'};
+  function gfxType(x){ if(window.AKX_GFX&&AKX_GFX.typeOf){var t=AKX_GFX.typeOf(x); if(t) return t;}
+    var k=String(x||'').trim().toLowerCase(); return GFX_ALIAS[k]||(/talk/.test(k)?'talk':'course'); }
+  function gfxTheme(t){ if(window.AKX_GFX&&AKX_GFX.themeOf){var th=AKX_GFX.themeOf(t); if(th) return th;} return GFX_FALLBACK[t]||GFX_FALLBACK.course; }
+  function gfxMotif(x){ return (window.AKX_GFX&&AKX_GFX.motifSVG)?AKX_GFX.motifSVG(x):''; }
+  function gfxVars(th){ return '--type:'+th.colour+';--typedk:'+th.dk+';--tint:'+th.tint+';--tintbd:'+th.tintbd+';--tintink:'+th.tintink+';'; }
   var DAYS={mon:'Monday',tue:'Tuesday',wed:'Wednesday',thu:'Thursday',fri:'Friday',sat:'Saturday',sun:'Sunday'};
   function fullDay(d){var k=(d||'').slice(0,3).toLowerCase();return DAYS[k]||d;}
   function shortDay(d){var s=(d||'').slice(0,3);return s?s.charAt(0).toUpperCase()+s.slice(1).toLowerCase():d;}
@@ -291,16 +313,18 @@
     +'</div>';
   }
   function card(item, classes, idx){
-    var isTalk = /talk/i.test(item.type);
+    var type = gfxType(item.type);            // canonical: talk|course|free|study|special|retreat
+    var theme = gfxTheme(type);
+    var isTalk = (type==='talk');
     var showFrom = parseFullDate(item.show_from);
-    var rings = '<span class="ring r1"></span><span class="ring r2"></span>';
+    var motif = gfxMotif(item.type);          // faint white type-motif behind the box
     var gfx;
-    if(item.graphic){                         // explicit URL in the sheet wins
-      gfx = '<div class="gfx">'+rings+'<img class="byid" src="'+esc(item.graphic)+'" alt="" onerror="this.remove()"></div>';
-    } else if(item.id){                        // else try images/<id>.jpg, then .png, then the auto panel (crossorigin lets us read a title colour from it)
-      gfx = '<div class="gfx">'+rings+'<img class="byid" crossorigin="anonymous" src="'+IMG_BASE+encodeURIComponent(item.id)+'.jpg" alt="" onerror="if(this.dataset.tried){this.remove()}else{this.dataset.tried=1;this.src=this.src.replace(/\\.jpg$/,\'.png\')}"></div>';
+    if(item.graphic){                         // explicit URL in the sheet wins (photo overlays the type tile)
+      gfx = '<div class="gfx">'+motif+'<img class="byid" src="'+esc(item.graphic)+'" alt="" onerror="this.remove()"></div>';
+    } else if(item.id){                        // else try images/<id>.jpg, then .png; if none, the coded type tile shows
+      gfx = '<div class="gfx">'+motif+'<img class="byid" crossorigin="anonymous" src="'+IMG_BASE+encodeURIComponent(item.id)+'.jpg" alt="" onerror="if(this.dataset.tried){this.remove()}else{this.dataset.tried=1;this.src=this.src.replace(/\\.jpg$/,\'.png\')}"></div>';
     } else {
-      gfx = '<div class="gfx">'+rings+'</div>';
+      gfx = '<div class="gfx">'+motif+'</div>';
     }
     var tags = splitList(item.tags).map(function(t,i){
       var cls = TAG_CYCLE[i % TAG_CYCLE.length];
@@ -311,7 +335,7 @@
         + wte.map(function(x){return '<li>'+esc(x)+'</li>';}).join('') + '</ul></div>' : '';
     var tlabel = bannerLabel(idx, classes, showFrom);
     var totalDates = classes.reduce(function(n,cl){return n+splitList(cl.dates).length;},0);
-    var typeLabel = isTalk ? ((classes.length>1||totalDates>1) ? 'Public Talks' : 'Public Talk') : 'Short Course';
+    var typeLabel = isTalk ? ((classes.length>1||totalDates>1) ? 'Public Talks' : 'Public Talk') : theme.label;
     var banner = '<div class="cc-banner">'
         + (tlabel ? '<span class="cc-when"><span class="cc-dot"></span>'+esc(tlabel)+'</span>' : '')
         + '<span class="cc-type">'+typeLabel+'</span>'
@@ -347,7 +371,7 @@
       +'</button>';
     var less = '<button type="button" class="cc-less"><span class="cc-sum-cta">Show less <span class="chev">&#9652;</span></span></button>';
     var exp = '<div class="cc-exp">'+body+foot+less+'</div>';
-    return '<div class="cc '+(isTalk?'talk':'course')+' mcol">'+banner+head+sum+exp+'</div>';
+    return '<div class="cc '+type+' mcol" style="'+gfxVars(theme)+'">'+banner+head+sum+exp+'</div>';
   }
   // ---- pull a readable title colour from the card graphic (fallback: charcoal, left as-is) ----
   function rgb2hsl(r,g,b){r/=255;g/=255;b/=255;var mx=Math.max(r,g,b),mn=Math.min(r,g,b),h,s,l=(mx+mn)/2;
@@ -457,6 +481,7 @@
     if(mount.getAttribute('data-akx-done')==='1') return;
     mount.setAttribute('data-akx-done','1');
     if(!document.getElementById('akx-programme-style')){var st=document.createElement('style');st.id='akx-programme-style';st.textContent=STYLE;document.head.appendChild(st);}
+    if(window.AKX_GFX&&AKX_GFX.injectCSS){AKX_GFX.injectCSS();}   // motif symbols for the type tiles
     mount.innerHTML='<div class="pg-msg">Loading&hellip;</div>';
     Promise.all([
       fetch(csvUrl(TAB_ITEMS)).then(function(r){return r.text();}),
