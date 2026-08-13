@@ -1,54 +1,65 @@
-/* Akanishta &mdash; Week at a Glance widget (v6)
-   - Quiet sign-posting: TERM DATES + OPEN HOUSE now use the cream+sand "pill" style
-     (matches the AT THE WEEKEND wayfinder). Open house = "OPEN HOUSE" pill + bold time.
-   - Day shown ONCE per day: when a day has 2+ events, the weekday label appears on the
-     first row only; later same-day rows show just the time (aligned in the day column).
-   - Desktop: full table with Details expand
-   - Mobile (<=640px): collapsed 'teaser' + filter tabs; rows TAP TO EXPAND (summary + link)
+/* Akanishta &mdash; Week at a Glance widget (v7 &mdash; semi-live)
+   NEW in v7:
+   - Each class shows its NEXT TWO real dates, pulled live from the Google
+     Calendar (same feeds the calendar widget uses). Matched by weekday + time.
+     Breaks/half-term/cancellations are handled for free (Google expands the
+     recurrence server-side via singleEvents=true and drops cancelled dates).
+   - Public talks: put a hidden token [talk] in the calendar event title. The
+     widget shows a coral "Talk" chip + the topic, and strips the token from
+     display. Everything untagged is just a weekly class / short course (plain).
+   - Saturday row pulls the next event (title + date) from the Courses &
+     Retreats (weekend) feed.
+   - Simply Meditate isn't on any calendar, so it stays a static line.
+   - GRACEFUL FALLBACK: the static timetable renders first and always; if the
+     live fetch fails, rows simply show without the "next date" line.
+   Static features kept: term-dates pill, Open House pills, day-shown-once,
+   desktop Details expand, mobile filter tabs.
    Include with: <div id="akx-glance"></div>
-                 <script src="https://kadampacheltenham.github.io/akx-widgets/glance.js" defer></script> */
+                 <script src="https://kadampacheltenham.github.io/akx-widgets/wc-glance.js" defer></script> */
 (function(){
   var MOUNT_ID='akx-glance';
   var OH_INVITE='New? Let us welcome you and show you around before the class.';
   var DIR_CH='https://maps.google.com/?q=59+Whaddon+Road,+Cheltenham';
   var DIR_CI='https://maps.google.com/?q=Cirencester';   /* TODO: exact Cirencester venue address */
 
-  /* ---- single source of truth for both desktop + mobile ---- */
+  /* ---- live calendar (same feeds/key as the calendar widget) ---- */
+  var API_KEY='AIzaSyAVm0epUASAL2aNbAN_aBmpDDPxoPJVOwA';
+  var TZ='Europe/London';
+  var CAL_IDS={
+    weekly:'c_9e95a300a2d0f8775b28d30ebfe5eb816d8dc678d4dffbebbc09cd59d9208ffd@group.calendar.google.com',
+    branch:'c_6b6fc5b8541682cc520a71d1bc5683dc16d14d2e907ef4da85a1e7479a73c798@group.calendar.google.com',
+    weekend:'c_687cfcac60ad1fa647cd2fb654774156e1e48fb2dcbcf5c40a72340e422a4b08@group.calendar.google.com'
+  };
+
+  /* ---- single source of truth for both desktop + mobile ----
+     feed: which calendar to match against (omit = static, no live dates).
+     Match key is feed + day + time. tag = a plain neutral word-label. ---- */
   var EVENTS=[
-    {day:'Mon',time:'12:30',name:'Simply Meditate',dur:'30 min',loc:'chelt',
-     tags:[['Drop-in','t-drop'],['Get started','t-start']],key:['Get started','t-start'],
+    {day:'Mon',time:'12:30',name:'Simply Meditate',dur:'30 min',loc:'chelt',tag:'Get started',
      sum:'Reduce stress and cultivate inner peace|Come as you are|Check term dates above or calendar below',
      cta:{label:'Get directions &rarr;',url:DIR_CH,ext:1}},
-    {day:'Mon',time:'18:30',name:'Evening meditation class',dur:'75 min',loc:'chelt',oh:'5:45&ndash;6:15 pm',
-     tags:[['Main class','t-main'],['Drop-in','t-drop']],key:['Main class','t-main'],
+    {day:'Mon',time:'18:30',name:'Evening meditation class',dur:'75 min',loc:'chelt',feed:'weekly',tag:'Drop-in welcome',oh:'5:45&ndash;6:15 pm',
      sum:'One-off talks &amp; short series on a theme or topic|See programme &amp; calendar below for details',
      cta:{label:'Get directions &rarr;',url:DIR_CH,ext:1}},
-    {day:'Tue',time:'10:30',name:'Daytime meditation class',dur:'75 min',loc:'chelt',
-     tags:[['Main class','t-main'],['Drop-in','t-drop']],key:['Main class','t-main'],
+    {day:'Tue',time:'10:30',name:'Daytime meditation class',dur:'75 min',loc:'chelt',feed:'weekly',tag:'Drop-in welcome',
      sum:'One-off talks &amp; short series on a theme or topic|See programme &amp; calendar below for details',
      cta:{label:'Get directions &rarr;',url:DIR_CH,ext:1}},
-    {day:'Wed',time:'19:00',name:'Young Adults',dur:'60 min',loc:'chelt',
-     tags:[['Young Adults','t-ya'],['Drop-in','t-drop']],key:['Young Adults','t-ya'],
+    {day:'Wed',time:'19:00',name:'Young Adults',dur:'60 min',loc:'chelt',feed:'weekly',tag:'Ages 18&ndash;35',
      sum:'Aimed at young adults 18+|Check programme or calendar below for more details',
      cta:{label:'Get directions &rarr;',url:DIR_CH,ext:1}},
-    {day:'Thu',time:'18:30',name:'Cirencester evening class',dur:'75 min',loc:'ciren',
-     tags:[['Drop-in','t-drop'],['Branch class','t-branch']],key:['Branch class','t-branch'],
+    {day:'Thu',time:'18:30',name:'Cirencester evening class',dur:'75 min',loc:'ciren',feed:'branch',tag:'',
      sum:'Talks &amp; meditations following a theme|Check programme or calendar for dates',
      cta:{label:'Get directions &rarr;',url:DIR_CI,ext:1}},
-    {day:'Fri',time:'12:00',name:'Free guided meditation',dur:'15 min',loc:'chelt',free:1,oh:'11:30&ndash;12:00',
-     tags:[['Perfect for beginners','t-start'],['Drop-in','t-drop']],key:['Free','t-start'],
+    {day:'Fri',time:'12:00',name:'Free guided meditation',dur:'15 min',loc:'chelt',feed:'weekly',free:1,tag:'Free &middot; get started',oh:'11:30&ndash;12:00',
      sum:'Get started|Come as you are|Check term dates above or calendar below',
      cta:{label:'Get directions &rarr;',url:DIR_CH,ext:1}},
-    {day:'Sat',time:'10:00',name:'Weekend courses &amp; retreats',dur:'',loc:'chelt',
-     tags:[['Day/Half-day','t-neutral'],['Go deeper','t-depth']],key:['Go deeper','t-depth'],
+    {day:'Sat',time:'10:00',name:'Weekend courses &amp; retreats',dur:'',loc:'chelt',feed:'weekend',tag:'',
      sum:'Day &amp; half-day courses and retreats throughout the year.',
      cta:{label:'Courses &amp; retreats page &rarr;',url:'/courses-retreats',coral:1}},
-    {day:'Sun',time:'09:30',name:'Teacher Training (TTP)',dur:'',loc:'chelt',depth:1,
-     tags:[['In-depth','t-depth'],['Enrolment required','t-enrol']],key:['In-depth','t-depth'],
+    {day:'Sun',time:'09:30',name:'Teacher Training (TTP)',dur:'',loc:'chelt',feed:'weekly',depth:1,tag:'In-depth &middot; enrol',
      sum:'In-depth training for those wishing to train as qualified meditation teachers|Not a drop-in class',
      cta:{label:'In-depth study page &rarr;',url:'/in-depth-study',coral:1}},
-    {day:'Sun',time:'15:00',name:'Foundation Programme (FP)',dur:'',loc:'chelt',depth:1,
-     tags:[['In-depth','t-depth'],['Enrolment required','t-enrol']],key:['In-depth','t-depth'],
+    {day:'Sun',time:'15:00',name:'Foundation Programme (FP)',dur:'',loc:'chelt',feed:'weekly',depth:1,tag:'In-depth &middot; enrol',
      sum:'Go further|In-depth structured study &amp; meditation|Not a drop-in class',
      cta:{label:'In-depth study page &rarr;',url:'/in-depth-study',coral:1}}
   ];
@@ -57,8 +68,12 @@
   var PIN_CH='<svg viewBox="0 0 24 24" fill="#C8102E"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/></svg>';
   var PIN_CI='<svg viewBox="0 0 24 24" fill="#6DBE45"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/></svg>';
 
+  /* ---- live data store ---- */
+  var NEXT={};       /* mkey -> {items:[{date,title,talk,start}]} */
+  var SOONK=null;    /* mkey of the soonest upcoming (for the "next up" tint) */
+
   var STYLE=String.raw`
-  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Roboto+Mono:wght@500;600&display=swap');
   :root{--ink:#2B2A28;--red:#C8102E;--teal:#4E938C;}
   #akx-glance *{box-sizing:border-box;}
   #akx-glance{font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);}
@@ -73,19 +88,27 @@
   #akx-glance .xall{background:none;border:1.5px solid #dcd6ca;border-radius:999px;padding:6px 15px;font-size:.82rem;font-weight:600;color:var(--teal);cursor:pointer;}
   #akx-glance .tbl{border:1px solid #ece7dd;border-radius:14px;background:#fff;box-shadow:0 3px 14px rgba(0,0,0,.05);overflow:hidden;}
   #akx-glance .r{border-top:1px solid #f0ece3;} #akx-glance .r:first-child{border-top:none;}
-  #akx-glance .rh{display:grid;grid-template-columns:72px 1fr auto;grid-template-areas:"day name det" "day meta meta" "day oh oh";column-gap:16px;row-gap:7px;padding:14px 20px;align-items:center;cursor:pointer;}
+  #akx-glance .r.soon .rh{background:#FBF6ED;}
+  #akx-glance .rh{display:grid;grid-template-columns:72px 1fr auto;grid-template-areas:"day name det" "day meta meta" "day next next" "day oh oh";column-gap:16px;row-gap:7px;padding:14px 20px;align-items:center;cursor:pointer;}
   #akx-glance .dt{grid-area:day;align-self:start;display:flex;flex-direction:column;}
   #akx-glance .dt .day{font-family:'Oswald',sans-serif;color:var(--red);font-weight:700;font-size:1.12rem;line-height:1;}
   #akx-glance .dt .time{font-family:'Oswald',sans-serif;color:var(--ink);font-weight:500;font-size:.84rem;margin-top:3px;}
   #akx-glance .meta{grid-area:meta;min-width:0;display:flex;align-items:center;gap:6px 10px;flex-wrap:wrap;}
   #akx-glance .nm{grid-area:name;font-weight:700;font-size:1rem;color:var(--ink);} #akx-glance .nm .dur{font-weight:500;color:#9a948b;font-size:.85rem;}
   #akx-glance .ptag{font-size:.62rem;font-weight:700;letter-spacing:.02em;text-transform:uppercase;padding:3px 8px;border-radius:999px;white-space:nowrap;}
-  #akx-glance .t-main{background:rgba(10,151,255,.16);color:#0A6FBF;} #akx-glance .t-drop{background:#D2E9E4;color:#227C74;} #akx-glance .t-start{background:#D6EFCB;color:#3B8B2E;}
-  #akx-glance .t-ya{background:#E7DDF7;color:#6A38B0;} #akx-glance .t-branch{background:#F6E6C2;color:#A5741A;} #akx-glance .t-neutral{background:#ECE3D2;color:#8A7647;} #akx-glance .t-depth{background:#F0DCE0;color:#7B2D3A;} #akx-glance .t-enrol{background:#E7DFF0;color:#6E5A86;}
+  #akx-glance .tagN{background:#EDE7DB;color:#7c6f58;}
   #akx-glance .loc{font-size:.85rem;font-weight:600;display:inline-flex;align-items:center;gap:3px;white-space:nowrap;flex:0 0 auto;} #akx-glance .loc svg{width:11px;height:11px;} #akx-glance .loc.chelt{color:#5A5A5A;} #akx-glance .loc.ciren{color:#5B8C1A;}
   #akx-glance .det{grid-area:det;align-self:center;border:1.5px solid #d9e3e0;background:#fff;color:var(--teal);font-size:.8rem;font-weight:700;padding:6px 12px;border-radius:999px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;}
   #akx-glance .det .chev{font-size:.66rem;transition:transform .2s;}
   #akx-glance .r.open .det{background:#EEF5F3;border-color:#bcd8d2;} #akx-glance .r.open .det .chev{transform:rotate(180deg);}
+  /* ---- the live "next dates" line ---- */
+  #akx-glance .nextline{grid-area:next;font-family:'Roboto Mono',monospace;font-size:.8rem;color:#4a4a48;letter-spacing:-.01em;}
+  #akx-glance .nextline:empty{display:none;}
+  #akx-glance .nlbl{color:#9a948b;text-transform:uppercase;font-size:.66rem;letter-spacing:.04em;margin-right:5px;font-family:'Inter',sans-serif;font-weight:700;}
+  #akx-glance .nextline b{color:#1f6b5f;font-weight:600;}
+  #akx-glance .nchip{display:inline-block;font-family:'Inter',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:#fff;padding:2px 8px;border-radius:999px;margin-right:6px;vertical-align:middle;}
+  #akx-glance .nchip.talk{background:#C56B45;}
+  #akx-glance .nstatic{color:#9a948b;font-style:italic;font-family:'Inter',sans-serif;font-size:.82rem;}
   #akx-glance .oh{grid-area:oh;display:flex;align-items:center;gap:10px;background:#FBF6ED;color:#5c6773;border:1px solid #EFE7D6;border-radius:8px;padding:7px 12px;font-size:.84rem;line-height:1.4;}
   #akx-glance .oh-pill{flex:none;font-family:'Inter',sans-serif;font-weight:800;font-size:.62rem;letter-spacing:.07em;text-transform:uppercase;color:#8a6d2f;background:#EFE3C8;border-radius:999px;padding:3px 9px;}
   #akx-glance .oh b{font-weight:700;color:#26303A;}
@@ -111,12 +134,16 @@
   #akx-glance .m-list{background:#fff;border:1px solid #ece7dd;border-radius:12px;box-shadow:0 3px 14px rgba(0,0,0,.05);overflow:hidden;position:relative;}
   #akx-glance .mrow{display:grid;grid-template-columns:46px 1fr auto;column-gap:10px;padding:12px 14px;border-top:1px solid #f0ece3;align-items:start;}
   #akx-glance .mrow:first-child{border-top:none;}
+  #akx-glance .mrow.soon{background:#FBF6ED;}
   #akx-glance .mrow.mx{cursor:pointer;}
   #akx-glance .mrow .mday{font-family:'Oswald',sans-serif;color:var(--red);font-weight:700;font-size:.98rem;line-height:1.05;}
   #akx-glance .mrow .mtime{font-family:'Oswald',sans-serif;font-size:.74rem;color:var(--ink);}
   #akx-glance .mrow .mname{font-weight:700;font-size:.94rem;}
   #akx-glance .mrow .msub{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:4px;}
   #akx-glance .mrow .msub .ptag{font-size:.57rem;padding:2px 7px;} #akx-glance .mrow .msub .loc{font-size:.77rem;}
+  #akx-glance .mnext{margin-top:5px;font-family:'Roboto Mono',monospace;font-size:.74rem;color:#4a4a48;}
+  #akx-glance .mnext:empty{display:none;}
+  #akx-glance .mnext b{color:#1f6b5f;font-weight:600;}
   #akx-glance .mchev{align-self:center;border:1.5px solid #d9e3e0;background:#fff;color:var(--teal);width:26px;height:26px;border-radius:999px;font-size:.62rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;}
   #akx-glance .mchev .c{transition:transform .2s;}
   #akx-glance .mrow.open .mchev{background:#EEF5F3;border-color:#bcd8d2;} #akx-glance .mrow.open .mchev .c{transform:rotate(180deg);}
@@ -137,37 +164,61 @@
   #akx-glance .m-reset{border-top:1px solid #f0ece3;text-align:center;padding:11px;font-size:.8rem;font-weight:600;color:#2A66A6;cursor:pointer;background:#FBF9F4;}
 `;
 
+  /* ================= helpers ================= */
   function mins(t){var p=t.split(':');return (+p[0])*60+(+p[1]);}
   function isAM(e){return mins(e.time)<=720;}          /* starts by 12:00 */
   function pin(loc){return loc==='ciren'?PIN_CI:PIN_CH;}
   function locName(loc){return loc==='ciren'?'Cirencester':'Cheltenham';}
   function locHTML(e){return '<span class="loc '+e.loc+'">'+pin(e.loc)+locName(e.loc)+'</span>';}
-  function tagsHTML(e){return e.tags.map(function(t){return '<span class="ptag '+t[1]+'">'+t[0]+'</span>';}).join('');}
-  function keyTagHTML(e){return '<span class="ptag '+e.key[1]+'">'+e.key[0]+'</span>';}
+  function tagHTML(e){return e.tag?'<span class="ptag tagN">'+e.tag+'</span>':'';}
   function sumHTML(s){return s.split('|').map(function(x,i){return (i?'<span class="sep">|</span>':'')+x;}).join('');}
   function ctaAttrs(e){return 'href="'+e.cta.url+'"'+(e.cta.ext?' target="_blank" rel="noopener"':'');}
+  function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function mkeyOf(e){return e.feed?(e.feed==='weekend'?'weekend':(e.feed+'|'+e.day+'|'+e.time)):'static';}
 
+  /* the "next dates" HTML for a given match key (reads NEXT).
+     isMobile: weekend row shows just one date + title on mobile. */
+  function nextHTML(k,isMobile){
+    if(k==='static') return '<span class="nstatic">Runs in term time &mdash; see calendar below</span>';
+    var d=NEXT[k]; if(!d) return '';                         /* not loaded yet */
+    var it=d.items||[];
+    if(!it.length) return '<span class="nstatic">Resumes next term &mdash; see calendar</span>';
+    var f=it[0];
+    var head = f.talk
+      ? '<span class="nchip talk">Talk</span> <b>'+f.date+'</b>'+(f.title?' &mdash; '+esc(f.title):'')
+      : '<span class="nlbl">Next</span> <b>'+f.date+'</b>'+(f.title?' &mdash; '+esc(f.title):'');
+    if(k==='weekend' && isMobile) return head;               /* mobile weekend: one date + title */
+    return head+(it[1]?', then '+it[1].date:'');
+  }
+
+  /* ================= row builders ================= */
   function desktopRow(e,hideDay){
+    var k=mkeyOf(e);
     var oh=e.oh?'<div class="oh"><span class="oh-pill">Open House</span><span><b>'+e.oh+'</b> &mdash; '+OH_INVITE+'</span></div>':'';
     return '<div class="r"><div class="rh">'
       +'<div class="dt">'+(hideDay?'':'<span class="day">'+e.day+'</span>')+'<span class="time">'+e.time+'</span></div>'
       +'<span class="nm">'+e.name+(e.dur?' <span class="dur">('+e.dur+')</span>':'')+'</span>'
-      +'<span class="meta">'+tagsHTML(e)+locHTML(e)+'</span>'
+      +'<span class="meta">'+tagHTML(e)+locHTML(e)+'</span>'
       +'<button class="det">Details <span class="chev">&#9662;</span></button>'
+      +'<div class="nextline nextfill" data-k="'+k+'">'+nextHTML(k,false)+'</div>'
       +oh
       +'</div><div class="rd"><div class="sum">'+sumHTML(e.sum)+'</div>'
       +'<a class="cta'+(e.cta.coral?' coral':'')+'" '+ctaAttrs(e)+'>'+e.cta.label+'</a></div></div>';
   }
   function mobileRow(e,cls,expandable,hideDay){
+    var k=mkeyOf(e);
+    var soon=(k===SOONK)?' soon':'';
     var dur=e.dur?' <span class="dur" style="color:#9a948b;font-weight:500;font-size:.8rem">('+e.dur+')</span>':'';
     var oh=e.oh?'<div class="oh-m"><span class="oh-pill">Open House</span><span><b>'+e.oh+'</b> &mdash; '+OH_INVITE+'</span></div>':'';
     var chev=expandable?'<button class="mchev"><span class="c">&#9662;</span></button>':'';
     var det=expandable?'<div class="mrd"><div class="msum">'+sumHTML(e.sum)+'</div>'
       +'<a class="mcta'+(e.cta.coral?' coral':'')+'" '+ctaAttrs(e)+'>'+e.cta.label+'</a></div>':'';
-    return '<div class="mrow'+(cls?' '+cls:'')+(expandable?' mx':'')+'">'
+    return '<div class="mrow'+(cls?' '+cls:'')+soon+(expandable?' mx':'')+'">'
       +'<div>'+(hideDay?'':'<div class="mday">'+e.day+'</div>')+'<div class="mtime">'+e.time+'</div></div>'
       +'<div class="mbody"><div class="mname">'+e.name+dur+'</div>'
-      +'<div class="msub">'+keyTagHTML(e)+locHTML(e)+'</div>'+oh+det+'</div>'
+      +'<div class="msub">'+tagHTML(e)+locHTML(e)+'</div>'
+      +'<div class="mnext nextfill" data-k="'+k+'">'+nextHTML(k,true)+'</div>'
+      +oh+det+'</div>'
       +chev+'</div>';
   }
   function match(e,tab){
@@ -183,7 +234,7 @@
 
   function headerHTML(){
     return '<h2 class="wag-h">Week at a Glance</h2>'
-      +'<div class="wag-lead">Here&rsquo;s an overview of all weekly classes and events. Tap an event to expand for more details. Please check the programme, or the calendar below, as we take breaks and not every class runs every week.</div>'
+      +'<div class="wag-lead">Here&rsquo;s the week at a glance &mdash; each class shows its next dates. Tap an event for more, or see the full calendar below.</div>'
       +'<div class="wag-term"><span class="wag-pill">Term dates</span><div>'
       +'<span class="line"><b>Autumn Term:</b> 22 Aug &ndash; 15 Dec <span class="ht">(half-term 8&ndash;15 Oct)</span></span>'
       +'<span class="line"><b>Spring Term:</b> from 2 Jan 2027</span>'
@@ -235,11 +286,72 @@
     renderMobile(root,null);
   }
 
+  /* ================= live calendar layer ================= */
+  function fmtWD(s){return new Intl.DateTimeFormat('en-GB',{timeZone:TZ,weekday:'short'}).format(new Date(s));}
+  function fmtHM(s,allDay){if(allDay)return'all';return new Intl.DateTimeFormat('en-GB',{timeZone:TZ,hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(s));}
+  function fmtNice(s,allDay){return new Intl.DateTimeFormat('en-GB',{timeZone:TZ,weekday:'short',day:'numeric',month:'short'}).format(new Date(s)).replace(',','');}
+  function isTalk(t){return /\[talk\]/i.test(t||'');}
+  function cleanTitle(t){return (t||'').replace(/\s*\[[^\]]*\]\s*/g,' ').replace(/\s{2,}/g,' ').trim();}
+
+  function apiUrl(id,tMin,tMax){
+    return 'https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(id)
+      +'/events?singleEvents=true&orderBy=startTime&maxResults=250&key='+API_KEY
+      +'&timeMin='+encodeURIComponent(tMin)+'&timeMax='+encodeURIComponent(tMax);
+  }
+  function grab(id,tMin,tMax){
+    return fetch(apiUrl(id,tMin,tMax)).then(function(r){return r.json();}).then(function(j){
+      if(!j||j.error||!j.items) return [];
+      return j.items.map(function(it){
+        var allDay=!!(it.start&&it.start.date);
+        var s=it.start?(it.start.dateTime||it.start.date):null; if(!s) return null;
+        return {start:s, day:fmtWD(s), time:fmtHM(s,allDay), nice:fmtNice(s,allDay), summary:it.summary||''};
+      }).filter(Boolean);
+    }).catch(function(){return [];});
+  }
+
+  function buildNext(byFeed){
+    NEXT={};
+    EVENTS.forEach(function(e){
+      if(!e.feed) return;
+      var k=mkeyOf(e), arr=byFeed[e.feed]||[], items;
+      if(e.feed==='weekend'){
+        items=arr.slice(0,2).map(function(x){return {date:x.nice,title:cleanTitle(x.summary),talk:isTalk(x.summary),start:x.start};});
+      }else{
+        items=arr.filter(function(x){return x.day===e.day && x.time===e.time;}).slice(0,2)
+          .map(function(x){return {date:x.nice,title:isTalk(x.summary)?cleanTitle(x.summary):'',talk:isTalk(x.summary),start:x.start};});
+      }
+      NEXT[k]={items:items};
+    });
+    /* soonest upcoming across all rows -> "next up" tint */
+    SOONK=null; var best=null;
+    Object.keys(NEXT).forEach(function(k){var it=NEXT[k].items; if(it&&it[0]&&it[0].start){ if(best===null||it[0].start<best){best=it[0].start;SOONK=k;} }});
+  }
+
+  function fillNext(root){
+    root.querySelectorAll('.nextfill').forEach(function(el){
+      var k=el.getAttribute('data-k'); el.innerHTML=nextHTML(k, el.classList.contains('mnext'));
+      var row=el.closest('.r')||el.closest('.mrow'); if(row) row.classList.toggle('soon', k===SOONK && k!=='static');
+    });
+  }
+
+  function loadLive(root){
+    if(!window.fetch || !window.Promise) return;                 /* very old browser: stay static */
+    var now=new Date();
+    var tMin=now.toISOString();
+    var tMax=new Date(now.getTime()+77*864e5).toISOString();      /* 11 weeks: clears half-term, still finds 2 dates */
+    var keys=Object.keys(CAL_IDS);
+    Promise.all(keys.map(function(k){return grab(CAL_IDS[k],tMin,tMax);})).then(function(res){
+      var byFeed={}; keys.forEach(function(k,i){byFeed[k]=res[i];});
+      buildNext(byFeed); fillNext(root);
+    }).catch(function(){/* keep static */});
+  }
+
   function init(){
     var mount=document.getElementById(MOUNT_ID); if(!mount) return;
     if(mount.getAttribute('data-akx-done')==='1') return;
     if(!document.getElementById('akx-glance-style')){var st=document.createElement('style');st.id='akx-glance-style';st.textContent=STYLE;document.head.appendChild(st);}
-    mount.innerHTML=buildHTML(); mount.setAttribute('data-akx-done','1'); wire(mount);
+    mount.innerHTML=buildHTML(); mount.setAttribute('data-akx-done','1'); wire(mount);   /* static first, always */
+    loadLive(mount);                                                                     /* then enhance with live dates */
   }
   if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{init();}
 })();
