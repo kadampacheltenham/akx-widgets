@@ -15,13 +15,14 @@
   "use strict";
 
   // ---- the taxonomy: canonical type -> colour, default label, motif id ----
+  // colour = the fill; dk = darker shade (strips, buttons); tint/tintbd/tintink = pale states.
   var TYPES = {
-    course:  { colour: "#2A66A6", label: "Course",        motif: "m-course"  },
-    talk:    { colour: "#C56B45", label: "Public talk",   motif: "m-talk"    },
-    retreat: { colour: "#227A72", label: "Retreat",       motif: "m-retreat" },
-    free:    { colour: "#4FA35A", label: "Free",          motif: "m-free"    },
-    study:   { colour: "#6A4A9C", label: "Study",         motif: "m-study"   }, // purple + cairn
-    special: { colour: "#B5771E", label: "Special event", motif: "m-special" }
+    course:  { colour:"#2A66A6", dk:"#1E4C7C", tint:"#E3F1FB", tintbd:"#9AD0EF", tintink:"#1F6FB0", label:"Short Course",   motif:"m-course"  },
+    talk:    { colour:"#C56B45", dk:"#A44E2E", tint:"#FBECE3", tintbd:"#F2C4AA", tintink:"#C05A2E", label:"Public Talk",    motif:"m-talk"    },
+    retreat: { colour:"#227A72", dk:"#185B54", tint:"#D5EFEC", tintbd:"#A6D9D2", tintink:"#1E6E66", label:"Retreat",        motif:"m-retreat" },
+    free:    { colour:"#4FA35A", dk:"#3C8146", tint:"#E7F3E1", tintbd:"#B9DCA9", tintink:"#3B8B2E", label:"Free Event",     motif:"m-free"    },
+    study:   { colour:"#6A4A9C", dk:"#52397A", tint:"#ECE4F7", tintbd:"#C9B6E8", tintink:"#6A38B0", label:"In-depth",       motif:"m-study"   }, // purple + cairn
+    special: { colour:"#B5771E", dk:"#8E5C14", tint:"#F6E9CE", tintbd:"#E4C48A", tintink:"#8E5C14", label:"Special Event",  motif:"m-special" }
   };
 
   // ---- aliases: whatever the two sheets' Event Type dropdowns say -> canonical ----
@@ -44,6 +45,10 @@
 
   function typeOf(x){ var k=String(x||"").trim().toLowerCase(); return ALIAS[k] || (TYPES[k]?k:"") ; }
   function colourOf(x){ var t=TYPES[typeOf(x)]; return t?t.colour:""; }
+  function themeOf(x){ return TYPES[typeOf(x)] || null; }   // full swatch for a type
+  // just the faint motif svg (for dropping into another widget's own graphic box)
+  function motifSVG(x){ var t=TYPES[typeOf(x)]; if(!t) return "";
+    return '<svg class="motif" viewBox="0 0 200 200" aria-hidden="true"><use href="#'+t.motif+'"/></svg>'; }
 
   // ---- the motif symbols (thin white line-art, one family) ----
   var DEFS =
@@ -158,7 +163,7 @@
   }
   function start(){ injectOnce(); var n=document.querySelectorAll(".akx-graphic"); for(var i=0;i<n.length;i++) hydrate(n[i]); }
 
-  window.AKX_GFX = { TYPES:TYPES, typeOf:typeOf, colourOf:colourOf, render:render, injectCSS:injectOnce };
+  window.AKX_GFX = { TYPES:TYPES, typeOf:typeOf, colourOf:colourOf, themeOf:themeOf, motifSVG:motifSVG, render:render, injectCSS:injectOnce };
 
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",start);
   else start();
