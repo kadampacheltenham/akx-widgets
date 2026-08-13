@@ -161,8 +161,11 @@
   // active column: Yes/blank = shown, No = hidden (dropdown-friendly)
   var HIDDEN={ "no":1,"n":1,"false":1,"hide":1,"hidden":1,"0":1,"off":1 };
 
-  // choose the item for a block: page-preferred but never exclusive
-  function pickItem(items, page, seed){
+  // choose the item for a block. Single stub: page-preferred (weighted). MULTIPLE stubs of the same
+  // type+page on one page: each gets a DISTINCT item (offset by its index) so two/three slots show
+  // different people/quotes. Never exclusive; still rotates daily.
+  function pickItem(items, page, seed, idx, multi){
+    idx = idx || 0;
     var active=items.filter(function(it){
       if(HIDDEN[String(it.active||"").trim().toLowerCase()]) return false;  // hidden
       if(!String(it.quote||"").trim()) return false;                        // needs quote text
@@ -170,12 +173,16 @@
     });
     if(!active.length) return null;
     var pool;
-    if(page){
+    if(multi){
+      // distinct list (each item once), page-preferred first -> consecutive idx = different item
+      var prefD=active.filter(function(it){return page && tagsOf(it).indexOf(page)>-1;});
+      pool=prefD.concat(active.filter(function(it){return prefD.indexOf(it)<0;}));
+    } else if(page){
       var pref=active.filter(function(it){return tagsOf(it).indexOf(page)>-1;});
       if(pref.length){ pool=[]; pref.forEach(function(x){pool.push(x,x);}); active.forEach(function(x){if(pref.indexOf(x)<0)pool.push(x);}); }
       else pool=active;
     } else pool=active;
-    return pool[(dayNumber()+seed)%pool.length];
+    return pool[(dayNumber()+seed+idx)%pool.length];
   }
 
   function chooseStyle(item, styles, seed, forced){
@@ -226,7 +233,8 @@
     return '<div class="q1">'+LOTUS+q+'<div class="hr"></div>'+attrHTML(item)+'</div>';
   }
 
-  function fill(el){
+  function fill(el, idx, multi){
+    idx = idx || 0;
     var type=(el.getAttribute("data-type")||"").toLowerCase();
     var page=(el.getAttribute("data-page")||"").toLowerCase().trim();
     var forced=(el.getAttribute("data-style")||"").toLowerCase().trim();
@@ -235,8 +243,8 @@
     var seed=hashStr(page)+(isT?0:97);
     el.className="akx-tq";
     load(url).then(function(items){
-      var item=pickItem(items,page,seed) || FALLBACK[isT?"testimony":"quotation"];
-      var style=chooseStyle(item, isT?TEST_STYLES:QUOTE_STYLES, seed, forced);
+      var item=pickItem(items,page,seed,idx,multi) || FALLBACK[isT?"testimony":"quotation"];
+      var style=chooseStyle(item, isT?TEST_STYLES:QUOTE_STYLES, seed+idx, forced);
       el.innerHTML=isT?renderTestimony(item,style):renderQuotation(item,style);
     }).catch(function(){
       var item=FALLBACK[isT?"testimony":"quotation"];
@@ -244,11 +252,14 @@
     });
   }
 
+  function keyOf(el){ return ((el.getAttribute("data-type")||"").toLowerCase())+"|"+((el.getAttribute("data-page")||"").toLowerCase().trim()); }
+
   function start(){
     injectCSS();
-    var nodes=document.querySelectorAll(".akx-tq");
-    // if the script sits alone with no host, do nothing gracefully
-    for(var i=0;i<nodes.length;i++) fill(nodes[i]);
+    var nodes=[].slice.call(document.querySelectorAll(".akx-tq"));
+    var total={}; nodes.forEach(function(el){ var k=keyOf(el); total[k]=(total[k]||0)+1; });
+    var seen={};
+    nodes.forEach(function(el){ var k=keyOf(el); var i=(seen[k]||0); seen[k]=i+1; fill(el, i, total[k]>1); });
   }
 
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",start);
