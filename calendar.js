@@ -14,15 +14,22 @@
     branch:   { name:'Branch classes',              color:'#4FA35A', id:'c_6b6fc5b8541682cc520a71d1bc5683dc16d14d2e907ef4da85a1e7479a73c798@group.calendar.google.com' },
     weekend:  { name:'Courses & retreats',          color:'#E2886A', id:'c_687cfcac60ad1fa647cd2fb654774156e1e48fb2dcbcf5c40a72340e422a4b08@group.calendar.google.com' },
     prayers:  { name:'Prayers & Pujas',             color:'#7E5CA8', id:'c_7120941805c32581a9dca9a00783a100d6d53914fc8915ee8df40ae74d864504@group.calendar.google.com' },
+    volunteer:{ name:'Volunteering',                color:'#5E7A8A', id:'c_75691d6f7c1a31c8a4ad3bbdaa29431702ceeadcec440781106a4a76a29c1759@group.calendar.google.com' },
     announce: { name:'Announcements',               color:'#BEB8AC', pinned:true, id:'c_8tho1a5ip2rh1g154iea6h0c0k@group.calendar.google.com' }
   };
   // ---- per-page presets: title (blue), default view, and which feeds (on:false = present but off by default) ----
   var PRESETS = {
-    whatson: { title:'Upcoming Classes & Courses', mode:'list',
-               feeds:[ {k:'weekly'}, {k:'branch',on:false}, {k:'weekend'}, {k:'prayers',on:false}, {k:'announce'} ] },
-    weekly:  { title:'Weekly Classes Calendar', mode:'list',
-               feeds:[ {k:'weekly'}, {k:'branch'}, {k:'announce'} ] }
-    // add more pages here later, e.g. courses / prayers, then set data-cal on the stub.
+    // Every calendar lists all feeds; feeds with on:false start greyed/muted and colour up when clicked.
+    weekly:   { title:'Weekly Classes Calendar', mode:'list',
+                feeds:[ {k:'weekly'}, {k:'branch'}, {k:'weekend',on:false}, {k:'prayers',on:false}, {k:'volunteer',on:false}, {k:'announce'} ] },
+    whatson:  { title:'Upcoming Meditation Classes & Courses', mode:'list',
+                feeds:[ {k:'weekly'}, {k:'branch'}, {k:'weekend'}, {k:'prayers',on:false}, {k:'volunteer',on:false}, {k:'announce'} ] },
+    courses:  { title:'Upcoming Weekend Courses & Retreats', mode:'list',
+                feeds:[ {k:'weekly',on:false}, {k:'branch',on:false}, {k:'weekend'}, {k:'prayers',on:false}, {k:'volunteer',on:false}, {k:'announce'} ] },
+    prayers:  { title:'Upcoming Prayers & Pujas', mode:'list',
+                feeds:[ {k:'weekly',on:false}, {k:'branch',on:false}, {k:'weekend',on:false}, {k:'prayers'}, {k:'volunteer',on:false}, {k:'announce'} ] },
+    volunteer:{ title:'Upcoming Volunteering Events', mode:'list',
+                feeds:[ {k:'weekly',on:false}, {k:'branch',on:false}, {k:'weekend',on:false}, {k:'prayers',on:false}, {k:'volunteer'}, {k:'announce'} ] }
   };
 
   var root = document.getElementById('akx-cal');
@@ -161,6 +168,7 @@
       +'&timeMin='+encodeURIComponent(tMin)+'&timeMax='+encodeURIComponent(tMax);
   }
   function fetchMonth(cal, y, m){
+    if(!cal.id || /PUT_/.test(cal.id)) return Promise.resolve();   // feed not configured yet (e.g. Volunteering) — skip, keep its pill visible
     var k=cal.id+'|'+y+'-'+m; if(fetched[k]) return Promise.resolve(); fetched[k]=true;
     var tMin=new Date(y,m,1).toISOString(), tMax=new Date(y,m+1,1).toISOString();
     return fetch(apiUrl(cal,tMin,tMax)).then(function(r){return r.json();}).then(function(j){
@@ -191,7 +199,7 @@
   function loadBanner(){
     var pins=CALS.filter(function(c){return c.pinned;}); if(!pins.length){return;}
     var now=new Date(), t0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-    var tMin=t0.toISOString(), tMax=new Date(t0.getFullYear(),t0.getMonth(),t0.getDate()+14).toISOString();   // only show notices active now or starting within 14 days (was 90)
+    var tMin=t0.toISOString(), tMax=new Date(t0.getFullYear(),t0.getMonth(),t0.getDate()+200).toISOString();   // show notices active now or starting within ~6.5 months, so festival closures highlight well ahead
     Promise.all(pins.map(function(c){
       return fetch(apiUrl(c,tMin,tMax)).then(function(r){return r.json();})
         .then(function(j){return {cal:c,items:(j.items||[])};}).catch(function(){return {cal:c,items:[]};});
