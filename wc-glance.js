@@ -1,16 +1,17 @@
-/* Akanishta &mdash; Week at a Glance widget (v8 &mdash; slim, unified, semi-live)
-   - ONE list for desktop + mobile, with the filter tabs on a single line at the
-     top of both: All | Get started | AM | PM | In-depth | Cheltenham | Branches.
-   - Slim collapsed listing shows just: day/time + event name (+ small chip).
-     "Dates & details" is the expander; tap ANYWHERE on a day to open it.
-   - Days with 2+ events are grouped under one day label and expand together.
-   - Chips: Talk (coral) · Free (green) · New (bright blue).
-   - Event titles (e.g. a public talk) shown semi-bold in place of the class name.
-   - Live: each class's next two real dates come from the Google Calendar
-     (singleEvents=true; matched by weekday+time). Hidden title tokens drive chips:
-     [talk] -> Talk + topic, [new] -> New + "Starts <date>". Static fallback if the
-     fetch fails.
-   - Term dates sit quietly at the bottom. Today's day is highlighted.
+/* Akanishta &mdash; Week at a Glance widget (v8.1 &mdash; slim, unified, semi-live)
+   - ONE list, filter tabs on a single line (centred on desktop, scrollable on
+     mobile): All | Get started | AM | PM | In-depth | Cheltenham | Branches.
+     Unselected tabs = slim blue outline; active = filled blue.
+   - Slim collapsed listing: day + (time + event name + chip) per event. Tap
+     ANYWHERE on a day to reveal each event's dates & details in place (no
+     duplicated headline). Days with 2+ events expand together.
+   - Chips: Talk (coral) · Free (green) · New (bright blue). Event titles semi-bold.
+   - Open House sits inside the expansion. Venue: after the location a quiet green
+     "tap for venue & directions" (Cheltenham -> maps; branches suppressed for now).
+   - Live next dates from Google Calendar (singleEvents=true, matched by weekday+
+     time). [talk] -> Talk + topic · [new] -> New + "Starts <date>". Static fallback.
+   - Term dates: quiet block at the bottom (a tap-to-reveal pill on mobile). Today
+     is highlighted.
    Include with: <div id="akx-glance"></div>
                  <script src="https://kadampacheltenham.github.io/akx-widgets/wc-glance.js" defer></script> */
 (function(){
@@ -28,27 +29,26 @@
     weekend:'c_687cfcac60ad1fa647cd2fb654774156e1e48fb2dcbcf5c40a72340e422a4b08@group.calendar.google.com'
   };
 
-  /* ---- single source of truth. feed = which calendar to match (omit = static).
-     start = get-started filter · free = Free chip · depth = In-depth filter. ---- */
+  /* start = get-started filter · free = Free chip · depth = In-depth filter · feed = calendar to match */
   var EVENTS=[
     {day:'Mon',time:'12:30',name:'Simply Meditate',dur:'30 min',loc:'chelt',feed:'weekly',start:1,
      sum:'Reduce stress and cultivate inner peace|Come as you are|Perfect if you are just getting started',
-     cta:{label:'Get directions &rarr;',url:DIR_CH,ext:1}},
+     cta:{label:'Get directions',url:DIR_CH,ext:1}},
     {day:'Mon',time:'18:30',name:'Evening meditation class',dur:'75 min',loc:'chelt',feed:'weekly',oh:'5:45&ndash;6:15 pm',
      sum:'One-off talks &amp; short courses on a theme or topic|See the programme or calendar below for details',
-     cta:{label:'Get directions &rarr;',url:DIR_CH,ext:1}},
+     cta:{label:'Get directions',url:DIR_CH,ext:1}},
     {day:'Tue',time:'10:30',name:'Daytime meditation class',dur:'75 min',loc:'chelt',feed:'weekly',
      sum:'One-off talks &amp; short courses on a theme or topic|See the programme or calendar below for details',
-     cta:{label:'Get directions &rarr;',url:DIR_CH,ext:1}},
+     cta:{label:'Get directions',url:DIR_CH,ext:1}},
     {day:'Wed',time:'19:00',name:'Young Adults',dur:'60 min',loc:'chelt',feed:'weekly',
      sum:'Aimed at young adults 18&ndash;35|Check the programme or calendar below for details',
-     cta:{label:'Get directions &rarr;',url:DIR_CH,ext:1}},
+     cta:{label:'Get directions',url:DIR_CH,ext:1}},
     {day:'Thu',time:'18:30',name:'Cirencester evening class',dur:'75 min',loc:'ciren',feed:'branch',
      sum:'Talks &amp; meditations following a theme|Check the programme or calendar for dates',
-     cta:{label:'Get directions &rarr;',url:DIR_CI,ext:1}},
+     cta:{label:'Get directions',url:DIR_CI,ext:1}},
     {day:'Fri',time:'12:00',name:'Free guided meditation',dur:'15 min',loc:'chelt',feed:'weekly',free:1,start:1,oh:'11:30&ndash;12:00',
      sum:'Free &mdash; nothing to book, just turn up|Perfect if you are just getting started',
-     cta:{label:'Get directions &rarr;',url:DIR_CH,ext:1}},
+     cta:{label:'Get directions',url:DIR_CH,ext:1}},
     {day:'Sat',time:'10:00',name:'Weekend courses &amp; retreats',dur:'',loc:'chelt',feed:'weekend',
      sum:'Day &amp; half-day courses and retreats throughout the year.',
      cta:{label:'Courses &amp; retreats page &rarr;',url:'/courses-retreats',coral:1}},
@@ -64,21 +64,20 @@
   var PIN_CH='<svg viewBox="0 0 24 24" fill="#C8102E"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/></svg>';
   var PIN_CI='<svg viewBox="0 0 24 24" fill="#6DBE45"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/></svg>';
 
-  var NEXT={};   /* mkey -> {items:[{date,title,talk,isnew,start}]} */
+  var NEXT={};
 
   var STYLE=String.raw`
   @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Roboto+Mono:wght@500;600&display=swap');
-  #akx-glance{--ink:#2B2A28;--red:#C8102E;--teal:#4E938C;font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);}
+  #akx-glance{--ink:#2B2A28;--red:#C8102E;--teal:#4E938C;--blue:#2A66A6;--dirg:#0B7A3B;font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);}
   #akx-glance *{box-sizing:border-box;}
   #akx-glance .wag{max-width:1000px;margin:0 auto;}
-  #akx-glance .wag-h{text-align:center;font-size:1.9rem;font-weight:600;color:#2A66A6;margin:0 0 6px;}
-  #akx-glance .wag-lead{margin:0 auto 16px;padding:0 20px;text-align:left;color:#6f6a62;font-size:.98rem;line-height:1.55;}
+  #akx-glance .wag-h{text-align:center;font-size:1.9rem;font-weight:600;color:var(--blue);margin:0 0 22px;}
 
-  /* filter tabs — one line, both breakpoints */
-  #akx-glance .f-tabs{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 12px;-webkit-overflow-scrolling:touch;}
+  /* filter tabs — one line; centred on desktop, scrollable on mobile */
+  #akx-glance .f-tabs{display:flex;justify-content:center;gap:7px;overflow-x:auto;padding:2px 2px 14px;-webkit-overflow-scrolling:touch;}
   #akx-glance .f-tabs::-webkit-scrollbar{height:0;}
-  #akx-glance .f-tab{flex:0 0 auto;border:1.5px solid #dcd6ca;background:#fff;color:#6f6a62;border-radius:999px;padding:6px 14px;font-size:.82rem;font-weight:600;cursor:pointer;white-space:nowrap;}
-  #akx-glance .f-tab.on{background:#2A66A6;border-color:#2A66A6;color:#fff;}
+  #akx-glance .f-tab{flex:0 0 auto;border:1.5px solid var(--blue);background:#fff;color:#42484d;border-radius:999px;padding:6px 14px;font-size:.82rem;font-weight:600;cursor:pointer;white-space:nowrap;}
+  #akx-glance .f-tab.on{background:var(--blue);color:#fff;}
 
   /* the list */
   #akx-glance .wag-list{border:1px solid #ece7dd;border-radius:14px;background:#fff;box-shadow:0 3px 14px rgba(0,0,0,.05);overflow:hidden;}
@@ -87,49 +86,55 @@
   #akx-glance .dayblk.today{background:#FBF6ED;}
   #akx-glance .dh{display:grid;grid-template-columns:60px 1fr auto;column-gap:14px;padding:13px 18px;align-items:center;}
   #akx-glance .dday{font-family:'Oswald',sans-serif;color:var(--red);font-weight:700;font-size:1.08rem;line-height:1;align-self:center;}
-  #akx-glance .devents{display:flex;flex-direction:column;gap:7px;min-width:0;}
+  #akx-glance .devents{display:flex;flex-direction:column;gap:8px;min-width:0;}
   #akx-glance .dev{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;}
   #akx-glance .dtime{font-family:'Oswald',sans-serif;font-size:.82rem;color:var(--ink);flex:none;}
   #akx-glance .dname{font-weight:500;font-size:.96rem;color:var(--ink);}
   #akx-glance .dname.tt{font-weight:700;}
-  #akx-glance .chip{font-size:.57rem;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:#fff;padding:2px 7px;border-radius:999px;white-space:nowrap;align-self:center;}
+  #akx-glance .chip{font-size:.57rem;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:#fff;padding:2px 7px;border-radius:999px;white-space:nowrap;align-self:center;flex:none;}
   #akx-glance .chip.talk{background:#C56B45;} #akx-glance .chip.free{background:#4FA35A;} #akx-glance .chip.new{background:#22B8F0;}
   #akx-glance .dtoggle{align-self:center;color:var(--teal);font-size:.78rem;font-weight:700;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;}
   #akx-glance .dtoggle .chev{font-size:.64rem;transition:transform .2s;}
   #akx-glance .dayblk.open .dtoggle .chev{transform:rotate(180deg);}
 
-  /* open house — visible on the collapsed day; turns white on the highlighted (today) row */
-  #akx-glance .oh{margin:0 18px 12px 74px;display:flex;align-items:center;gap:10px;background:#FBF6ED;color:#5c6773;border:1px solid #EFE7D6;border-radius:8px;padding:7px 12px;font-size:.84rem;line-height:1.4;}
-  #akx-glance .dayblk.today .oh{background:#fff;border-color:#E7DFC9;}
-  #akx-glance .oh-pill{flex:none;font-family:'Inter',sans-serif;font-weight:800;font-size:.62rem;letter-spacing:.07em;text-transform:uppercase;color:#8a6d2f;background:#EFE3C8;border-radius:999px;padding:3px 9px;}
-  #akx-glance .oh b{font-weight:700;color:#26303A;}
-
-  /* expanded details */
-  #akx-glance .ddetails{display:none;padding:0 18px 16px 74px;}
-  #akx-glance .dayblk.open .ddetails{display:block;}
-  #akx-glance .ed{border-top:1px dashed #eee6d8;padding-top:11px;margin-top:11px;}
-  #akx-glance .ed:first-child{border-top:none;padding-top:0;margin-top:0;}
-  #akx-glance .ed-h{font-weight:700;font-size:.9rem;margin-bottom:5px;}
+  /* per-event details, revealed in place under each event line */
+  #akx-glance .dev-details{display:none;margin:7px 0 2px;}
+  #akx-glance .dayblk.open .dev-details{display:block;}
+  #akx-glance .dayblk.open .dev-wrap + .dev-wrap{border-top:1px dashed #eee6d8;padding-top:9px;margin-top:9px;}
   #akx-glance .ed-next{font-family:'Roboto Mono',monospace;font-size:.82rem;color:#4a4a48;margin-bottom:7px;}
   #akx-glance .ed-next b{color:#1f6b5f;font-weight:600;} #akx-glance .ed-next .nlbl{color:#9a948b;text-transform:uppercase;font-size:.66rem;letter-spacing:.04em;margin-right:5px;font-family:'Inter',sans-serif;font-weight:700;}
   #akx-glance .ed-sum{font-size:.92rem;color:#5A5A5A;line-height:1.55;margin-bottom:10px;} #akx-glance .ed-sum .sep{color:#cfc8bc;padding:0 6px;}
-  #akx-glance .loc{font-size:.85rem;font-weight:600;display:inline-flex;align-items:center;gap:3px;white-space:nowrap;margin-right:14px;} #akx-glance .loc svg{width:11px;height:11px;} #akx-glance .loc.chelt{color:#5A5A5A;} #akx-glance .loc.ciren{color:#5B8C1A;}
-  #akx-glance .cta{display:inline-block;background:#E4F1E7;color:#0B7A3B;border:1px solid #C4E1CC;font-weight:600;font-size:.84rem;text-decoration:none;padding:8px 16px;border-radius:999px;margin-top:8px;}
-  #akx-glance .cta.coral{background:#F8E8DF;color:#B85C37;border-color:#EDCDBD;}
+  #akx-glance .oh{display:flex;align-items:center;gap:10px;background:#FBF6ED;color:#5c6773;border:1px solid #EFE7D6;border-radius:8px;padding:7px 12px;font-size:.84rem;line-height:1.4;margin-bottom:10px;}
+  #akx-glance .oh-pill{flex:none;font-family:'Inter',sans-serif;font-weight:800;font-size:.62rem;letter-spacing:.07em;text-transform:uppercase;color:#8a6d2f;background:#EFE3C8;border-radius:999px;padding:3px 9px;}
+  #akx-glance .oh b{font-weight:700;color:#26303A;}
+  #akx-glance .venue{font-size:.85rem;}
+  #akx-glance .loc{font-weight:600;display:inline-flex;align-items:center;gap:3px;white-space:nowrap;} #akx-glance .loc svg{width:12px;height:12px;} #akx-glance .loc.chelt{color:#5A5A5A;} #akx-glance .loc.ciren{color:#5B8C1A;}
+  #akx-glance .dir{color:var(--dirg);font-weight:600;text-decoration:underline;text-decoration-color:rgba(11,122,59,.35);text-underline-offset:2px;margin-left:8px;}
+  #akx-glance .pagelink{color:#B85C37;font-weight:700;text-decoration:none;}
 
   #akx-glance .wag-empty{padding:20px;text-align:center;color:#9a948b;font-size:.9rem;}
 
-  /* term dates — quiet, at the bottom */
-  #akx-glance .wag-term{margin-top:14px;display:flex;gap:12px;align-items:flex-start;background:#FBF6ED;border:1px solid #EFE7D6;border-radius:10px;padding:11px 15px;font-size:.88rem;line-height:1.55;color:#7a746b;}
-  #akx-glance .wag-pill{flex:none;align-self:flex-start;margin-top:1px;font-family:'Inter',sans-serif;font-weight:800;font-size:.66rem;letter-spacing:.06em;text-transform:uppercase;color:#8a6d2f;background:#EFE3C8;border-radius:999px;padding:5px 11px;}
-  #akx-glance .wag-term .line{display:block;} #akx-glance .wag-term b{font-weight:700;color:#4a4a48;} #akx-glance .wag-term .ht{color:#a49a86;}
+  /* term dates */
+  #akx-glance .wag-term{margin-top:14px;display:flex;gap:12px;align-items:flex-start;background:#FBF6ED;border:1px solid #EFE7D6;border-radius:10px;padding:11px 15px;}
+  #akx-glance .wag-pill{flex:none;align-self:flex-start;margin-top:1px;font-family:'Inter',sans-serif;font-weight:800;font-size:.66rem;letter-spacing:.06em;text-transform:uppercase;color:#8a6d2f;background:#EFE3C8;border:none;border-radius:999px;padding:5px 11px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;}
+  #akx-glance .tchev{display:none;font-size:.58rem;}
+  #akx-glance .term-body{font-size:.88rem;line-height:1.55;color:#7a746b;}
+  #akx-glance .term-body .line{display:block;} #akx-glance .term-body b{font-weight:700;color:#4a4a48;} #akx-glance .term-body .ht{color:#a49a86;}
 
   @media(max-width:640px){
-    #akx-glance .wag-h{font-size:1.5rem;} #akx-glance .wag-lead{font-size:.95rem;}
-    #akx-glance .dh{grid-template-columns:48px 1fr auto;column-gap:10px;padding:12px 13px;}
-    #akx-glance .dtoggle{font-size:0;gap:0;} #akx-glance .dtoggle .chev{font-size:.8rem;}
-    #akx-glance .oh, #akx-glance .ddetails{margin-left:0;padding-left:13px;}
-    #akx-glance .ddetails{padding-right:13px;}
+    #akx-glance .wag-h{font-size:1.5rem;margin-bottom:16px;}
+    #akx-glance .f-tabs{justify-content:flex-start;}
+    #akx-glance .dh{grid-template-columns:44px 1fr auto;column-gap:10px;padding:12px 12px;}
+    /* one line per event: time + name(ellipsis) + chip */
+    #akx-glance .dev{flex-wrap:nowrap;overflow:hidden;}
+    #akx-glance .dname{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    #akx-glance .dtoggle{font-size:0;gap:0;} #akx-glance .dtoggle .chev{font-size:.82rem;}
+    /* term dates: quiet tap-to-reveal pill */
+    #akx-glance .wag-term{background:none;border:none;padding:0;margin-top:14px;display:block;}
+    #akx-glance .wag-pill{margin-top:0;} #akx-glance .tchev{display:inline;}
+    #akx-glance .term-body{display:none;margin-top:10px;background:#FBF6ED;border:1px solid #EFE7D6;border-radius:10px;padding:11px 15px;}
+    #akx-glance .wag-term.open .term-body{display:block;}
+    #akx-glance .wag-term.open .tchev{transform:rotate(180deg);display:inline-block;}
   }
 `;
 
@@ -156,7 +161,6 @@
     return true;
   }
 
-  /* the dates line inside the expanded details */
   function datesLine(k){
     if(k==='static') return '';
     var d=NEXT[k]; if(!d) return '';                                  /* not loaded / fetch failed: no line */
@@ -167,48 +171,48 @@
     return '<span class="nlbl">'+word+'</span> <b>'+f.date+'</b>'+(it[1]?', then <b>'+it[1].date+'</b>':'');
   }
 
-  /* one collapsed event line: time + name(+chips) */
-  function eventLine(e){
-    var f=firstItem(e);
-    var titled=f&&f.title;
-    var name=titled?'<span class="dname tt">'+esc(f.title)+'</span>':'<span class="dname">'+e.name+'</span>';
-    var chips='';
-    if(f&&f.talk) chips+='<span class="chip talk">Talk</span>';
-    else if(e.free) chips+='<span class="chip free">Free</span>';
-    if(f&&f.isnew) chips+='<span class="chip new">New</span>';
-    return '<div class="dev"><span class="dtime">'+e.time+'</span> '+name+' '+chips+'</div>';
-  }
-
-  /* one event's block inside the expanded details */
-  function eventDetail(e,multi){
-    var dl=datesLine(mkeyOf(e));
-    return '<div class="ed">'
-      +(multi?'<div class="ed-h">'+e.time+' &middot; '+e.name+(e.dur?' ('+e.dur+')':'')+'</div>':'')
-      +(dl?'<div class="ed-next">'+dl+'</div>':'')
-      +'<div class="ed-sum">'+sumHTML(e.sum)+'</div>'
-      +locHTML(e)
-      +'<div><a class="cta'+(e.cta.coral?' coral':'')+'" '+ctaAttrs(e)+'>'+e.cta.label+'</a></div>'
-      +'</div>';
+  /* venue line: location + a quiet "tap for venue & directions" (Cheltenham -> maps;
+     branches suppressed for now). Page-pointer events keep their page link. */
+  function venueHTML(e){
+    var isDir = e.cta && /maps\./.test(e.cta.url);
+    if(isDir){
+      return e.loc==='ciren'
+        ? locHTML(e)
+        : locHTML(e)+' <a class="dir" '+ctaAttrs(e)+'>tap for venue &amp; directions</a>';
+    }
+    return '<a class="pagelink" '+ctaAttrs(e)+'>'+e.cta.label+'</a>';
   }
 
   function dayBlock(day, group){
     var today=(day===todayAbbr());
-    var multi=group.length>1;
-    var lines=group.map(eventLine).join('');
-    var ohs=group.filter(function(e){return e.oh;}).map(function(e){
-      return '<div class="oh"><span class="oh-pill">Open House</span><span><b>'+e.oh+'</b> &mdash; '+OH_INVITE+'</span></div>';
+    var evs=group.map(function(e){
+      var f=firstItem(e);
+      var titled=f&&f.title;
+      var name=titled?'<span class="dname tt">'+esc(f.title)+'</span>':'<span class="dname">'+e.name+'</span>';
+      var chips='';
+      if(f&&f.talk) chips+='<span class="chip talk">Talk</span>';
+      else if(e.free) chips+='<span class="chip free">Free</span>';
+      if(f&&f.isnew) chips+='<span class="chip new">New</span>';
+      var dl=datesLine(mkeyOf(e));
+      var oh=e.oh?'<div class="oh"><span class="oh-pill">Open House</span><span><b>'+e.oh+'</b> &mdash; '+OH_INVITE+'</span></div>':'';
+      var det='<div class="dev-details">'
+        +(dl?'<div class="ed-next">'+dl+'</div>':'')
+        +'<div class="ed-sum">'+sumHTML(e.sum)+'</div>'
+        +oh
+        +'<div class="venue">'+venueHTML(e)+'</div>'
+        +'</div>';
+      return '<div class="dev-wrap"><div class="dev"><span class="dtime">'+e.time+'</span> '+name+' '+chips+'</div>'+det+'</div>';
     }).join('');
-    var details=group.map(function(e){return eventDetail(e,multi);}).join('');
     return '<div class="dayblk'+(today?' today':'')+'">'
       +'<div class="dh"><div class="dday">'+day+'</div>'
-      +'<div class="devents">'+lines+'</div>'
+      +'<div class="devents">'+evs+'</div>'
       +'<span class="dtoggle">Dates &amp; details <span class="chev">&#9662;</span></span></div>'
-      +ohs
-      +'<div class="ddetails">'+details+'</div></div>';
+      +'</div>';
   }
 
   function termHTML(){
-    return '<div class="wag-term"><span class="wag-pill">Term dates</span><div>'
+    return '<div class="wag-term"><button class="wag-pill" type="button">Term dates<span class="tchev"> &#9662;</span></button>'
+      +'<div class="term-body">'
       +'<span class="line"><b>Autumn Term:</b> 22 Aug &ndash; 15 Dec <span class="ht">(half-term 8&ndash;15 Oct)</span></span>'
       +'<span class="line"><b>Spring Term:</b> from 2 Jan 2027</span>'
       +'</div></div>';
@@ -217,7 +221,6 @@
   function buildHTML(){
     return '<div class="wag">'
       +'<h2 class="wag-h">Week at a Glance</h2>'
-      +'<div class="wag-lead">Here&rsquo;s the week at a glance &mdash; tap any day for its dates and details.</div>'
       +'<div class="f-tabs">'+TABS.map(function(t){return '<button class="f-tab" data-tab="'+t+'">'+t+'</button>';}).join('')+'</div>'
       +'<div class="wag-list"></div>'
       +termHTML()
@@ -246,6 +249,8 @@
     root.querySelectorAll('.f-tab').forEach(function(b){
       b.addEventListener('click',function(){render(root, b.getAttribute('data-tab'));});
     });
+    var pill=root.querySelector('.wag-pill');
+    if(pill)pill.addEventListener('click',function(){root.querySelector('.wag-term').classList.toggle('open');});
   }
 
   /* ================= live calendar layer ================= */
@@ -288,16 +293,16 @@
   }
 
   function loadLive(root){
-    if(!window.fetch || !window.Promise) return;                 /* very old browser: stay static */
+    if(!window.fetch || !window.Promise) return;
     var now=new Date();
     var tMin=now.toISOString();
-    var tMax=new Date(now.getTime()+77*864e5).toISOString();      /* 11 weeks: clears half-term, still finds 2 dates */
+    var tMax=new Date(now.getTime()+77*864e5).toISOString();
     var keys=Object.keys(CAL_IDS);
     Promise.all(keys.map(function(k){return grab(CAL_IDS[k],tMin,tMax);})).then(function(res){
       var byFeed={}; keys.forEach(function(k,i){byFeed[k]=res[i];});
       buildNext(byFeed);
-      render(root, root.getAttribute('data-tab')||'All');        /* re-render with live titles/chips/dates */
-    }).catch(function(){/* keep static */});
+      render(root, root.getAttribute('data-tab')||'All');
+    }).catch(function(){});
   }
 
   function init(){
@@ -305,8 +310,8 @@
     if(mount.getAttribute('data-akx-done')==='1') return;
     if(!document.getElementById('akx-glance-style')){var st=document.createElement('style');st.id='akx-glance-style';st.textContent=STYLE;document.head.appendChild(st);}
     mount.innerHTML=buildHTML(); mount.setAttribute('data-akx-done','1');
-    wire(mount); render(mount,'All');    /* static list first, always */
-    loadLive(mount);                     /* then enhance with live dates */
+    wire(mount); render(mount,'All');
+    loadLive(mount);
   }
   if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{init();}
 })();
