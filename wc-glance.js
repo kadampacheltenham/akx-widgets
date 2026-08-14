@@ -124,13 +124,13 @@
   @media(max-width:640px){
     #akx-glance .wag-h{font-size:1.5rem;margin-bottom:16px;}
     #akx-glance .f-tabs{justify-content:flex-start;}
-    #akx-glance .dh{grid-template-columns:44px 1fr auto;column-gap:10px;padding:12px 12px;}
+    #akx-glance .dh{grid-template-columns:38px 1fr auto;column-gap:10px;padding:12px 12px;}
     /* one line per event: time + name(ellipsis) + chip */
     #akx-glance .dev{flex-wrap:nowrap;overflow:hidden;}
     #akx-glance .dname{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-    #akx-glance .dtoggle{font-size:0;gap:0;} #akx-glance .dtoggle .chev{font-size:.82rem;}
+    #akx-glance .dtoggle{font-size:0;gap:0;} #akx-glance .dtoggle .chev{font-size:1.05rem;}
     /* term dates: quiet tap-to-reveal pill */
-    #akx-glance .wag-term{background:none;border:none;padding:0;margin-top:14px;display:block;}
+    #akx-glance .wag-term{background:none;border:none;padding:0 0 0 6px;margin-top:14px;display:block;}
     #akx-glance .wag-pill{margin-top:0;} #akx-glance .tchev{display:inline;}
     #akx-glance .term-body{display:none;margin-top:10px;background:#FBF6ED;border:1px solid #EFE7D6;border-radius:10px;padding:11px 15px;}
     #akx-glance .wag-term.open .term-body{display:block;}
