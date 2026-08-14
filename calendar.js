@@ -211,16 +211,15 @@
         var endDate=(allDay&&it.end&&it.end.date)?it.end.date:null;
         var title=it.summary||'Notice';
         var closure=/clos(e|ed|ure)|shut|cancel/i.test(title);
+        if(!closure) return;                                    // BANNER is ONLY for "centre closed" notices; every other announcement just shows in the list (so programme gaps are explained)
         var startD = allDay ? parseYmd(startStr) : new Date(startStr);
-        var lastDay;                                            // last ACTUAL day of the notice
+        var lastDay;                                            // last ACTUAL day of the closure
         if(allDay && endDate){ lastDay=parseYmd(endDate); lastDay.setDate(lastDay.getDate()-1); }
         else if(allDay){ lastDay=new Date(startD); }
         else { lastDay = endDate ? new Date(endDate) : new Date(startStr); }
-        // TIMING RULE (agreed 4 Aug 2026): closures show 10 days ahead & hide at MIDDAY the day before the last day; other notices show 2 days before & end on the last day.
-        var showFrom=new Date(startD); showFrom.setDate(showFrom.getDate()-(closure?10:2)); showFrom.setHours(0,0,0,0);
-        var showUntil;
-        if(closure){ showUntil=new Date(lastDay); showUntil.setDate(showUntil.getDate()-1); showUntil.setHours(12,0,0,0); }
-        else { showUntil=new Date(lastDay); showUntil.setHours(23,59,59,999); }
+        // TIMING (Gen, 14 Aug 2026): closure banner shows 7 days ahead, and clears at MIDDAY on the last day.
+        var showFrom=new Date(startD); showFrom.setDate(showFrom.getDate()-7); showFrom.setHours(0,0,0,0);
+        var showUntil=new Date(lastDay); showUntil.setHours(12,0,0,0);
         if(now2>=showFrom && now2<=showUntil){
           anns.push({color:r.cal.color, title:title, start:startStr, endDate:endDate, allDay:allDay, _s:startD.getTime()});
         }
