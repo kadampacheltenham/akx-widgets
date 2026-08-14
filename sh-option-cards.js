@@ -6,7 +6,10 @@
        <script src="https://kadampacheltenham.github.io/akx-widgets/sh-option-cards.js" defer></script>
    NOTE: renders as a CONTAINED, ROUNDED card (max-width 720px) to match the meditation
    cards. For the rounding/gutters to read, put the block in a section with a pale/white
-   background (not full cream). */
+   background (not full cream).
+   The first card ("15-minute Meditation") shows a quiet "see below" cue that scrolls to
+   the fuller free-15 invitation card (#akx-free15) sitting just underneath — the cue only
+   appears if that card is present on the page. */
 (function(){
   var KEY='AIzaSyAVm0epUASAL2aNbAN_aBmpDDPxoPJVOwA';
   var TZ='Europe/London';
@@ -31,6 +34,7 @@
   var CARDS=[
     { key:'free', title:'15-minute Meditation', tag:'Free', lotus:1,
       match:/15\s*-?\s*minute/i,
+      seeBelow:{ target:'akx-free15', text:'Full details, benefits & directions just below' },
       desc:[
         'A short guided meditation — with no booking and no experience needed. Come as you are.',
         'We open about 30 minutes beforehand and you’re welcome to look round, browse the bookshop, ask questions or chat before it begins.'
@@ -74,6 +78,10 @@
   +"#cr-swipe .fr-price{margin:18px 0 0;font-size:14.5px;line-height:1.7;color:#5b5b5b;}"
   +"#cr-swipe .fr-price strong{color:#1D1D1F;font-weight:600;}"
   +"#cr-swipe .fr-price .sep{color:#CBBFA6;margin:0 9px;}"
+  +"#cr-swipe .fr-see{display:inline-flex;align-items:center;gap:7px;margin:16px 0 0;font-size:14px;font-weight:600;color:#2E7C7C;text-decoration:none;cursor:pointer;}"
+  +"#cr-swipe .fr-see:hover{text-decoration:underline;}"
+  +"#cr-swipe .fr-see .ar{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:50%;background:#E4F0EE;font-size:12px;line-height:1;animation:frbob 1.7s ease-in-out infinite;}"
+  +"@keyframes frbob{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}"
   +"#cr-swipe .fr-panel{flex:1 1 46%;background:#fff;border-radius:14px;padding:24px 26px;box-shadow:0 1px 4px rgba(29,29,31,.05);box-sizing:border-box;}"
   +"#cr-swipe .fr-ptitle{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#2A66A6;font-weight:700;margin:0 0 14px;}"
   +"#cr-swipe .fr-day{padding:11px 0;border-bottom:1px solid #F2ECDD;}"
@@ -195,6 +203,13 @@
     });
     return '<div class="fr-price">'+parts.join('<span class="sep">|</span>')+'</div>';
   }
+  function seeBelowHtml(c){
+    if(!c.seeBelow) return '';
+    /* only show the cue if the target card is actually on the page */
+    if(!document.getElementById(c.seeBelow.target)) return '';
+    return '<a class="fr-see" href="#'+c.seeBelow.target+'" data-target="'+c.seeBelow.target+'">'
+      +c.seeBelow.text+' <span class="ar">&#8595;</span></a>';
+  }
   function fillLists(root){
     CARDS.forEach(function(c){
       var el=root.querySelector('.fr-list[data-key="'+c.key+'"]'); if(!el)return;
@@ -212,11 +227,12 @@
       var mark='<div class="fr-mark'+(c.lotus>1?' multi':'')+'">'+imgs+tag+'</div>';
       var desc=c.desc.map(function(p){return '<p>'+p+'</p>';}).join('');
       var price=priceHtml(c.price);
+      var see=seeBelowHtml(c);
       var nav='<div class="fr-nav">'
         +'<button class="fr-prev" type="button" aria-label="Previous card"'+(i===0?' disabled':'')+'>&larr;</button>'
         +'<button class="fr-next" type="button" aria-label="Next card"'+(i===last?' disabled':'')+'>&rarr;</button></div>';
       return '<div class="sw-slide"><div class="fr-wrap"><div class="fr-in">'
-        +'<div class="fr-copy">'+mark+'<h2 class="fr-h2">'+c.title+'</h2>'+desc+price+'</div>'
+        +'<div class="fr-copy">'+mark+'<h2 class="fr-h2">'+c.title+'</h2>'+desc+price+see+'</div>'
         +'<div class="fr-panel"><p class="fr-ptitle">Next dates</p><div class="fr-list" data-key="'+c.key+'"><p class="fr-opens">Loading…</p></div>'
         +'<button class="fr-dir" type="button">Get directions →</button>'
         +'<p class="fr-addr" hidden>59 Whaddon Road,<br>Cheltenham GL52 5NE<br><a href="'+MAPS_URL+'" target="_blank" rel="noopener">'+MAPS_LABEL+'</a></p>'
@@ -239,6 +255,14 @@
     [].slice.call(root.querySelectorAll('.fr-dir')).forEach(function(btn){ btn.addEventListener('click',function(){ var a=btn.nextElementSibling; if(a) a.hidden=!a.hidden; }); });
     [].slice.call(root.querySelectorAll('.fr-prev')).forEach(function(btn,i){ btn.addEventListener('click',function(){ goTo(i-1); }); });
     [].slice.call(root.querySelectorAll('.fr-next')).forEach(function(btn,i){ btn.addEventListener('click',function(){ goTo(i+1); }); });
+
+    /* "see below" cue → smooth-scroll to the fuller free-15 card, clear of the fixed header */
+    [].slice.call(root.querySelectorAll('.fr-see')).forEach(function(a){
+      a.addEventListener('click',function(e){
+        var tgt=document.getElementById(a.getAttribute('data-target'));
+        if(tgt){ e.preventDefault(); var y=tgt.getBoundingClientRect().top+window.pageYOffset-100; window.scrollTo({top:y,behavior:'smooth'}); }
+      });
+    });
 
     fillLists(root);
     if(!DATA){ loadData(function(){ document.querySelectorAll('#cr-swipe').forEach(function(rt){ fillLists(rt); }); }); }
