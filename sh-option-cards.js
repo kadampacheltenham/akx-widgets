@@ -78,10 +78,17 @@
   +"#cr-swipe .fr-price{margin:18px 0 0;font-size:14.5px;line-height:1.7;color:#5b5b5b;}"
   +"#cr-swipe .fr-price strong{color:#1D1D1F;font-weight:600;}"
   +"#cr-swipe .fr-price .sep{color:#CBBFA6;margin:0 9px;}"
-  +"#cr-swipe .fr-see{display:inline-flex;align-items:center;gap:7px;margin:16px 0 0;font-size:14px;font-weight:600;color:#2E7C7C;text-decoration:none;cursor:pointer;}"
-  +"#cr-swipe .fr-see:hover{text-decoration:underline;}"
-  +"#cr-swipe .fr-see .ar{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:50%;background:#E4F0EE;font-size:12px;line-height:1;animation:frbob 1.7s ease-in-out infinite;}"
-  +"@keyframes frbob{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}"
+  /* "See below" cue — Option A: teal outline circle, teal words, with the animated arrow sweep */
+  +"#cr-swipe .fr-see{display:inline-flex;align-items:center;justify-content:center;position:relative;width:78px;height:78px;margin:20px 0 2px;border-radius:50%;border:1.6px solid #2E7C7C;color:#2E7C7C;text-decoration:none;cursor:pointer;overflow:hidden;opacity:0;transform:scale(.66);transition:opacity .6s ease, transform .6s cubic-bezier(.2,.8,.2,1), background .2s ease;}"
+  +"#cr-swipe .fr-see.in{opacity:1;transform:scale(1);}"
+  +"#cr-swipe .fr-see:hover{background:rgba(46,124,124,.08);}"
+  +"#cr-swipe .fr-see .txt{position:absolute;text-align:center;font-weight:600;font-size:13.5px;line-height:1.14;letter-spacing:.01em;opacity:0;transition:opacity .55s ease;}"
+  +"#cr-swipe .fr-see .txt.show{opacity:1;}"
+  +"#cr-swipe .fr-see .txt.out{transition:opacity .22s ease;opacity:0;}"
+  +"#cr-swipe .fr-see .arw{position:absolute;left:50%;top:-34%;transform:translateX(-50%);opacity:0;fill:#2E7C7C;}"
+  +"#cr-swipe .fr-see .arw.sweep{animation:frArrowSweep 1.25s linear forwards;}"
+  +"@keyframes frArrowSweep{0%{top:-34%;opacity:0}10%{opacity:1}86%{opacity:1}100%{top:116%;opacity:0}}"
+  +"@media(prefers-reduced-motion:reduce){#cr-swipe .fr-see{opacity:1;transform:none;transition:none;}#cr-swipe .fr-see .txt{opacity:1;transition:none;}#cr-swipe .fr-see .arw{display:none;}}"
   +"#cr-swipe .fr-panel{flex:1 1 46%;background:#fff;border-radius:14px;padding:24px 26px;box-shadow:0 1px 4px rgba(29,29,31,.05);box-sizing:border-box;}"
   +"#cr-swipe .fr-ptitle{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#2A66A6;font-weight:700;margin:0 0 14px;}"
   +"#cr-swipe .fr-day{padding:11px 0;border-bottom:1px solid #F2ECDD;}"
@@ -207,8 +214,46 @@
     if(!c.seeBelow) return '';
     /* only show the cue if the target card is actually on the page */
     if(!document.getElementById(c.seeBelow.target)) return '';
-    return '<a class="fr-see" href="#'+c.seeBelow.target+'" data-target="'+c.seeBelow.target+'">'
-      +c.seeBelow.text+' <span class="ar">&#8595;</span></a>';
+    return '<a class="fr-see" href="#'+c.seeBelow.target+'" data-target="'+c.seeBelow.target+'" aria-label="See below for full details">'
+      +'<span class="txt">See<br>below</span>'
+      +'<svg class="arw" width="30" height="37" viewBox="0 0 26 34" aria-hidden="true"><path d="M9 0 h8 v17 h6 l-10 15 -10 -15 h6 z"/></svg>'
+      +'</a>';
+  }
+  /* Animated reveal: circle fades in ~10s after the panel is readable, then loops
+     "See below" (hold) -> fade out -> solid arrow sweeps top->bottom -> "See below" returns. */
+  var SEE_APPEAR_DELAY=10000;   /* ms after the card is on-screen before the circle appears */
+  function animateSeeBelow(circle){
+    if(!circle || circle.dataset.anim) return; circle.dataset.anim='1';
+    var reduce=false; try{ reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){}
+    var txt=circle.querySelector('.txt'), arw=circle.querySelector('.arw');
+    if(reduce){ circle.classList.add('in'); if(txt){txt.classList.add('show');} return; }
+    function showText(){ if(!txt)return; txt.classList.remove('out'); txt.classList.add('show'); }
+    function hideText(){ if(!txt)return; txt.classList.remove('show'); txt.classList.add('out'); }
+    function sweep(cb){ if(!arw){cb&&cb();return;} arw.classList.remove('sweep'); void arw.offsetWidth; arw.classList.add('sweep'); setTimeout(cb,1250); }
+    var timers=[];
+    function later(fn,ms){ timers.push(setTimeout(fn,ms)); }
+    function loop(){
+      showText();                 /* 0.55s fade in, hold ~4s */
+      later(function(){
+        hideText();               /* fast 0.22s fade out */
+        later(function(){
+          sweep(function(){ loop(); });   /* arrow sweeps through, then repeat */
+        },240);
+      },4600);
+    }
+    /* appear, then begin the sequence */
+    circle.classList.add('in');
+    later(loop,700);
+  }
+  function armSeeBelow(root){
+    var circle=root.querySelector('.fr-see'); if(!circle||circle.dataset.armed) return; circle.dataset.armed='1';
+    var panel=circle.closest('.fr-in')||circle.closest('.sw-slide')||circle;
+    var started=false;
+    function start(){ if(started)return; started=true; setTimeout(function(){ animateSeeBelow(circle); }, SEE_APPEAR_DELAY); }
+    if('IntersectionObserver' in window){
+      var io=new IntersectionObserver(function(en){ en.forEach(function(e){ if(e.isIntersecting){ start(); io.disconnect(); } }); },{threshold:.5});
+      io.observe(panel);
+    } else { start(); }
   }
   function fillLists(root){
     CARDS.forEach(function(c){
@@ -265,6 +310,7 @@
     });
 
     fillLists(root);
+    armSeeBelow(root);
     if(!DATA){ loadData(function(){ document.querySelectorAll('#cr-swipe').forEach(function(rt){ fillLists(rt); }); }); }
   }
   function render(){
