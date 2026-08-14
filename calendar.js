@@ -199,21 +199,35 @@
   function loadBanner(){
     var pins=CALS.filter(function(c){return c.pinned;}); if(!pins.length){return;}
     var now=new Date(), t0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-    var tMin=t0.toISOString(), tMax=new Date(t0.getFullYear(),t0.getMonth(),t0.getDate()+200).toISOString();   // show notices active now or starting within ~6.5 months, so festival closures highlight well ahead
+    var tMin=new Date(t0.getFullYear(),t0.getMonth(),t0.getDate()-1).toISOString(), tMax=new Date(t0.getFullYear(),t0.getMonth(),t0.getDate()+21).toISOString();   // fetch near-term; the per-type display window below decides what actually shows
     Promise.all(pins.map(function(c){
       return fetch(apiUrl(c,tMin,tMax)).then(function(r){return r.json();})
         .then(function(j){return {cal:c,items:(j.items||[])};}).catch(function(){return {cal:c,items:[]};});
     })).then(function(res){
-      var anns=[];
+      var anns=[], now2=new Date();
       res.forEach(function(r){ r.items.forEach(function(it){
         var allDay=!!(it.start&&it.start.date);
-        anns.push({color:r.cal.color, title:it.summary||'Notice',
-                   start:(it.start&&(it.start.dateTime||it.start.date)),
-                   endDate:(allDay&&it.end&&it.end.date)?it.end.date:null, allDay:allDay});
+        var startStr=(it.start&&(it.start.dateTime||it.start.date));
+        var endDate=(allDay&&it.end&&it.end.date)?it.end.date:null;
+        var title=it.summary||'Notice';
+        var closure=/clos(e|ed|ure)|shut|cancel/i.test(title);
+        var startD = allDay ? parseYmd(startStr) : new Date(startStr);
+        var lastDay;                                            // last ACTUAL day of the notice
+        if(allDay && endDate){ lastDay=parseYmd(endDate); lastDay.setDate(lastDay.getDate()-1); }
+        else if(allDay){ lastDay=new Date(startD); }
+        else { lastDay = endDate ? new Date(endDate) : new Date(startStr); }
+        // TIMING RULE (agreed 4 Aug 2026): closures show 10 days ahead & hide at MIDDAY the day before the last day; other notices show 2 days before & end on the last day.
+        var showFrom=new Date(startD); showFrom.setDate(showFrom.getDate()-(closure?10:2)); showFrom.setHours(0,0,0,0);
+        var showUntil;
+        if(closure){ showUntil=new Date(lastDay); showUntil.setDate(showUntil.getDate()-1); showUntil.setHours(12,0,0,0); }
+        else { showUntil=new Date(lastDay); showUntil.setHours(23,59,59,999); }
+        if(now2>=showFrom && now2<=showUntil){
+          anns.push({color:r.cal.color, title:title, start:startStr, endDate:endDate, allDay:allDay, _s:startD.getTime()});
+        }
       }); });
-      anns.sort(function(a,b){return (a.start||'').localeCompare(b.start||'');});
+      anns.sort(function(a,b){return a._s-b._s;});
       var box=document.getElementById('akx-banner'); box.innerHTML='';
-      anns.slice(0,3).forEach(function(a){
+      anns.slice(0,1).forEach(function(a){                      // one at a time — the next/current notice only
         var closure=/clos(e|ed|ure)|shut|cancel/i.test(a.title);
         var ink=closure?'#8A2A26':'#B7791F';
         var el=document.createElement('div'); el.className='ann '+(closure?'closure':'notice');
