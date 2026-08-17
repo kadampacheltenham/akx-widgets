@@ -22,22 +22,24 @@
   if (!slug) slug = "home";
 
   var CSS =
-    ".akx-ps{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.45;border-top:1px solid rgba(0,0,0,.05);border-bottom:1px solid rgba(0,0,0,.05);}" +
-    ".akx-ps .row{max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:12px;padding:9px 6vw;}" +
+    ".akx-ps{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.45;max-width:1000px;margin:18px auto 22px;padding:0 20px;box-sizing:border-box;}" +
+    ".akx-ps .row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;border:1px solid transparent;}" +
     ".akx-ps .dot{width:11px;height:11px;border-radius:50%;flex:0 0 auto;}" +
     ".akx-ps b{font-weight:600;}" +
-    ".akx-ps .more{margin-left:auto;font-weight:600;text-decoration:underline;cursor:pointer;background:none;border:0;padding:0;font:inherit;color:inherit;opacity:.85;white-space:nowrap;}" +
-    ".akx-ps.g{background:#EAF6EC;color:#1E5A2B;} .akx-ps.g .dot{background:#4FA35A;}" +
-    ".akx-ps.a{background:#FFF4E0;color:#7A4B00;} .akx-ps.a .dot{background:#E8A33D;}" +
-    ".akx-ps.r{background:#FDECEA;color:#8A2A22;} .akx-ps.r .dot{background:#D9534F;}" +
-    ".akx-ps .panel{display:none;max-width:1400px;margin:0 auto;padding:0 6vw 12px;}" +
+    ".akx-ps .more{margin-left:auto;font-weight:600;cursor:pointer;background:none;border:0;padding:0;font:inherit;color:inherit;opacity:.9;white-space:nowrap;display:inline-flex;align-items:center;gap:7px;}" +
+    ".akx-ps .chev{display:inline-block;width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-top:-4px;transition:transform .2s;}" +
+    ".akx-ps.open .chev{transform:rotate(-135deg);margin-top:3px;}" +
+    ".akx-ps.g .row{background:#EEF7EF;border-color:#BFE0C4;color:#1E5A2B;} .akx-ps.g .dot{background:#4FA35A;}" +
+    ".akx-ps.a .row{background:#FFF7E8;border-color:#F3D8A6;color:#6B4200;} .akx-ps.a .dot{background:#E8A33D;}" +
+    ".akx-ps.r .row{background:#FDEEEC;border-color:#F0BDB8;color:#7E2A22;} .akx-ps.r .dot{background:#D9534F;}" +
+    ".akx-ps .panel{display:none;margin-top:8px;}" +
     ".akx-ps.open .panel{display:block;}" +
     ".akx-ps .box{background:#FBF6ED;border-left:4px solid #E8A33D;border-radius:0 12px 12px 0;padding:12px 16px;color:#3a3a3a;display:grid;grid-template-columns:1fr 1fr;gap:6px 30px;}" +
     ".akx-ps.r .box{border-left-color:#D9534F;} .akx-ps.g .box{border-left-color:#4FA35A;}" +
     ".akx-ps h4{margin:0 0 4px;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:#7A8797;font-weight:700;}" +
     ".akx-ps ul{margin:0;padding-left:18px;} .akx-ps li{margin:2px 0;}" +
     ".akx-ps .upd{grid-column:1/-1;font-size:12px;color:#7A8797;margin-top:4px;}" +
-    "@media(max-width:680px){.akx-ps .row{flex-wrap:wrap;padding:9px 16px;} .akx-ps .more{margin-left:auto;} .akx-ps .panel{padding:0 16px 12px;} .akx-ps .box{grid-template-columns:1fr;}}";
+    "@media(max-width:680px){.akx-ps{padding:0 12px;} .akx-ps .row{flex-wrap:wrap;} .akx-ps .box{grid-template-columns:1fr;}}";
 
   function parseCSV(text) {
     var rows = [], row = [], cur = "", q = false;
@@ -64,7 +66,7 @@
     if (!cls) return;
     if (cls === "g" && !(rec.note || "").trim()) return;
     var imp = items(rec.improved), todo = items(rec.todo);
-    var hasPanel = imp.length || todo.length;
+    var hasPanel = true;
     var lead = cls === "r" ? "Known issue:" : cls === "a" ? "We're still working on this page" : "Recently improved";
     var note = (rec.note || "").trim();
 
@@ -72,7 +74,7 @@
     var el = document.createElement("div"); el.className = "akx-ps " + cls; el.setAttribute("role", "status");
     el.innerHTML =
       '<div class="row"><span class="dot"></span><span><b>' + esc(lead) + '</b>' + (note ? (cls === "r" ? " " : " &mdash; ") + esc(note) : "") + '</span>' +
-      (hasPanel ? '<button class="more" type="button" aria-expanded="false">What\u2019s changed \u25BE</button>' : "") + '</div>' +
+      '<button class="more" type="button" aria-expanded="false"><span class="lbl">What\u2019s changed</span> <span class="chev"></span></button>' + '</div>' +
       (hasPanel ? '<div class="panel"><div class="box">' +
         (imp.length ? '<div><h4>Recently improved</h4><ul>' + imp.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + '</ul></div>' : "<div></div>") +
         (todo.length ? '<div><h4>Still to do</h4><ul>' + todo.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + '</ul></div>' : "") +
@@ -83,12 +85,13 @@
       btn.addEventListener("click", function () {
         var open = el.classList.toggle("open");
         btn.setAttribute("aria-expanded", open ? "true" : "false");
-        btn.textContent = open ? "Hide \u25B4" : "What\u2019s changed \u25BE";
+        btn.querySelector(".lbl").textContent = open ? "Hide" : "What\u2019s changed";
       });
     }
-    var header = document.getElementById("header") || document.querySelector("header");
-    if (header && header.parentNode) header.parentNode.insertBefore(el, header.nextSibling);
-    else document.body.insertBefore(el, document.body.firstChild);
+    var secs = document.querySelectorAll("#sections > section.page-section, main section.page-section, section.page-section");
+    var anchor = secs.length >= 2 ? secs[1] : (secs.length ? secs[0] : null);
+    if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(el, anchor.nextSibling);
+    else { var header = document.getElementById("header"); if (header && header.parentNode) header.parentNode.insertBefore(el, header.nextSibling); else document.body.insertBefore(el, document.body.firstChild); }
   }
 
   function go(text) {
