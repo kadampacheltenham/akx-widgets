@@ -12,7 +12,7 @@
  *   <script src="https://kadampacheltenham.github.io/akx-widgets/page-status.js"></script>
  */
 (function () {
-  var CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRtty9gWoClUCr7f2l4nQcmm8wNtetmqDnt59JmzmReMBxoZ65kqd5kbDZu7IE7rJGbR6WLyPzfqSv7/pub?gid=162269595PASTE_PUBLISHED_CSV_URL_HEREsingle=truePASTE_PUBLISHED_CSV_URL_HEREoutput=csv";
+  var CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRtty9gWoClUCr7f2l4nQcmm8wNtetmqDnt59JmzmReMBxoZ65kqd5kbDZu7IE7rJGbR6WLyPzfqSv7/pub?gid=162269595&single=true&output=csv";
   var CACHE_MIN = 3;
 
   if (!CSV_URL || CSV_URL.indexOf("http") !== 0) return;
