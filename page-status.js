@@ -88,8 +88,11 @@
         btn.querySelector(".lbl").textContent = open ? "Hide" : "What\u2019s changed";
       });
     }
-    var secs = document.querySelectorAll("#sections > section.page-section, main section.page-section, section.page-section");
-    var anchor = secs.length >= 2 ? secs[1] : (secs.length ? secs[0] : null);
+    // place after the first page section that contains text (the hero title / intro), i.e. hero image → title → text → HERE
+    var secs = document.querySelectorAll("section.page-section");
+    var anchor = null;
+    for (var k = 0; k < secs.length; k++) { if (secs[k].querySelector(".sqs-block-html, h1, h2, p")) { anchor = secs[k]; break; } }
+    if (!anchor && secs.length) anchor = secs[0];
     if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(el, anchor.nextSibling);
     else { var header = document.getElementById("header"); if (header && header.parentNode) header.parentNode.insertBefore(el, header.nextSibling); else document.body.insertBefore(el, document.body.firstChild); }
   }
