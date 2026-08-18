@@ -1,4 +1,4 @@
-/* Akanishta — Weekend Courses & Retreats widget.
+/* Akanishta — Weekend Courses & Retreats widget. v2.1 (18 Aug 2026): no photo -> generated type graphic (event-graphics.js).
    Reads a public Google Sheet (tabs "Events", "Timetables", "Teachers")
    and renders poster tiles.
    Include with:  <div id="akx-events"></div>
@@ -37,6 +37,14 @@
   #akx-events .img{position:relative;height:190px;overflow:hidden;background:linear-gradient(135deg,var(--a2),var(--accent));}
   #akx-events .img.has-img{background-size:cover;background-position:center;}
   #akx-events .img.has-img .ph{display:none;}
+  #akx-events .img.has-gfx .ph{display:none;}
+  #akx-events .img .gfx{position:absolute;inset:0;overflow:hidden;color:#fff;font-family:'Inter',system-ui,sans-serif;}
+  #akx-events .img .gfx.g-course{background:#2A66A6;}#akx-events .img .gfx.g-talk{background:#C56B45;}#akx-events .img .gfx.g-retreat{background:#227A72;}
+  #akx-events .img .gfx.g-free{background:#4FA35A;}#akx-events .img .gfx.g-study{background:#6A4A9C;}#akx-events .img .gfx.g-special{background:#B5771E;}
+  #akx-events .img .gfx .motif{position:absolute;top:50%;right:-6%;height:210%;transform:translateY(-50%);opacity:.17;pointer-events:none;}
+  #akx-events .img .gfx .gtxt{position:absolute;left:20px;right:116px;top:20px;} #akx-events .img.has-chip .gfx .gtxt{left:88px;}
+  #akx-events .img .gfx .gt{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:22px;line-height:1.16;letter-spacing:-.01em;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+  #akx-events .img .gfx .gm{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px;margin-top:8px;opacity:.85;}
   #akx-events .img .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#ffffff66;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;}
   #akx-events .datechip{position:absolute;top:14px;left:14px;background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:13px;padding:7px 12px;text-align:center;line-height:1;box-shadow:0 4px 14px rgba(0,0,0,.28);z-index:3;}
   #akx-events .datechip .d{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:1.32rem;}
@@ -89,6 +97,7 @@
     #akx-events .grid{grid-template-columns:1fr;}
     #akx-events .avatar{width:66px;height:66px;}
     #akx-events .img{height:150px;}
+    #akx-events .img .gfx .gtxt{left:16px;right:92px;top:14px;} #akx-events .img.has-chip .gfx .gtxt{left:82px;} #akx-events .img .gfx .gt{font-size:18px;-webkit-line-clamp:2;} #akx-events .card.open .img .gfx .gt{-webkit-line-clamp:3;}
     #akx-events .foldbtn{display:flex;align-items:center;justify-content:space-between;width:100%;margin-top:14px;padding:11px 14px;border:1px solid var(--line);border-radius:12px;background:#fff;cursor:pointer;font-weight:700;font-size:.82rem;letter-spacing:.03em;text-transform:uppercase;color:var(--accent);}
     #akx-events .foldbtn .fchev{transition:transform .2s;}
     #akx-events .card.open .foldbtn .fchev{transform:rotate(180deg);}
@@ -208,7 +217,8 @@
 
     // event image loaded as the panel BACKGROUND (so overlays always sit on top)
     var imgbase = ev['Event ID'] ? IMG+encodeURIComponent(ev['Event ID'].trim()) : '';
-    var img = '<div class="img"'+(imgbase?' data-imgbase="'+imgbase+'"':'')+'><span class="ph">event photo</span>'+chip
+    var gfxDate = d ? WD[d.getDay()]+' '+d.getDate()+' '+MON[d.getMonth()] + (ev['Time']?' \u00b7 '+String(ev['Time']).trim():'') : (ev['Time']||'');
+    var img = '<div class="img'+(chip?' has-chip':'')+'"'+(imgbase?' data-imgbase="'+imgbase+'"':'')+' data-gtype="'+esc(ev['Event Type']||'')+'" data-gtitle="'+esc(ev['Title']||'')+'" data-gdate="'+esc(gfxDate)+'"><span class="ph">event photo</span>'+chip
       + (tag? '<div class="type"><i></i>'+esc(tag)+'</div>':'')
       + av + '</div>';
 
@@ -266,12 +276,30 @@
     wireFold(mount);
     if(document.fonts&&document.fonts.ready){document.fonts.ready.then(function(){wireMore(mount);});}
   }
+  // No photo -> generated graphic (same type/colour/motif family as the Weekly Classes cards, via event-graphics.js)
+  function gfxPanel(el){
+    if(el.dataset.gfxdone) return; el.dataset.gfxdone='1';
+    var go=function(){
+      var G=window.AKX_GFX; if(!G) return;
+      G.injectCSS();
+      var t=G.typeOf(el.getAttribute('data-gtype'))||'course';
+      var wrap=document.createElement('div'); wrap.className='gfx g-'+t;
+      wrap.innerHTML=G.motifSVG(t)+'<div class="gtxt"><div class="gt">'+esc(el.getAttribute('data-gtitle')||'')+'</div>'+
+        (el.getAttribute('data-gdate')?'<div class="gm">'+esc(el.getAttribute('data-gdate'))+'</div>':'')+'</div>';
+      el.insertBefore(wrap, el.firstChild); el.classList.add('has-gfx');
+    };
+    if(window.AKX_GFX) return go();
+    var id='akx-gfx-loader', sc=document.getElementById(id);
+    if(!sc){ sc=document.createElement('script'); sc.id=id; sc.src=IMG.replace(/images\/$/,'')+'event-graphics.js'; document.head.appendChild(sc); }
+    sc.addEventListener('load', go);
+  }
   function wireImages(mount){
-    mount.querySelectorAll('.img[data-imgbase]').forEach(function(el){
+    mount.querySelectorAll('.img').forEach(function(el){
       if(el.dataset.imgdone) return; el.dataset.imgdone='1';
       var base=el.getAttribute('data-imgbase'), exts=['.jpg','.png'], i=0;
+      if(!base){ gfxPanel(el); return; }
       (function tryNext(){
-        if(i>=exts.length) return;
+        if(i>=exts.length){ gfxPanel(el); return; }
         var url=base+exts[i++], im=new Image();
         im.onload=function(){ el.style.backgroundImage='url("'+url+'")'; el.classList.add('has-img'); };
         im.onerror=tryNext; im.src=url;
