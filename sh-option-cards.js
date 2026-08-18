@@ -34,7 +34,7 @@
   var CARDS=[
     { key:'free', title:'15-minute Meditation', tag:'Free', lotus:1,
       match:/15\s*-?\s*minute/i,
-      seeBelow:{ target:'akx-free15', text:'Full details, benefits & directions just below' },
+      /* seeBelow cue removed 18 Aug 2026 (Gen: unnecessary, distorted card height on mobile) */
       desc:[
         'A short guided meditation — with no booking and no experience needed. Come as you are.',
         'We open about 30 minutes beforehand and you’re welcome to look round, browse the bookshop, ask questions or chat before it begins.'
