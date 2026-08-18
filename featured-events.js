@@ -1,4 +1,4 @@
-/* Akanishta — FEATURED "Coming up" block (v1.0, 18 Aug 2026)
+/* Akanishta — FEATURED "Coming up" block (v1.1, 18 Aug 2026 — Book → goes straight to the booking form; rest of card opens the page)
    Shows the next Featured weekly class (talk / short course) and the next Featured weekend event
    as two "ticket" cards, side by side (stacked on phones).
    Reads: Weekly Classes sheet (tabs "Talks & series" + "Class times", column Featured = yes)
@@ -26,7 +26,7 @@
   .akx-feat .fh .line{flex:1;height:1px;background:#EFE8DA;}
   .akx-feat .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
   .akx-feat .grid.one{grid-template-columns:1fr;max-width:520px;margin:0 auto;}
-  .akx-feat .card{display:grid;grid-template-columns:172px 1fr;background:#fff;border:1px solid #EFE8DA;border-radius:18px;overflow:hidden;box-shadow:0 8px 24px rgba(38,48,58,.07);text-decoration:none;color:inherit;transition:transform .18s,box-shadow .18s;}
+  .akx-feat .card{position:relative;display:grid;grid-template-columns:172px 1fr;background:#fff;border:1px solid #EFE8DA;border-radius:18px;overflow:hidden;box-shadow:0 8px 24px rgba(38,48,58,.07);text-decoration:none;color:inherit;transition:transform .18s,box-shadow .18s;}
   .akx-feat .card:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(38,48,58,.12);}
   .akx-feat .pic{position:relative;min-height:172px;background:var(--c,#2A66A6) center/cover;overflow:hidden;}
   .akx-feat .pic .g{position:absolute;inset:0;display:block;}
@@ -40,7 +40,9 @@
   .akx-feat .m{font-size:.85rem;color:#5c6773;line-height:1.45;}
   .akx-feat .cta{margin-top:auto;padding-top:8px;font-size:.84rem;font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:10px;}
   .akx-feat .cta .fee{color:#26303A;}
-  .akx-feat .cta .go{color:var(--c);white-space:nowrap;}
+  .akx-feat .cta .go{color:var(--c);white-space:nowrap;text-decoration:none;position:relative;z-index:2;}
+  .akx-feat .cta .go.book{background:var(--c);color:#fff;border-radius:999px;padding:8px 14px;}
+  .akx-feat .cover{position:absolute;inset:0;z-index:1;}
   .akx-feat .chip{position:absolute;top:10px;left:10px;background:#fff;border-radius:11px;padding:6px 9px;text-align:center;line-height:1;box-shadow:0 4px 12px rgba(0,0,0,.25);}
   .akx-feat .chip .d{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:1.1rem;}
   .akx-feat .chip .mo{font-size:.55rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#5c6773;margin-top:2px;}
@@ -117,11 +119,13 @@
     var gdate=(shortDay(o.cl.day)+' '+(o.cl.time||'')).trim().toUpperCase()+' · '+(isTalk?'':'FROM ')+ddmm(o.next);
     var pic=G.render(type,{title:it.title,date:gdate,shape:'sq'});
     var kind='Weekly class · '+(th.label||type);
-    return '<a class="card" style="--c:'+th.colour+'" href="'+LINK_WC+'">'
+    var bookUrl=(o.cl&&o.cl.booking_url)||(o.classes.filter(function(c){return c.booking_url;})[0]||{}).booking_url||'';
+    var go=bookUrl?'<a class="go book" href="'+esc(bookUrl)+'" target="_blank" rel="noopener">Book →</a>':'<span class="go">See details →</span>';
+    return '<div class="card" style="--c:'+th.colour+'"><a class="cover" href="'+LINK_WC+'" aria-label="'+esc(it.title)+' — see details"></a>'
       +'<div class="pic">'+pic+'</div>'
       +'<div class="txt"><span class="kind">'+esc(kind)+'</span><span class="t">'+esc(it.title)+'</span>'
       +'<span class="m">'+meta+'</span>'
-      +'<span class="cta"><span class="fee">'+fee+'</span><span class="go">See details →</span></span></div></a>';
+      +'<span class="cta"><span class="fee">'+fee+'</span>'+go+'</span></div></div>';
   }
 
   // ---------- weekend event ----------
@@ -147,10 +151,11 @@
     var gt=G.typeOf(e['Event Type'])||'course';
     var gfx=G.render(gt,{title:e.Title,date:(d?fmt(d):'')+(e.Time?' · '+e.Time:''),shape:'sq',label:tag||undefined});
     var pic='<div class="pic" style="--c:'+colour+'"'+(id?' data-imgbase="'+IMG+encodeURIComponent(id)+'"':'')+'><span class="g">'+gfx+'</span>'+chip+'</div>';
-    return '<a class="card" style="--c:'+colour+'" href="'+LINK_EV+'">'+pic
+    var go=e['Booking link']?'<a class="go book" href="'+esc(e['Booking link'])+'" target="_blank" rel="noopener">Book →</a>':'<span class="go">See details →</span>';
+    return '<div class="card" style="--c:'+colour+'"><a class="cover" href="'+LINK_EV+'" aria-label="'+esc(e.Title)+' — see details"></a>'+pic
       +'<div class="txt"><span class="kind">Weekend event'+(tag?' · '+esc(tag):'')+'</span><span class="t">'+esc(e.Title)+'</span>'
       +'<span class="m">'+meta+'</span>'
-      +'<span class="cta"><span class="fee">'+fee+'</span><span class="go">See details →</span></span></div></a>';
+      +'<span class="cta"><span class="fee">'+fee+'</span>'+go+'</span></div></div>';
   }
   function wireImages(mount){ // event photo (images/<Event ID>.jpg|.png) replaces the generated graphic when it exists
     mount.querySelectorAll('.pic[data-imgbase]').forEach(function(el){
