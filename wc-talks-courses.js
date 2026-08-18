@@ -298,7 +298,7 @@
   }
   function pane(cl,i,on){
     var c=isCiren(cl.location), dates=splitList(cl.dates), n=dates.length;
-    var datesHtml = n>1 ? esc(n+' classes &middot; '+dates.join(', ')) : (n===1 ? '<span class="d-lbl">Date:</span> '+esc(formatDate(dates[0])) : '');
+    var datesHtml = n>1 ? esc(n+' classes')+' &middot; '+esc(dates.join(', ')) : (n===1 ? '<span class="d-lbl">Date:</span> '+esc(formatDate(dates[0])) : '');
     var pp = cl.price_class ? '<span class="pp">'+esc(cl.price_class)+' / class</span>' : '';
     var offer = (cl.price_series && n>1) ? '<span class="d-offer">Special offer '+n+' classes only '+esc(cl.price_series)+'</span>' : '';
     var book = cl.booking_url ? '<a class="book" href="'+esc(cl.booking_url)+'" target="_blank" rel="noopener">Book &rarr;</a>' : '';
@@ -330,6 +330,7 @@
     var showFrom = parseFullDate(item.show_from);
     var motif = gfxMotif(item.type);          // faint white type-motif behind the box
     var totalDates = classes.reduce(function(n,cl){return n+splitList(cl.dates).length;},0);
+    var weeks = classes.reduce(function(m,cl){var k=splitList(cl.dates).length;return k>m?k:m;},0);   // course length = longest single class run, not all sittings added up
     var typeLabel = isTalk ? ((classes.length>1||totalDates>1) ? 'Public Talks' : 'Public Talk') : theme.label;
     // mini-poster (Fable recipe): type label + title + one date line, from the first class
     var pDate='';
@@ -355,7 +356,7 @@
     var wteHtml = wte.length ? '<div class="wte collapsed"><button class="wte-t">What to expect <span class="chev">&#9662;</span></button><ul>'
         + wte.map(function(x){return '<li>'+esc(x)+'</li>';}).join('') + '</ul></div>' : '';
     var tlabel = bannerLabel(idx, classes, showFrom);
-    var lenLabel = (!isTalk && totalDates>1) ? ' &middot; '+totalDates+' weeks' : '';   // length in the banner (courses)
+    var lenLabel = (!isTalk && weeks>1) ? ' &middot; '+weeks+' weeks' : '';   // length in the banner (courses)
     var banner = '<div class="cc-banner">'
         + (tlabel ? '<span class="cc-when"><span class="cc-dot"></span>'+esc(tlabel)+'</span>' : '')
         + '<span class="cc-type">'+typeLabel+lenLabel+'</span>'
