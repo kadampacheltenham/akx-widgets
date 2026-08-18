@@ -6,7 +6,7 @@
  */
 (function(){
   var CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIHL1qFChqELQNZYWph1_rKJ4OR6a3Mvd8E9vr3Zu2d6GnmWnsWf58m9W1rfIi4ytajGl5_i1tP7rb/pub?gid=1509373689&single=true&output=csv";
-  var DAYS = 30;
+  var DAYS = 30, DEFAULT_DAYS = 7;
   var root=document.getElementById("akx-msgs"); if(!root) return;
   var CSS=".akx-msgs{font-family:Inter,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#1F2A3C;max-width:1000px;margin:0 auto;}"+
     ".akx-msgs .hd{display:flex;justify-content:space-between;align-items:baseline;margin:0 0 12px;}"+
@@ -18,6 +18,9 @@
     ".akx-msgs .body{white-space:pre-wrap;line-height:1.5;font-size:.95rem;}"+
     ".akx-msgs .ft{margin-top:8px;font-size:.85rem;} .akx-msgs .ft a{color:#2A66A6;text-decoration:none;margin-right:14px;} .akx-msgs .ft a:hover{text-decoration:underline;}"+
     ".akx-msgs .ft .meta{color:#7A8797;margin-right:14px;}"+
+    ".akx-msgs .rt{display:flex;align-items:baseline;gap:10px;margin:0 0 14px;font-size:.95rem;} .akx-msgs .rt .stars{color:#E0A526;font-size:1.25rem;letter-spacing:2px;} .akx-msgs .rt .lbl{font-weight:600;} .akx-msgs .rt .n{color:#7A8797;}"+
+    ".akx-msgs .tog{background:none;border:1px solid #D9D2C4;border-radius:999px;padding:5px 12px;font:inherit;font-size:.82rem;color:#2A66A6;cursor:pointer;padding:8px 18px;font-size:.9rem;}"+
+    ".akx-msgs .more{text-align:center;margin:14px 0 6px;}"+
     ".akx-msgs .empty{color:#7A8797;padding:20px 0;}";
   var st=document.createElement("style");st.textContent=CSS;document.head.appendChild(st);
   root.className="akx-msgs";root.innerHTML='<div class="empty">Loading messages…</div>';
@@ -41,11 +44,23 @@
     for(var i=1;i<rows.length;i++){var r=rows[i],d=iW>-1?when(r[iW]):new Date(NaN);if(!isNaN(d)&&d.getTime()<since)continue;
       items.push({d:d,name:iN>-1?r[iN]:"",email:iE>-1?r[iE]:"",phone:iP>-1?r[iP]:"",topic:iT>-1?r[iT]:"",msg:iM>-1?r[iM]:r.slice(3).filter(Boolean).join("\n"),page:iG>-1?r[iG]:"",rating:iR>-1?r[iR]:""});}
     items.sort(function(a,b){return (b.d||0)-(a.d||0);});
-    var h='<div class="hd"><b>Contact Us messages</b><span>Last '+DAYS+' days · '+items.length+' message'+(items.length===1?"":"s")+'</span></div>';
-    if(!items.length)h+='<div class="empty">No messages in the last '+DAYS+' days.</div>';
-    items.forEach(function(m){var subj=encodeURIComponent("Re: your message to Akanishta KBC"+(m.topic?" — "+m.topic:""));
-      h+='<div class="m"><div class="top"><b>'+esc(m.name||"(no name)")+'</b>'+(m.topic?'<span class="tag">'+esc(m.topic)+'</span>':'')+'<span class="d">'+esc(fmt(m.d))+'</span></div>'+
-         '<div class="body">'+esc(m.msg)+'</div><div class="ft">'+(m.email?'<a href="mailto:'+esc(m.email)+'?subject='+subj+'">Reply to '+esc(m.email)+'</a>':'')+(m.phone?'<a href="tel:'+esc(m.phone.replace(/\s+/g,""))+'">'+esc(m.phone)+'</a>':'')+(m.page?'<span class="meta">Page: '+esc(m.page)+'</span>':'')+(m.rating?'<span class="meta">Rating: '+esc(m.rating)+'/5</span>':'')+'</div></div>';});
-    root.innerHTML=h;
+    var rs=items.map(function(m){return parseFloat(m.rating);}).filter(function(x){return !isNaN(x);});
+    var avg=rs.length?rs.reduce(function(a,b){return a+b;},0)/rs.length:0;
+    var stars="";for(var k=1;k<=5;k++)stars+=Math.round(avg)>=k?"\u2605":"\u2606";
+    var rt='<div class="rt"><span class="lbl">30-day Rating</span>'+(rs.length?'<span class="stars">'+stars+'</span><span class="n">('+avg.toFixed(1)+' from '+rs.length+')</span>':'<span class="n">no ratings yet</span>')+'</div>';
+    var showAll=false;
+    function draw(){
+      var lim=showAll?DAYS:DEFAULT_DAYS, cut=Date.now()-lim*864e5;
+      var vis=items.filter(function(m){return isNaN(m.d)||m.d.getTime()>=cut;});
+      var h=rt+'<div class="hd"><b>Contact Us messages</b><span>Last '+lim+' days · '+vis.length+' message'+(vis.length===1?"":"s")+'</span></div>';
+      if(!vis.length)h+='<div class="empty">No messages in the last '+lim+' days.</div>';
+      vis.forEach(function(m){var subj=encodeURIComponent("Re: your message to Akanishta KBC"+(m.topic?" \u2014 "+m.topic:""));
+        h+='<div class="m"><div class="top"><b>'+esc(m.name||"(no name)")+'</b>'+(m.topic?'<span class="tag">'+esc(m.topic)+'</span>':'')+'<span class="d">'+esc(fmt(m.d))+'</span></div>'+
+           '<div class="body">'+esc(m.msg)+'</div><div class="ft">'+(m.email?'<a href="mailto:'+esc(m.email)+'?subject='+subj+'">Reply to '+esc(m.email)+'</a>':'')+(m.phone?'<a href="tel:'+esc(m.phone.replace(/\s+/g,""))+'">'+esc(m.phone)+'</a>':'')+(m.page?'<span class="meta">Page: '+esc(m.page)+'</span>':'')+(m.rating?'<span class="meta">Rating: '+esc(m.rating)+'/5</span>':'')+'</div></div>';});
+      if(items.length>vis.length||showAll)h+='<div class="more"><button class="tog" type="button">'+(showAll?"Show last "+DEFAULT_DAYS+" days":"Show all (up to "+DAYS+" days \u00b7 "+items.length+")")+'</button></div>';
+      root.innerHTML=h;
+      var b=root.querySelector(".tog");if(b)b.addEventListener("click",function(){showAll=!showAll;draw();});
+    }
+    draw();
   }).catch(function(){root.innerHTML='<div class="empty">Couldn’t load the messages sheet.</div>';});
 })();
