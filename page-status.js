@@ -1,4 +1,4 @@
-/* AKBC page-status card v5 — plain-language sheet columns — self-injecting widget
+/* AKBC page-status card v5.1 — plain-language sheet columns — self-injecting widget
  * Reads a published Google Sheet (CSV) and shows a slim colour strip under the site header
  * on pages that have a row. Sheet columns (header row, any order, case-insensitive):
  *   page      — slug, e.g. courses-retreats  ("home" for the homepage)
@@ -22,7 +22,7 @@
   if (!slug) slug = "home";
 
   var CSS =
-    ".akx-ps{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.45;max-width:1000px;margin:18px auto 22px;padding:0 20px;box-sizing:border-box;}" +
+    ".akx-ps{position:relative;z-index:5;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.45;max-width:1000px;margin:18px auto 22px;padding:0 20px;box-sizing:border-box;}" +
     ".akx-ps .row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;border:1px solid transparent;}" +
     ".akx-ps .dot{width:11px;height:11px;border-radius:50%;flex:0 0 auto;}" +
     ".akx-ps b{font-weight:600;}" +
