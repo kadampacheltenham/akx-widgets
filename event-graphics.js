@@ -60,8 +60,7 @@
       '<circle cx="100" cy="100" r="70" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' +
       '<circle cx="100" cy="100" r="88" stroke-width="1.5" vector-effect="non-scaling-stroke"/></g></symbol>' +
     '<symbol id="m-course" viewBox="0 0 200 200"><g fill="none" stroke="#fff" stroke-linecap="round">' +
-      '<path d="M100 104 a12 12 0 0 1 24 0 a24 24 0 0 1 -48 0 a36 36 0 0 1 72 0 a48 48 0 0 1 -96 0 a60 60 0 0 1 120 0 a72 72 0 0 1 -144 0" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' +
-      '<path d="M148 176 a8 8 0 0 1 16 0 a16 16 0 0 1 -32 0" stroke-width="1.5" vector-effect="non-scaling-stroke"/></g></symbol>' +
+      '<path d="M-20 40 C10 26 40 54 70 40 S130 26 160 40 S220 54 250 40" stroke-width="1.5" vector-effect="non-scaling-stroke"/><path d="M-20 66 C10 52 40 80 70 66 S130 52 160 66 S220 80 250 66" stroke-width="1.5" vector-effect="non-scaling-stroke"/><path d="M-20 92 C10 78 40 106 70 92 S130 78 160 92 S220 106 250 92" stroke-width="1.5" vector-effect="non-scaling-stroke"/><path d="M-20 118 C10 104 40 132 70 118 S130 104 160 118 S220 132 250 118" stroke-width="1.5" vector-effect="non-scaling-stroke"/><path d="M-20 144 C10 130 40 158 70 144 S130 130 160 144 S220 158 250 144" stroke-width="1.5" vector-effect="non-scaling-stroke"/><path d="M-20 170 C10 156 40 184 70 170 S130 156 160 170 S220 184 250 170" stroke-width="1.5" vector-effect="non-scaling-stroke"/></g></symbol>' +
     '<symbol id="m-retreat" viewBox="0 0 200 200"><g fill="none" stroke="#fff" stroke-linecap="round">' +
       '<path d="M70 172 a30 30 0 0 1 60 0" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' +
       '<path d="M42 172 a58 58 0 0 1 116 0" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' +
