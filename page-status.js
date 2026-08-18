@@ -1,4 +1,4 @@
-/* AKBC page-status card v5.3 (card sits directly under the hero) — plain-language sheet columns (headers: page | state | update summary | how it affects website visitors | recent updates | outstanding | show until | updated) — self-injecting widget
+/* AKBC page-status card v5.4 (mobile: one-line row, tap to expand) — plain-language sheet columns (headers: page | state | update summary | how it affects website visitors | recent updates | outstanding | show until | updated) — self-injecting widget
  * Reads a published Google Sheet (CSV) and shows a slim colour strip under the site header
  * on pages that have a row. Sheet columns (header row, any order, case-insensitive):
  *   page      — slug, e.g. courses-retreats  ("home" for the homepage)
@@ -39,7 +39,8 @@
     ".akx-ps h4{margin:0 0 4px;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:#7A8797;font-weight:700;}" +
     ".akx-ps ul{margin:0;padding-left:18px;} .akx-ps li{margin:2px 0;}" +
     ".akx-ps .upd{grid-column:1/-1;font-size:12px;color:#7A8797;margin-top:4px;}" +
-    "@media(max-width:680px){.akx-ps{padding:0 12px;} .akx-ps .row{flex-wrap:wrap;} .akx-ps .box{grid-template-columns:1fr;}}";
+    ".akx-ps .more.nopanel{display:none;}" +
+    "@media(max-width:680px){.akx-ps{padding:0 10px;} .akx-ps .row{cursor:pointer;padding:10px 14px;} .akx-ps .row .txt{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} .akx-ps.open .row .txt{white-space:normal;} .akx-ps .more .lbl{display:none;} .akx-ps .more.nopanel{display:inline-flex;} .akx-ps .box{grid-template-columns:1fr;}}";
 
   function parseCSV(text) {
     var rows = [], row = [], cur = "", q = false;
@@ -79,21 +80,24 @@
     var el = document.createElement("div"); el.className = "akx-ps " + cls; el.setAttribute("role", "status");
     var hasPanel = imp.length || todo.length || rec.updated;
     el.innerHTML =
-      '<div class="row"><span class="dot"></span><span><b>' + esc(lead) + (line ? ":" : "") + '</b> ' + esc(line) + '</span>' +
-      (hasPanel ? '<button class="more" type="button" aria-expanded="false"><span class="lbl">What\u2019s changed</span> <span class="chev"></span></button>' : '') + '</div>' +
+      '<div class="row"><span class="dot"></span><span class="txt"><b>' + esc(lead) + (line ? ":" : "") + '</b> ' + esc(line) + '</span>' +
+      '<button class="more' + (hasPanel ? '' : ' nopanel') + '" type="button" aria-expanded="false" aria-label="Show more"><span class="lbl">What\u2019s changed</span> <span class="chev"></span></button></div>' +
       (hasPanel ? '<div class="panel"><div class="box">' +
         (imp.length ? '<div><h4>Recent updates</h4><ul>' + imp.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + '</ul></div>' : "<div></div>") +
         (todo.length ? '<div><h4>Outstanding</h4><ul>' + todo.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + '</ul></div>' : "") +
         '<div class="upd">' + (rec.updated ? "Last updated " + esc(rec.updated) + " \u00B7 " : "") + 'Spotted something? Use the \u201CSend us a message\u201D button.</div>' +
         '</div></div>' : "");
-    if (hasPanel) {
-      var btn = el.querySelector(".more");
-      btn.addEventListener("click", function () {
+    (function () {
+      var btn = el.querySelector(".more"), row = el.querySelector(".row");
+      function toggle() {
         var open = el.classList.toggle("open");
         btn.setAttribute("aria-expanded", open ? "true" : "false");
         btn.querySelector(".lbl").textContent = open ? "Hide" : "What\u2019s changed";
-      });
-    }
+      }
+      btn.addEventListener("click", function (e) { e.stopPropagation(); toggle(); });
+      // on phones the whole (single-line) row is tappable
+      row.addEventListener("click", function () { if (window.matchMedia("(max-width:680px)").matches) toggle(); });
+    })();
     // place directly under the hero (the first page section), with a small gap above and below
     var secs = document.querySelectorAll("section.page-section");
     var anchor = secs.length ? secs[0] : null;
