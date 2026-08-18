@@ -1,4 +1,4 @@
-/* AKBC page-status card v5.2 — plain-language sheet columns (headers: page | state | update summary | how it affects website visitors | recent updates | outstanding | show until | updated) — self-injecting widget
+/* AKBC page-status card v5.3 (card sits directly under the hero) — plain-language sheet columns (headers: page | state | update summary | how it affects website visitors | recent updates | outstanding | show until | updated) — self-injecting widget
  * Reads a published Google Sheet (CSV) and shows a slim colour strip under the site header
  * on pages that have a row. Sheet columns (header row, any order, case-insensitive):
  *   page      — slug, e.g. courses-retreats  ("home" for the homepage)
@@ -94,15 +94,12 @@
         btn.querySelector(".lbl").textContent = open ? "Hide" : "What\u2019s changed";
       });
     }
-    // place after the first page section that contains text (the hero title / intro), i.e. hero image -> title -> text -> HERE
+    // place directly under the hero (the first page section), with a small gap above and below
     var secs = document.querySelectorAll("section.page-section");
-    var anchor = null;
-    for (var k = 0; k < secs.length; k++) { if (secs[k].querySelector(".sqs-block-html, h1, h2, p")) { anchor = secs[k]; break; } }
-    if (!anchor && secs.length) anchor = secs[0];
+    var anchor = secs.length ? secs[0] : null;
     if (anchor && anchor.parentNode) {
       anchor.parentNode.insertBefore(el, anchor.nextSibling);
-      var cw = anchor.querySelector(".content-wrapper"), pb = cw ? parseFloat(getComputedStyle(cw).paddingBottom) || 0 : 0;
-      el.style.marginTop = (24 - pb) + "px"; el.style.marginBottom = "24px";
+      el.style.marginTop = "22px"; el.style.marginBottom = "6px";
     }
     else { var header = document.getElementById("header"); if (header && header.parentNode) header.parentNode.insertBefore(el, header.nextSibling); else document.body.insertBefore(el, document.body.firstChild); }
   }
