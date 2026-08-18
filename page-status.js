@@ -1,4 +1,4 @@
-/* AKBC page-status strip — self-injecting widget
+/* AKBC page-status card v5 — plain-language sheet columns — self-injecting widget
  * Reads a published Google Sheet (CSV) and shows a slim colour strip under the site header
  * on pages that have a row. Sheet columns (header row, any order, case-insensitive):
  *   page      — slug, e.g. courses-retreats  ("home" for the homepage)
@@ -61,22 +61,28 @@
   function items(s) { return String(s || "").split("|").map(function (x) { return x.trim(); }).filter(Boolean); }
 
   function render(rec) {
-    var status = (rec.status || "").trim().toLowerCase();
-    var cls = status === "red" ? "r" : status === "amber" || status === "orange" ? "a" : status === "green" ? "g" : "";
+    // v5 columns: page | state | what's happening | what it means for you | done recently | still to do | show until | updated
+    // (old columns status/note/improved/todo still accepted)
+    var state = (rec.state || rec.status || "").trim().toLowerCase();
+    var cls = /problem|red|broken/.test(state) ? "r" : /heads|amber|orange|working|progress/.test(state) ? "a" : /updated|green|new/.test(state) ? "g" : "";
     if (!cls) return;
-    if (cls === "g" && !(rec.note || "").trim()) return;
-    var imp = items(rec.improved), todo = items(rec.todo);
-    var hasPanel = true;
-    var lead = cls === "r" ? "Known issue:" : cls === "a" ? "We're still working on this page" : "Recently improved";
-    var note = (rec.note || "").trim();
+    var what = (rec["what's happening"] || rec.whats_happening || rec.what || rec.note || "").trim();
+    var means = (rec["what it means for you"] || rec.means || rec.so_what || "").trim();
+    if (cls === "g" && !what) return;
+    var until = (rec["show until"] || rec.until || "").trim();
+    if (until) { var u = parseUK(until); if (u && Date.now() > u.getTime() + 864e5) return; }
+    var imp = items(rec["done recently"] || rec.done || rec.improved), todo = items(rec["still to do"] || rec.next || rec.todo);
+    var lead = cls === "r" ? "Known problem" : cls === "a" ? "Heads-up" : "Just updated";
+    var line = what + (means ? " \u2014 " + means : "");
 
     var st = document.createElement("style"); st.textContent = CSS; document.head.appendChild(st);
     var el = document.createElement("div"); el.className = "akx-ps " + cls; el.setAttribute("role", "status");
+    var hasPanel = imp.length || todo.length || rec.updated;
     el.innerHTML =
-      '<div class="row"><span class="dot"></span><span><b>' + esc(lead) + '</b>' + (note ? (cls === "r" ? " " : " &mdash; ") + esc(note) : "") + '</span>' +
-      '<button class="more" type="button" aria-expanded="false"><span class="lbl">What\u2019s changed</span> <span class="chev"></span></button>' + '</div>' +
+      '<div class="row"><span class="dot"></span><span><b>' + esc(lead) + (line ? ":" : "") + '</b> ' + esc(line) + '</span>' +
+      (hasPanel ? '<button class="more" type="button" aria-expanded="false"><span class="lbl">What\u2019s changed</span> <span class="chev"></span></button>' : '') + '</div>' +
       (hasPanel ? '<div class="panel"><div class="box">' +
-        (imp.length ? '<div><h4>Recently improved</h4><ul>' + imp.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + '</ul></div>' : "<div></div>") +
+        (imp.length ? '<div><h4>Done recently</h4><ul>' + imp.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + '</ul></div>' : "<div></div>") +
         (todo.length ? '<div><h4>Still to do</h4><ul>' + todo.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + '</ul></div>' : "") +
         '<div class="upd">' + (rec.updated ? "Last updated " + esc(rec.updated) + " \u00B7 " : "") + 'Spotted something? Use the \u201CReport a problem\u201D button.</div>' +
         '</div></div>' : "");
@@ -88,22 +94,36 @@
         btn.querySelector(".lbl").textContent = open ? "Hide" : "What\u2019s changed";
       });
     }
-    // place after the first page section that contains text (the hero title / intro), i.e. hero image → title → text → HERE
+    // place after the first page section that contains text (the hero title / intro), i.e. hero image -> title -> text -> HERE
     var secs = document.querySelectorAll("section.page-section");
     var anchor = null;
     for (var k = 0; k < secs.length; k++) { if (secs[k].querySelector(".sqs-block-html, h1, h2, p")) { anchor = secs[k]; break; } }
     if (!anchor && secs.length) anchor = secs[0];
-    if (anchor && anchor.parentNode) anchor.parentNode.insertBefore(el, anchor.nextSibling);
+    if (anchor && anchor.parentNode) {
+      anchor.parentNode.insertBefore(el, anchor.nextSibling);
+      var cw = anchor.querySelector(".content-wrapper"), pb = cw ? parseFloat(getComputedStyle(cw).paddingBottom) || 0 : 0;
+      el.style.marginTop = (24 - pb) + "px"; el.style.marginBottom = "24px";
+    }
     else { var header = document.getElementById("header"); if (header && header.parentNode) header.parentNode.insertBefore(el, header.nextSibling); else document.body.insertBefore(el, document.body.firstChild); }
   }
+  // "30 Sep" / "30 Sep 2026" / "30/09/2026" -> Date (year defaults to this year, or next if already passed by >6 months)
+  function parseUK(s) {
+    var m = String(s).match(/(\d{1,2})[\/\-\s]+([A-Za-z]{3,}|\d{1,2})(?:[\/\-\s]+(\d{2,4}))?/); if (!m) return null;
+    var months = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"], mo;
+    if (/^\d/.test(m[2])) mo = +m[2] - 1; else { mo = months.indexOf(m[2].slice(0,3).toLowerCase()); if (mo < 0) return null; }
+    var y = m[3] ? (+m[3] < 100 ? 2000 + +m[3] : +m[3]) : new Date().getFullYear();
+    var d = new Date(y, mo, +m[1]); if (!m[3] && d.getTime() < Date.now() - 180 * 864e5) d.setFullYear(y + 1); return d;
+  }
+  function slugify(s) { return String(s || "").toLowerCase().replace(/['\u2019]/g, "").replace(/&/g, " ").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, ""); }
 
   function go(text) {
     var rows = parseCSV(text); if (rows.length < 2) return;
     var head = rows[0].map(function (h) { return h.trim().toLowerCase(); });
     for (var i = 1; i < rows.length; i++) {
       var rec = {}; head.forEach(function (h, j) { rec[h] = rows[i][j] || ""; });
-      var p = (rec.page || "").trim().replace(/^\/+|\/+$/g, "").toLowerCase();
-      if (p === slug || (p === "home" && slug === "home")) { render(rec); return; }
+      var raw = (rec.page || "").trim(); if (!raw || raw.charAt(0) === "\u2192" || raw.charAt(0) === "-") continue; // skip hint rows
+      var p = slugify(raw.replace(/^\/+|\/+$/g, ""));
+      if (p === slug || (p === "home" && slug === "home") || (p === "homepage" && slug === "home")) { render(rec); return; }
     }
   }
 
