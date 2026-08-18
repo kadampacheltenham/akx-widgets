@@ -1,4 +1,4 @@
-/* AKBC page-status card v5.1 — plain-language sheet columns — self-injecting widget
+/* AKBC page-status card v5.2 — plain-language sheet columns (headers: page | state | update summary | how it affects website visitors | recent updates | outstanding | show until | updated) — self-injecting widget
  * Reads a published Google Sheet (CSV) and shows a slim colour strip under the site header
  * on pages that have a row. Sheet columns (header row, any order, case-insensitive):
  *   page      — slug, e.g. courses-retreats  ("home" for the homepage)
@@ -66,12 +66,12 @@
     var state = (rec.state || rec.status || "").trim().toLowerCase();
     var cls = /problem|red|broken/.test(state) ? "r" : /heads|amber|orange|working|progress/.test(state) ? "a" : /updated|green|new/.test(state) ? "g" : "";
     if (!cls) return;
-    var what = (rec["what's happening"] || rec.whats_happening || rec.what || rec.note || "").trim();
-    var means = (rec["what it means for you"] || rec.means || rec.so_what || "").trim();
+    var what = (rec["update summary"] || rec["update headline"] || rec["what's happening"] || rec.whats_happening || rec.what || rec.note || "").trim();
+    var means = (rec["how it affects website visitors"] || rec["what it means for you"] || rec.means || rec.so_what || "").trim();
     if (cls === "g" && !what) return;
     var until = (rec["show until"] || rec.until || "").trim();
     if (until) { var u = parseUK(until); if (u && Date.now() > u.getTime() + 864e5) return; }
-    var imp = items(rec["done recently"] || rec.done || rec.improved), todo = items(rec["still to do"] || rec.next || rec.todo);
+    var imp = items(rec["recent updates"] || rec["done recently"] || rec.done || rec.improved), todo = items(rec["outstanding"] || rec["still to do"] || rec.next || rec.todo);
     var lead = cls === "r" ? "Known problem" : cls === "a" ? "Heads-up" : "Just updated";
     var line = what + (means ? " \u2014 " + means : "");
 
@@ -82,9 +82,9 @@
       '<div class="row"><span class="dot"></span><span><b>' + esc(lead) + (line ? ":" : "") + '</b> ' + esc(line) + '</span>' +
       (hasPanel ? '<button class="more" type="button" aria-expanded="false"><span class="lbl">What\u2019s changed</span> <span class="chev"></span></button>' : '') + '</div>' +
       (hasPanel ? '<div class="panel"><div class="box">' +
-        (imp.length ? '<div><h4>Done recently</h4><ul>' + imp.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + '</ul></div>' : "<div></div>") +
-        (todo.length ? '<div><h4>Still to do</h4><ul>' + todo.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + '</ul></div>' : "") +
-        '<div class="upd">' + (rec.updated ? "Last updated " + esc(rec.updated) + " \u00B7 " : "") + 'Spotted something? Use the \u201CReport a problem\u201D button.</div>' +
+        (imp.length ? '<div><h4>Recent updates</h4><ul>' + imp.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + '</ul></div>' : "<div></div>") +
+        (todo.length ? '<div><h4>Outstanding</h4><ul>' + todo.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + '</ul></div>' : "") +
+        '<div class="upd">' + (rec.updated ? "Last updated " + esc(rec.updated) + " \u00B7 " : "") + 'Spotted something? Use the \u201CSend us a message\u201D button.</div>' +
         '</div></div>' : "");
     if (hasPanel) {
       var btn = el.querySelector(".more");
