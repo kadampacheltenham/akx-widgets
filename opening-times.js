@@ -1,4 +1,4 @@
-/* Akanishta — OPENING TIMES widget (file: opening-times.js; formerly when-to-visit.js, renamed 19 Aug 2026). Opening hours derived from the LIVE Google Calendar.
+/* Akanishta — OPENING TIMES widget (file: opening-times.js; formerly when-to-visit.js, renamed 19 Aug 2026; v2: event lines = start time | title | duration). Opening hours derived from the LIVE Google Calendar.
    ONE shared file; reuse on any page. Include with a stub like:
        <div id="akx-visit" data-theme="light"></div>
        <script src="https://kadampacheltenham.github.io/akx-widgets/when-to-visit.js" defer></script>
@@ -69,10 +69,11 @@
   +'#akx-visit .wtime{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.1rem;letter-spacing:-.01em;color:var(--ink);}'
   +'#akx-visit .wtime .odot{width:9px;height:9px;border-radius:50%;background:var(--op-dot);flex:none;box-shadow:0 0 0 3px rgba(59,155,94,.16);}'
   +'#akx-visit .wevs{margin:7px 0 0 19px;}'
-  +'#akx-visit .wev{font-size:.94rem;color:var(--mut);line-height:1.5;margin-top:4px;}'
+  +'#akx-visit .wev{font-size:.94rem;color:var(--mut);line-height:1.5;margin-top:4px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;}'
   +'#akx-visit .wev:first-child{margin-top:0;}'
+  +'#akx-visit .wev .es{font-variant-numeric:tabular-nums;min-width:4.6em;color:#26303A;font-weight:600;}'
   +'#akx-visit .wev .en{color:var(--acc);font-weight:700;}'
-  +'#akx-visit .wev .et{color:var(--mut);}'
+  +'#akx-visit .wev .ed{color:var(--mut);}'
   +'#akx-visit .cltxt{padding:14px 0;color:var(--cl-tx);font-size:.95rem;}'
   +'#akx-visit .msg{padding:22px 4px;color:var(--mut);font-size:.9rem;}'
   +'@media(min-width:768px){#akx-visit .whead{text-align:center;} #akx-visit .st{max-width:420px;margin:0 auto;}}';
@@ -198,10 +199,16 @@
   }
 
   /* ---------- render ---------- */
-  function evLine(e,w){
-    var diff=(e.tS!==w.oS || e.tE!==w.oE);
-    var t=diff?' &middot; <span class="et">'+to12(minToHM(e.tS))+' &ndash; '+to12(minToHM(e.tE))+'</span>':'';
-    return '<div class="wev"><span class="en">'+e.name+'</span>'+t+'</div>';
+  function durTxt(m){ // 15 -> "15 mins", 60 -> "1 hr", 90 -> "1\u00bd hrs", 150 -> "2\u00bd hrs", 75 -> "1 hr 15"
+    if(!(m>0)) return ''; var h=Math.floor(m/60), r=m%60;
+    if(h===0) return r+' mins';
+    if(r===0) return h+(h===1?' hr':' hrs');
+    if(r===30) return h+'\u00bd hrs';
+    return h+' hr '+r;
+  }
+  function evLine(e,w){ // start time first, then title, then a quiet duration  (19 Aug 2026)
+    var d=durTxt(e.tE-e.tS);
+    return '<div class="wev"><span class="es">'+to12(minToHM(e.tS))+'</span><span class="en">'+e.name+'</span>'+(d?'<span class="ed">&middot; '+d+'</span>':'')+'</div>';
   }
   function winHTML(w){
     return '<div class="win"><div class="wtime"><span class="odot"></span>Open '+to12(minToHM(w.oS))+' &ndash; '+to12(minToHM(w.oE))+'</div>'
