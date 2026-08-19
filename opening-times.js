@@ -1,4 +1,4 @@
-/* Akanishta - "When to Visit" widget. Opening hours derived from the LIVE Google Calendar.
+/* Akanishta — OPENING TIMES widget (file: opening-times.js; formerly when-to-visit.js, renamed 19 Aug 2026). Opening hours derived from the LIVE Google Calendar.
    ONE shared file; reuse on any page. Include with a stub like:
        <div id="akx-visit" data-theme="light"></div>
        <script src="https://kadampacheltenham.github.io/akx-widgets/when-to-visit.js" defer></script>
