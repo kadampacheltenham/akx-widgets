@@ -1,4 +1,4 @@
-/* Akanishta — Weekend Courses & Retreats widget. v2.1 (18 Aug 2026): no photo -> generated type graphic (event-graphics.js).
+/* Akanishta — Weekend Courses & Retreats widget. v2.2 (20 Aug 2026): sheet colour overrides — "Colour" (titles/accent, accepts names or hex) + "Background colour" (generated tile background). v2.1: no photo -> generated type graphic (event-graphics.js).
    Reads a public Google Sheet (tabs "Events", "Timetables", "Teachers")
    and renders poster tiles.
    Include with:  <div id="akx-events"></div>
@@ -126,6 +126,12 @@
   function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
   function splitLines(s){return (s||'').split(/\r?\n|;/).map(function(x){return x.trim();}).filter(Boolean);}
   function low(s){return (s||'').trim().toLowerCase();}
+  function normColour(v){ v=String(v||'').trim(); if(!v) return '';
+    var c=document.createElement('canvas').getContext('2d');
+    c.fillStyle='#000'; c.fillStyle=v; if(c.fillStyle!=='#000000'||/^black$|^#0{3,8}$/i.test(v)) return c.fillStyle;
+    if(/^[0-9a-f]{3}([0-9a-f]{3})?$/i.test(v)){ c.fillStyle='#'+v; return c.fillStyle; }
+    return ''; }
+  function colOv(ev,names){ for(var i=0;i<names.length;i++){ var v=normColour(ev[names[i]]); if(v) return v; } return ''; }
   var MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   var WD=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   function parseDate(s){ if(!s) return null;
@@ -191,7 +197,8 @@
 
   function card(ev, ttMap, teMap){
     var type = TYPES[low(ev['Event Type'])] || {tag:'', colour:DEFAULT_COLOUR};
-    var accent = ev['Colour'] || type.colour || DEFAULT_COLOUR;
+    var accent = colOv(ev,['Colour','colour','Color']) || type.colour || DEFAULT_COLOUR;
+    var gbg = colOv(ev,['Background colour','Background Colour','background colour','BG colour','Background color']);
     var isFeature = !!type.feature;
     var isFree = low(ev['Free'])==='yes' || !!type.free;
     var tag = ev['Event tag'] || type.tag || '';
@@ -218,7 +225,7 @@
     // event image loaded as the panel BACKGROUND (so overlays always sit on top)
     var imgbase = ev['Event ID'] ? IMG+encodeURIComponent(ev['Event ID'].trim()) : '';
     var gfxDate = d ? WD[d.getDay()]+' '+d.getDate()+' '+MON[d.getMonth()] + (ev['Time']?' \u00b7 '+String(ev['Time']).trim():'') : (ev['Time']||'');
-    var img = '<div class="img'+(chip?' has-chip':'')+'"'+(imgbase?' data-imgbase="'+imgbase+'"':'')+' data-gtype="'+esc(ev['Event Type']||'')+'" data-gtitle="'+esc(ev['Title']||'')+'" data-gdate="'+esc(gfxDate)+'"><span class="ph">event photo</span>'+chip
+    var img = '<div class="img'+(chip?' has-chip':'')+'"'+(imgbase?' data-imgbase="'+imgbase+'"':'')+' data-gtype="'+esc(ev['Event Type']||'')+'"'+(gbg?' data-gbg="'+gbg+'"':'')+' data-gtitle="'+esc(ev['Title']||'')+'" data-gdate="'+esc(gfxDate)+'"><span class="ph">event photo</span>'+chip
       + (tag? '<div class="type"><i></i>'+esc(tag)+'</div>':'')
       + av + '</div>';
 
@@ -284,6 +291,7 @@
       G.injectCSS();
       var t=G.typeOf(el.getAttribute('data-gtype'))||'course';
       var wrap=document.createElement('div'); wrap.className='gfx g-'+t;
+      var gbg=el.getAttribute('data-gbg'); if(gbg) wrap.style.background=gbg;
       wrap.innerHTML=G.motifSVG(t)+'<div class="gtxt"><div class="gt">'+esc(el.getAttribute('data-gtitle')||'')+'</div>'+
         (el.getAttribute('data-gdate')?'<div class="gm">'+esc(el.getAttribute('data-gdate'))+'</div>':'')+'</div>';
       el.insertBefore(wrap, el.firstChild); el.classList.add('has-gfx');
