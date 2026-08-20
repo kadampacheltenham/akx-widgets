@@ -1,4 +1,4 @@
-/* Akanishta — Weekend Courses & Retreats widget. v2.2 (20 Aug 2026): sheet colour overrides — "Colour" (titles/accent, accepts names or hex) + "Background colour" (generated tile background). v2.1: no photo -> generated type graphic (event-graphics.js).
+/* Akanishta — Weekend Courses & Retreats widget. v2.2 (20 Aug 2026): sheet colour overrides — "Title colour" (titles/accent; old "Colour" still accepted; names or hex) + "Background colour" (generated tile background). v2.1: no photo -> generated type graphic (event-graphics.js).
    Reads a public Google Sheet (tabs "Events", "Timetables", "Teachers")
    and renders poster tiles.
    Include with:  <div id="akx-events"></div>
@@ -197,7 +197,7 @@
 
   function card(ev, ttMap, teMap){
     var type = TYPES[low(ev['Event Type'])] || {tag:'', colour:DEFAULT_COLOUR};
-    var accent = colOv(ev,['Colour','colour','Color']) || type.colour || DEFAULT_COLOUR;
+    var accent = colOv(ev,['Title colour','Title Colour','title colour','Colour','colour','Color']) || type.colour || DEFAULT_COLOUR;
     var gbg = colOv(ev,['Background colour','Background Colour','background colour','BG colour','Background color']);
     var isFeature = !!type.feature;
     var isFree = low(ev['Free'])==='yes' || !!type.free;
