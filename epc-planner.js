@@ -1,4 +1,4 @@
-/* AKBC — Promotion planner (volunteer tool on /epc). v1.0.5 (22 Aug 2026)
+/* AKBC — Promotion planner (volunteer tool on /epc). v1.0.6 (22 Aug 2026)
  * Stub on the page:
  *   <div id="akx-promo"></div>
  *   <script src="https://kadampacheltenham.github.io/akx-widgets/epc-planner.js"><\/script>
@@ -175,8 +175,7 @@ function render(model,events){
       else meta+=' · <span class="pp-quietnote">on runway — nothing due this week — promote early if space allows</span>';
       h+='<div class="pp-meta">'+meta+'</div>';
       h+='<div class="pp-copy">Copy for socials: <a data-cp="1" data-ev="'+esc(ev.id)+'">blurb</a> · <a data-cp="2" data-ev="'+esc(ev.id)+'">+ what to expect</a> · <a data-cp="3" data-ev="'+esc(ev.id)+'">+ price & booking</a> · <a data-cp="3i" data-ev="'+esc(ev.id)+'">Insta version</a>'
-        +' · <a data-gfx="'+esc(ev.id)+'">get graphic \u2193</a>'
-        +(ev.tid?' · <a href="https://raw.githubusercontent.com/kadampacheltenham/akx-widgets/main/images/teachers/'+esc(ev.tid)+'.jpg" target="_blank" rel="noopener">teacher photo</a>':'')+'</div>';
+        +' · <a data-gfx="'+esc(ev.id)+'">get graphic \u2193</a></div>';
       var chans=r.touch?r.touch.chans:(r.missed?["enews","insta"]:[]);
       if(chans.length){ h+='<div class="pp-acts">'+chans.filter(function(c){return c!=="announce";}).map(function(c){return chip(ev,c,w.wk);}).join("")+'</div>'; }
       h+='</div>';
@@ -223,7 +222,7 @@ root.innerHTML='<style>'
 +'#akx-promo .pp-annhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;}'
 +'#akx-promo .pp-stats{display:flex;gap:12px;justify-content:center;margin:16px 0 4px;flex-wrap:wrap;}'
 +'#akx-promo .pp-spill{display:flex;align-items:center;gap:12px;border-radius:999px;padding:9px 20px;flex:1;min-width:250px;max-width:360px;}'
-+'#akx-promo .pp-s7{background:#EAF4EF;color:#227A72;} #akx-promo .pp-s30{background:#F7EEDC;color:#8a5c12;}'
++'#akx-promo .pp-s7{background:#EAF4EF;color:#227A72;} #akx-promo .pp-s30{background:#F8E0D5;color:#B0430F;}'
 +'#akx-promo .pp-spn{font-size:26px;font-weight:700;line-height:1;}'
 +'#akx-promo .pp-spl{font-size:10px;line-height:1.35;color:inherit;opacity:.85;font-weight:600;}'
 +'#akx-promo .pp-segs{display:flex;gap:3px;margin-left:auto;}'
@@ -233,7 +232,7 @@ root.innerHTML='<style>'
 +'#akx-promo .pp-cd{font-size:13.5px;font-weight:700;border-radius:999px;padding:6px 14px;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,.08);}'
 +'@keyframes ppPulse{50%{opacity:.55}} #akx-promo .pp-cd-r{animation:ppPulse 1.2s infinite;}'
 +'#akx-promo .pp-cd-g{background:#EAF4EF;color:#2E6B4F;} #akx-promo .pp-cd-a{background:#FBF3DC;color:#8a6d1f;} #akx-promo .pp-cd-r{background:#F9E3DC;color:#A33B1E;}'
-+'#akx-promo .pp-copy{font-size:11.5px;color:#8a93a3;margin-top:8px;} #akx-promo .pp-copy a{color:#2A66A6;cursor:pointer;text-decoration:underline;}'
++'#akx-promo .pp-copy{font-size:11.5px;color:#8a93a3;margin:1px 0 9px;} #akx-promo .pp-copy a{color:#2A66A6;cursor:pointer;text-decoration:underline;}'
 +'#akx-promo .pp-modal{position:fixed;inset:0;background:rgba(31,42,60,.45);display:flex;align-items:center;justify-content:center;z-index:9999;}'
 +'#akx-promo .pp-mbox{background:#fff;border-radius:12px;padding:18px;width:min(560px,92vw);box-shadow:0 12px 40px rgba(0,0,0,.25);}'
 +'#akx-promo .pp-mbox b{font-size:14px;color:#2b4c70;} #akx-promo .pp-mbox textarea{width:100%;box-sizing:border-box;height:260px;font:13px/1.5 Inter,sans-serif;border:1px solid #D9D2C4;border-radius:8px;padding:10px;margin:10px 0;color:#1F2A3C;}'
