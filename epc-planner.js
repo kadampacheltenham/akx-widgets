@@ -1,4 +1,4 @@
-/* AKBC — Promotion planner (volunteer tool on /epc). v1.0.6 (22 Aug 2026)
+/* AKBC — Promotion planner (volunteer tool on /epc). v1.0.8 (22 Aug 2026)
  * Stub on the page:
  *   <div id="akx-promo"></div>
  *   <script src="https://kadampacheltenham.github.io/akx-widgets/epc-planner.js"><\/script>
@@ -35,11 +35,11 @@ var API=root.dataset.api||"https://script.google.com/macros/s/AKfycbz3SDO43X4ZF6
 var TOK=root.dataset.token||"cf38d295b1";
 function apiGet(cb){ if(!API){cb();return;} fetch(API+"?token="+encodeURIComponent(TOK)).then(function(r){return r.json();}).then(function(d){ if(d&&!d.error){
     var srv=d.log||[], local=S.log||[];
-    if(!S.synced&&local.length){ // one-time: push ticks made before shared mode
-      var have={}; srv.forEach(function(l){have[l.ev+"|"+l.ch+"|"+l.wk]=1;});
-      local.forEach(function(l){ if(!have[l.ev+"|"+l.ch+"|"+l.wk]){ srv.push(l); apiPost({action:"tick",ev:l.ev,ch:l.ch,wk:l.wk,who:l.who||""}); } });
+    if(!S.synced2&&local.length){ // one-time: push local-only ticks up to the shared log
+      var have={}; srv.forEach(function(l){have[l.ev+"|"+l.ch+"|"+wkOf(l.wk)]=1;});
+      local.forEach(function(l){ if(!have[l.ev+"|"+l.ch+"|"+wkOf(l.wk)]){ srv.push(l); apiPost({action:"tick",ev:l.ev,ch:l.ch,wk:wkOf(l.wk),who:l.who||""}); } });
     }
-    S.synced=1; S.log=srv; S.team=d.team||S.team; S.rota=d.rota||S.rota; S.ann=d.ann||S.ann; save(); } cb(); }).catch(function(){cb();});}
+    S.synced2=1; S.log=srv; S.team=d.team||S.team; S.rota=d.rota||S.rota; S.ann=d.ann||S.ann; save(); } cb(); }).catch(function(){cb();});}
 function apiPost(b,then){ if(!API){ if(then)then(); return; }
   fetch(API+"?token="+encodeURIComponent(TOK),{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(b)})
     .then(function(r){return r.json();}).then(function(d){ if(d&&!d.error){ S.log=d.log||S.log; S.team=d.team||S.team; S.rota=d.rota||S.rota; S.ann=d.ann||S.ann; save(); } if(then)then(); }).catch(function(){ if(then)then(); });}
@@ -58,7 +58,8 @@ function fdate(d){return d.toLocaleDateString("en-GB",{weekday:"short",day:"nume
 function fwc(d){return "W/c Mon "+d.getDate()+" "+d.toLocaleDateString("en-GB",{month:"short"});}
 function esc(s){return String(s||"").replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 function yes(v){return /^y/i.test((v||"").trim());}
-function wkKey(d){return d.toISOString().slice(0,10);}
+function wkKey(d){return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2);}
+function wkOf(v){ return String(v||"").slice(0,10); }
 
 /* ---------- classify ---------- */
 function classify(ev){ // -> {cls, runway[], weight-base}
@@ -83,7 +84,7 @@ function touchesFor(ev){ // [{wo(weeks out), chans[], stage}]
   });
   return out;
 }
-function logged(ev,ch,wk){ return S.log.some(function(l){return l.ev===ev.id&&l.ch===ch&&l.wk===wk;}); }
+function logged(ev,ch,wk){ return S.log.some(function(l){return l.ev===ev.id&&l.ch===ch&&wkOf(l.wk)===wk;}); }
 function loggedAny(ev){ return S.log.filter(function(l){return l.ev===ev.id;}).length; }
 
 function build(events){
@@ -109,7 +110,7 @@ function build(events){
 /* ---------- render ---------- */
 function chip(ev,ch,wk,extra){
   var done=logged(ev,ch,wk);
-  var who=(S.log.filter(function(l){return l.ev===ev.id&&l.ch===ch&&l.wk===wk;})[0]||{}).who;
+  var who=(S.log.filter(function(l){return l.ev===ev.id&&l.ch===ch&&wkOf(l.wk)===wk;})[0]||{}).who;
   return '<span class="pp-act'+(done?' pp-done':'')+'" data-ev="'+esc(ev.id)+'" data-ch="'+ch+'" data-wk="'+wk+'">'
     +'<span class="pp-bx"></span>'+CHAN_LABEL[ch]+(extra?' · '+esc(extra):'')
     +(who?' <span class="pp-who">'+esc(who.toUpperCase())+'</span>':'')+'</span>';
@@ -154,12 +155,15 @@ function render(model,events){
     }
     h+='</div><span class="pp-annnote">Blank slots auto-fill from the top suggestions at send time, so something always goes out.</span></div>';
     /* events-promoted result pills: n of target, 5-segment bar */
-    var t7=Date.now()-7*864e5, t30=Date.now()-30*864e5, target=Math.max(w.count,1);
+    var t7=Date.now()-7*864e5, t30=Date.now()-30*864e5;
+    var tgt7=Math.max(w.count,1), all30={};
+    model.forEach(function(w2){ w2.rows.forEach(function(r2){ all30[r2.ev.id]=1; }); });
+    var tgt30=Math.max(Object.keys(all30).length,1);
     function promoted(since){ var seen={}; S.log.forEach(function(l){ var t=Date.parse(l.at||""); if(t>=since) seen[l.ev]=1; }); return Object.keys(seen).length; }
-    function spill(label,n,cls){ var pct=Math.min(100,Math.round(n/target*100)), fill=Math.round(pct/20), segs="";
+    function spill(label,n,target,cls){ var pct=Math.min(100,Math.round(n/target*100)), fill=Math.round(pct/20), segs="";
       for(var i2=0;i2<5;i2++) segs+='<i class="'+(i2<fill?'pp-on':'')+'"></i>';
       return '<div class="pp-spill '+cls+'"><span class="pp-spn">'+n+'</span><span class="pp-spl">events promoted<br>'+label+' \u00b7 '+n+' of '+target+'</span><span class="pp-segs">'+segs+'</span><span class="pp-pct">'+pct+'%</span></div>'; }
-    h+='<div class="pp-stats">'+spill("7 days",promoted(t7),"pp-s7")+spill("30 days",promoted(t30),"pp-s30")+'</div>';
+    h+='<div class="pp-stats">'+spill("7 days",promoted(t7),tgt7,"pp-s7")+spill("30 days",promoted(t30),tgt30,"pp-s30")+'</div>';
     /* capacity meters (tally of what's gone out this week) */
     function used(ch){ return S.log.filter(function(l){return l.ch===ch&&l.wk===w.wk;}).length; }
     h+='<div class="pp-caps">'+["enews","whatsapp","fbgroup","insta"].map(function(ch){
@@ -176,7 +180,8 @@ function render(model,events){
       h+='<div class="pp-meta">'+meta+'</div>';
       h+='<div class="pp-copy">Copy for socials: <a data-cp="1" data-ev="'+esc(ev.id)+'">blurb</a> · <a data-cp="2" data-ev="'+esc(ev.id)+'">+ what to expect</a> · <a data-cp="3" data-ev="'+esc(ev.id)+'">+ price & booking</a> · <a data-cp="3i" data-ev="'+esc(ev.id)+'">Insta version</a>'
         +' · <a data-gfx="'+esc(ev.id)+'">get graphic \u2193</a></div>';
-      var chans=r.touch?r.touch.chans:(r.missed?["enews","insta"]:[]);
+      var chans=(r.touch?r.touch.chans:(r.missed?["enews","insta"]:[])).slice();
+      S.log.forEach(function(l){ if(l.ev===ev.id&&wkOf(l.wk)===w.wk&&chans.indexOf(l.ch)<0) chans.push(l.ch); }); // keep done ticks visible
       if(chans.length){ h+='<div class="pp-acts">'+chans.filter(function(c){return c!=="announce";}).map(function(c){return chip(ev,c,w.wk);}).join("")+'</div>'; }
       h+='</div>';
     });
@@ -310,18 +315,19 @@ Promise.all([fetchCSV(WE_SHEET,"Events"),fetchCSV(WC_SHEET,"Talks & series"),fet
     var cp=e.target.closest("[data-cp]");
     if(cp){ var ev2=evById[cp.dataset.ev]; if(ev2) openModal(ev2, parseInt(cp.dataset.cp), /i$/.test(cp.dataset.cp)); return; }
     var gx=e.target.closest("[data-gfx]");
-    if(gx){ var ev3=evById[gx.dataset.ev];
+    if(gx){ var ev3=evById[gx.dataset.gfx];
       if(ev3){ var ty=(ev3.type||"").toLowerCase(), g= /talk/.test(ty)?"talk": /course/.test(ty)?"course": /retreat|away/.test(ty)?"retreat": /silent|depth/.test(ty)?"study": ev3.free?"free":"special";
         try{ location.hash="egm="+encodeURIComponent(JSON.stringify({ty:g,t:ev3.title,d:fdate(ev3.date)+(ev3.time?" \u00b7 "+ev3.time:""),loc:ev3.loc||""})); }catch(err){}
         var tgt=document.getElementById("akx-egm"); if(tgt) tgt.scrollIntoView({behavior:"smooth"}); }
       return; }
     var act=e.target.closest(".pp-act");
     if(act){ var ev=act.dataset.ev,ch2=act.dataset.ch,wk=act.dataset.wk;
-      var i=S.log.findIndex(function(l){return l.ev===ev&&l.ch===ch2&&l.wk===wk;});
-      if(i>-1) S.log.splice(i,1);
+      var i=S.log.findIndex(function(l){return l.ev===ev&&l.ch===ch2&&wkOf(l.wk)===wk;});
+      var act2;
+      if(i>-1){ S.log.splice(i,1); act2={action:"untick",ev:ev,ch:ch2,wk:wk}; }
       else { if(!S.me){alert("Choose who you are (top right) first — ticks are signed.");return;}
-        S.log.push({ev:ev,ch:ch2,wk:wk,who:S.me,at:new Date().toISOString()}); }
-      save();paint();return; }
+        S.log.push({ev:ev,ch:ch2,wk:wk,who:S.me,at:new Date().toISOString()}); act2={action:"tick",ev:ev,ch:ch2,wk:wk,who:S.me}; }
+      save();paint();apiPost(act2,paint);return; }
     var wkhdr=e.target.closest(".pp-wk");
     if(wkhdr){ var b=root.querySelector('[data-wkb="'+wkhdr.dataset.wk+'"]');
       if(b){ var open=b.style.display!=="none"; b.style.display=open?"none":"block";
