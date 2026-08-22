@@ -3,7 +3,7 @@
  *   <div id="akx-egm"></div>
  *   <script src="https://kadampacheltenham.github.io/akx-widgets/epc-events-graphic-tool.js"><\/script>
  * Fill the form -> three PNGs (1080x1080, 1200x628, 1920x600) in the locked type colours/fonts/motifs.
- * v1.4 (20 Aug 2026): quiet colour overrides — background + text (colour name or hex); swirl style still follows the type.
+ * v1.5 (22 Aug 2026): prefill via #egm= hash (planner "get graphic" link). v1.4: quiet colour overrides — background + text (colour name or hex); swirl style still follows the type.
  */
 (function(){
   var root=document.getElementById("akx-egm"); if(!root) return;
@@ -85,10 +85,23 @@
   function slug(){return (val("egm-title")||"event").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");}
   function dl(id){var names={"egm-sq":"square-1080","egm-fb":"banner-1200x628","egm-tt":"banner-1920x600"};
     var a=document.createElement("a");a.download=slug()+"-"+names[id]+".png";a.href=q(id).toDataURL("image/png");document.body.appendChild(a);a.click();a.remove();}
+  function applyHash(){
+    var m=location.hash.match(/egm=([^&]+)/); if(!m) return;
+    try{ var p=JSON.parse(decodeURIComponent(m[1]));
+      if(p.ty&&q("egm-type").querySelector('option[value="'+p.ty+'"]')) q("egm-type").value=p.ty;
+      if(p.t) q("egm-title").value=p.t;
+      if(p.d) q("egm-date").value=p.d;
+      if(p.loc!==undefined) q("egm-loc").value=p.loc;
+      q("egm-sub").value=""; q("egm-pills").value="";
+      drawAll();
+    }catch(err){}
+  }
+  window.addEventListener("hashchange",applyHash);
   root.addEventListener("input",drawAll);
   root.addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;
     if(b.id==="egm-all"){["egm-sq","egm-fb","egm-tt"].forEach(function(id,i){setTimeout(function(){dl(id);},i*400);});} else if(b.dataset.dl) dl(b.dataset.dl);});
   drawAll();
+  applyHash();
   if(document.fonts&&document.fonts.load){Promise.all([document.fonts.load("600 40px Fraunces"),document.fonts.load("600 20px Inter")]).then(drawAll,drawAll);
     document.fonts.ready.then(drawAll);}
   setTimeout(drawAll,1500);
