@@ -1,4 +1,4 @@
-/* AKBC — Promotion planner (volunteer tool on /epc). v1.0.8 (22 Aug 2026)
+/* AKBC — Promotion planner (volunteer tool on /epc). v1.1.0 (22 Aug 2026)
  * Stub on the page:
  *   <div id="akx-promo"></div>
  *   <script src="https://kadampacheltenham.github.io/akx-widgets/epc-planner.js"><\/script>
@@ -21,7 +21,7 @@ var CHAN_LABEL={enews:"eNews",whatsapp:"WhatsApp",fbpost:"FB post",fbgroup:"FB g
 /* which channels suit which weeks-out (windows; refine later) */
 var CHAN_WINDOW={enews:[10,6,4,2],insta:[10,6,4,2,1,0],fbpost:[2,1,0],fbgroup:[4,2,1],whatsapp:[2,1,0],announce:[4,2,1,0]};
 var STAGE={10:"save the date",6:"save the date",4:"announcement + booking link",2:"two weeks — reminder",1:"one week — final push",0:"it’s this week!"};
-var LSK="akx-promo-proto";
+var LSK="akx-promo-proto", VER="1.1.0";
 
 /* ---------- state (prototype: this device only) ---------- */
 var LS={get:function(){try{return localStorage.getItem(LSK);}catch(e){return null;}},set:function(v){try{localStorage.setItem(LSK,v);}catch(e){}}};
@@ -40,9 +40,17 @@ function apiGet(cb){ if(!API){cb();return;} fetch(API+"?token="+encodeURICompone
       local.forEach(function(l){ if(!have[l.ev+"|"+l.ch+"|"+wkOf(l.wk)]){ srv.push(l); apiPost({action:"tick",ev:l.ev,ch:l.ch,wk:wkOf(l.wk),who:l.who||""}); } });
     }
     S.synced2=1; S.log=srv; S.team=d.team||S.team; S.rota=d.rota||S.rota; S.ann=d.ann||S.ann; save(); } cb(); }).catch(function(){cb();});}
+var UNSAVED={};   // key -> true when a tick could not be confirmed on the server
 function apiPost(b,then){ if(!API){ if(then)then(); return; }
+  var key=b.ev&&b.ch?(b.ev+"|"+b.ch+"|"+b.wk):null;
   fetch(API+"?token="+encodeURIComponent(TOK),{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(b)})
-    .then(function(r){return r.json();}).then(function(d){ if(d&&!d.error){ S.log=d.log||S.log; S.team=d.team||S.team; S.rota=d.rota||S.rota; S.ann=d.ann||S.ann; save(); } if(then)then(); }).catch(function(){ if(then)then(); });}
+    .then(function(r){return r.json();}).then(function(d){
+      if(d&&!d.error){ S.log=d.log||S.log; S.team=d.team||S.team; S.rota=d.rota||S.rota; S.ann=d.ann||S.ann; save();
+        if(key){ var on=(S.log||[]).some(function(l){ return l.ev===b.ev&&l.ch===b.ch&&wkOf(l.wk)===wkOf(b.wk); });
+          if((b.action==="tick")===on) delete UNSAVED[key]; else UNSAVED[key]=1; }
+      } else if(key) UNSAVED[key]=1;
+      if(then)then(); })
+    .catch(function(){ if(key) UNSAVED[key]=1; if(then)then(); });}
 
 /* ---------- helpers ---------- */
 function csv(t){var rows=[],row=[],cur="",q=false;for(var i=0;i<t.length;i++){var c=t[i];
@@ -59,7 +67,10 @@ function fwc(d){return "W/c Mon "+d.getDate()+" "+d.toLocaleDateString("en-GB",{
 function esc(s){return String(s||"").replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
 function yes(v){return /^y/i.test((v||"").trim());}
 function wkKey(d){return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2);}
-function wkOf(v){ return String(v||"").slice(0,10); }
+function wkOf(v){ var s=String(v||"").slice(0,10); if(!/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  var d=new Date(s+"T12:00:00"); if(isNaN(d)) return s;
+  if(d.getDay()===0) d.setDate(d.getDate()+1);   // legacy key landed on the Sunday (UTC shift) -> its Monday
+  return wkKey(monday(d)); }
 
 /* ---------- classify ---------- */
 function classify(ev){ // -> {cls, runway[], weight-base}
@@ -111,8 +122,10 @@ function build(events){
 function chip(ev,ch,wk,extra){
   var done=logged(ev,ch,wk);
   var who=(S.log.filter(function(l){return l.ev===ev.id&&l.ch===ch&&wkOf(l.wk)===wk;})[0]||{}).who;
-  return '<span class="pp-act'+(done?' pp-done':'')+'" data-ev="'+esc(ev.id)+'" data-ch="'+ch+'" data-wk="'+wk+'">'
+  var bad=UNSAVED[ev.id+"|"+ch+"|"+wk];
+  return '<span class="pp-act'+(done?' pp-done':'')+(bad?' pp-unsaved':'')+'" data-ev="'+esc(ev.id)+'" data-ch="'+ch+'" data-wk="'+wk+'">'
     +'<span class="pp-bx"></span>'+CHAN_LABEL[ch]+(extra?' · '+esc(extra):'')
+    +(bad?' <span class="pp-warn">not saved \u2014 tap again</span>':'')
     +(who?' <span class="pp-who">'+esc(who.toUpperCase())+'</span>':'')+'</span>';
 }
 function render(model,events){
@@ -164,6 +177,16 @@ function render(model,events){
       for(var i2=0;i2<5;i2++) segs+='<i class="'+(i2<fill?'pp-on':'')+'"></i>';
       return '<div class="pp-spill '+cls+'"><span class="pp-spn">'+n+'</span><span class="pp-spl">events promoted<br>'+label+' \u00b7 '+n+' of '+target+'</span><span class="pp-segs">'+segs+'</span><span class="pp-pct">'+pct+'%</span></div>'; }
     h+='<div class="pp-stats">'+spill("7 days",promoted(t7),tgt7,"pp-s7")+spill("30 days",promoted(t30),tgt30,"pp-s30")+'</div>';
+    /* done this week — what's been done, and by whom */
+    var titleOf={}; events.forEach(function(e2){ titleOf[e2.id]=e2.title; });
+    var doneWk=S.log.filter(function(l){ return wkOf(l.wk)===w.wk; })
+      .sort(function(a,b){ return String(b.at||"").localeCompare(String(a.at||"")); });
+    h+='<div class="pp-done-wrap"><b>\u2713 Done this week ('+doneWk.length+')</b>';
+    if(doneWk.length){ h+='<div class="pp-donelist">'+doneWk.map(function(l){
+        return '<span class="pp-doneitem"><b>'+esc(CHAN_LABEL[l.ch]||l.ch)+'</b> \u00b7 '+esc(titleOf[l.ev]||l.ev)
+          +(l.who?' <span class="pp-who">'+esc(String(l.who).toUpperCase())+'</span>':'')+'</span>'; }).join("")+'</div>';
+    } else { h+='<div class="pp-donenone">Nothing logged yet this week \u2014 tick a channel below as things go out.</div>'; }
+    h+='</div>';
     /* capacity meters (tally of what's gone out this week) */
     function used(ch){ return S.log.filter(function(l){return l.ch===ch&&l.wk===w.wk;}).length; }
     h+='<div class="pp-caps">'+["enews","whatsapp","fbgroup","insta"].map(function(ch){
@@ -222,9 +245,16 @@ root.innerHTML='<style>'
 +'#akx-promo .pp-bx{width:13px;height:13px;border:1.6px solid #9FB0C4;border-radius:3.5px;display:inline-block;position:relative;}'
 +'#akx-promo .pp-done{background:#EAF4EF;border-color:#9CC7B2;color:#2E6B4F;} #akx-promo .pp-done .pp-bx{background:#2E6B4F;border-color:#2E6B4F;} #akx-promo .pp-done .pp-bx:after{content:"✓";color:#fff;font-size:10px;position:absolute;left:1.5px;top:-2.5px;}'
 +'#akx-promo .pp-who{font-size:10.5px;font-weight:600;color:#fff;background:#7A8797;border-radius:999px;padding:2px 7px;}'
++'#akx-promo .pp-unsaved{border-color:#E0A0A0;background:#FBF0EE;} #akx-promo .pp-warn{font-size:10px;font-weight:700;color:#A33B1E;}'
 +'#akx-promo .pp-caps{display:flex;gap:10px;margin:12px 0 18px;flex-wrap:wrap;} #akx-promo .pp-capbox{flex:1;min-width:120px;background:#F6F3EC;border-radius:9px;padding:9px 12px;} #akx-promo .pp-capbox b{font-size:11.5px;font-weight:600;color:#4a5a6e;display:block;margin-bottom:5px;} #akx-promo .pp-meter{height:7px;border-radius:999px;background:#E4DFD2;overflow:hidden;} #akx-promo .pp-meter i{display:block;height:100%;border-radius:999px;background:#2b4c70;} #akx-promo .pp-capbox span{font-size:10.5px;color:#9aa0a6;}'
 +'#akx-promo .pp-team{margin-top:14px;background:#F6F3EC;border-radius:9px;padding:10px 13px;font-size:12px;color:#4a5a6e;} #akx-promo .pp-team b{display:block;margin-bottom:6px;} #akx-promo .pp-teamrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;} #akx-promo .pp-member{font-weight:600;} #akx-promo .pp-rota{font:inherit;font-size:11.5px;border:1px solid #D9D2C4;border-radius:7px;padding:4px 8px;margin-left:5px;width:180px;} #akx-promo .pp-team button{font:inherit;font-size:11.5px;font-weight:600;border:0;border-radius:999px;padding:5px 12px;background:#2b4c70;color:#fff;cursor:pointer;}'
 +'#akx-promo .pp-annhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;}'
++'#akx-promo .pp-done-wrap{background:#F3F8F5;border:1px solid #CFE3D8;border-radius:10px;padding:10px 14px;margin:12px 0 16px;}'
++'#akx-promo .pp-done-wrap>b{font-size:12.5px;color:#2E6B4F;display:block;margin-bottom:7px;}'
++'#akx-promo .pp-donelist{display:flex;flex-wrap:wrap;gap:7px;}'
++'#akx-promo .pp-doneitem{font-size:11.5px;color:#3d4d61;background:#fff;border:1px solid #DDE7E1;border-radius:999px;padding:5px 11px;display:inline-flex;align-items:center;gap:6px;}'
++'#akx-promo .pp-doneitem b{color:#2E6B4F;}'
++'#akx-promo .pp-donenone{font-size:11.5px;color:#8a93a3;font-style:italic;}'
 +'#akx-promo .pp-stats{display:flex;gap:12px;justify-content:center;margin:16px 0 4px;flex-wrap:wrap;}'
 +'#akx-promo .pp-spill{display:flex;align-items:center;gap:12px;border-radius:999px;padding:9px 20px;flex:1;min-width:250px;max-width:360px;}'
 +'#akx-promo .pp-s7{background:#EAF4EF;color:#227A72;} #akx-promo .pp-s30{background:#F8E0D5;color:#B0430F;}'
@@ -273,7 +303,7 @@ Promise.all([fetchCSV(WE_SHEET,"Events"),fetchCSV(WC_SHEET,"Talks & series"),fet
     var cur=model.filter(function(w){return w.current;})[0];
     if(cur&&API){ var sug=cur.rows.slice(0,6).map(function(r){return r.ev.title;}); var key=sug.join("|");
       if(key!==lastSug){ lastSug=key; apiPost({action:"sug",sug:sug}); } } }
-  apiGet(function(){ paint(); var m=document.getElementById("pp-mode"); if(m) m.textContent=API?"Shared mode \u2014 everyone sees the same ticks.":"Prototype: ticks save on this device only."; });
+  apiGet(function(){ paint(); var m=document.getElementById("pp-mode"); if(m) m.textContent=(API?"Shared mode \u2014 everyone sees the same ticks.":"Prototype: ticks save on this device only.")+" \u00b7 v"+VER; });
   var evById={}; events.forEach(function(ev){evById[ev.id]=ev;});
   function postText(ev,lv,insta){
     var out=[ev.title];
