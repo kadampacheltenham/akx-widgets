@@ -1,4 +1,4 @@
-/* AKBC — Promotion planner (volunteer tool on /epc). v1.1.0 (22 Aug 2026)
+/* AKBC — Promotion planner (volunteer tool on /epc). v1.1.1 (22 Aug 2026)
  * Stub on the page:
  *   <div id="akx-promo"></div>
  *   <script src="https://kadampacheltenham.github.io/akx-widgets/epc-planner.js"><\/script>
@@ -21,7 +21,7 @@ var CHAN_LABEL={enews:"eNews",whatsapp:"WhatsApp",fbpost:"FB post",fbgroup:"FB g
 /* which channels suit which weeks-out (windows; refine later) */
 var CHAN_WINDOW={enews:[10,6,4,2],insta:[10,6,4,2,1,0],fbpost:[2,1,0],fbgroup:[4,2,1],whatsapp:[2,1,0],announce:[4,2,1,0]};
 var STAGE={10:"save the date",6:"save the date",4:"announcement + booking link",2:"two weeks — reminder",1:"one week — final push",0:"it’s this week!"};
-var LSK="akx-promo-proto", VER="1.1.0";
+var LSK="akx-promo-proto", VER="1.1.1";
 
 /* ---------- state (prototype: this device only) ---------- */
 var LS={get:function(){try{return localStorage.getItem(LSK);}catch(e){return null;}},set:function(v){try{localStorage.setItem(LSK,v);}catch(e){}}};
@@ -92,6 +92,15 @@ function touchesFor(ev){ // [{wo(weeks out), chans[], stage}]
     var chans=[];
     for(var ch in CHAN_WINDOW) if(CHAN_WINDOW[ch].indexOf(wo)>-1) chans.push(ch);
     out.push({wo:wo,chans:chans,stage:STAGE[wo]||""});
+  });
+  return out;
+}
+function touchWeeks(ev){   // each planned touch: which week it falls in, and how many channel actions it suggests
+  var c=classify(ev), out=[];
+  c.run.forEach(function(wo){
+    var wd=monday(ev.date); wd.setDate(wd.getDate()-7*wo);
+    var n=0; for(var ch in CHAN_WINDOW){ if(ch!=="announce" && CHAN_WINDOW[ch].indexOf(wo)>-1) n++; }
+    out.push({wk:wkKey(wd), n:n});
   });
   return out;
 }
@@ -167,16 +176,22 @@ function render(model,events){
       }
     }
     h+='</div><span class="pp-annnote">Blank slots auto-fill from the top suggestions at send time, so something always goes out.</span></div>';
-    /* events-promoted result pills: n of target, 5-segment bar */
-    var t7=Date.now()-7*864e5, t30=Date.now()-30*864e5;
-    var tgt7=Math.max(w.count,1), all30={};
-    model.forEach(function(w2){ w2.rows.forEach(function(r2){ all30[r2.ev.id]=1; }); });
-    var tgt30=Math.max(Object.keys(all30).length,1);
-    function promoted(since){ var seen={}; S.log.forEach(function(l){ var t=Date.parse(l.at||""); if(t>=since) seen[l.ev]=1; }); return Object.keys(seen).length; }
-    function spill(label,n,target,cls){ var pct=Math.min(100,Math.round(n/target*100)), fill=Math.round(pct/20), segs="";
-      for(var i2=0;i2<5;i2++) segs+='<i class="'+(i2<fill?'pp-on':'')+'"></i>';
-      return '<div class="pp-spill '+cls+'"><span class="pp-spn">'+n+'</span><span class="pp-spl">events promoted<br>'+label+' \u00b7 '+n+' of '+target+'</span><span class="pp-segs">'+segs+'</span><span class="pp-pct">'+pct+'%</span></div>'; }
-    h+='<div class="pp-stats">'+spill("7 days",promoted(t7),tgt7,"pp-s7")+spill("30 days",promoted(t30),tgt30,"pp-s30")+'</div>';
+    /* result pills: ACTIONS done / ACTIONS suggested, 5-segment bar */
+    var now30=Date.now()-30*864e5;
+    var sug7=0, sug30=0;
+    events.forEach(function(ev2){ touchWeeks(ev2).forEach(function(t2){
+      if(t2.wk===w.wk) sug7+=t2.n;
+      var td=new Date(t2.wk+"T12:00:00");
+      if(!isNaN(td) && td.getTime()>=now30 && td.getTime()<=Date.now()) sug30+=t2.n;
+    }); });
+    var done7=S.log.filter(function(l){ return wkOf(l.wk)===w.wk; }).length;
+    var done30=S.log.filter(function(l){ var t=Date.parse(l.at||""); return t>=now30; }).length;
+    function spill(label,n,target,cls){
+      var pct=target>0?Math.min(100,Math.round(n/target*100)):0;
+      var fill = pct<=0?0 : pct<20?1 : pct<40?2 : pct<60?3 : pct<80?4 : 5;
+      var segs=""; for(var i2=0;i2<5;i2++) segs+='<i class="'+(i2<fill?'pp-on':'')+'"></i>';
+      return '<div class="pp-spill '+cls+'"><span class="pp-spn">'+n+'</span><span class="pp-spl">promotion actions done<br>'+label+' \u00b7 '+n+' of '+target+' suggested</span><span class="pp-segs">'+segs+'</span><span class="pp-pct">'+pct+'%</span></div>'; }
+    h+='<div class="pp-stats">'+spill("this week",done7,sug7,"pp-s7")+spill("30 days",done30,sug30,"pp-s30")+'</div>';
     /* done this week — what's been done, and by whom */
     var titleOf={}; events.forEach(function(e2){ titleOf[e2.id]=e2.title; });
     var doneWk=S.log.filter(function(l){ return wkOf(l.wk)===w.wk; })
@@ -283,14 +298,14 @@ Promise.all([fetchCSV(WE_SHEET,"Events"),fetchCSV(WC_SHEET,"Talks & series"),fet
   var eh=E[0];
   var eI={id:idx(eh,"event id"),t:idx(eh,"title"),ty:idx(eh,"event type"),tag:idx(eh,"event tag"),d:idx(eh,"date"),free:idx(eh,"free"),f:idx(eh,"featured"),hp:idx(eh,"hp showcase"),st:idx(eh,"status"),loc:idx(eh,"location"),tm:idx(eh,"time"),sum:idx(eh,"summary"),tid:idx(eh,"teacher id"),wte:idx(eh,"what to expect"),fee:idx(eh,"fee"),disc:idx(eh,"discounts"),bk:idx(eh,"booking link")};
   E.slice(1).forEach(function(r){ if(!r[eI.id]) return; if(/draft/i.test(r[eI.st]||"")) return;
-    var d=dmy(r[eI.d]); if(!d||d<new Date()) return;
+    var d=dmy(r[eI.d]); if(!d||d<new Date(Date.now()-45*864e5)) return;
     events.push({id:r[eI.id],title:r[eI.t],type:r[eI.ty],tag:r[eI.tag],date:d,free:yes(r[eI.free]),feat:yes(r[eI.f]),hp:yes(r[eI.hp]),
       loc:r[eI.loc]||"",time:r[eI.tm]||"",tid:(r[eI.tid]||"").trim(),desc:r[eI.sum]||"",wte:r[eI.wte]||"",fee:r[eI.fee]||"",disc:r[eI.disc]||"",book:r[eI.bk]||""});
   });
   var th=T[0], tI={id:idx(th,"id"),t:idx(th,"title"),ty:idx(th,"type"),f:idx(th,"featured"),hp:idx(th,"hp showcase"),st:idx(th,"status"),desc:idx(th,"description"),wte:idx(th,"what_to_expect"),disc:idx(th,"discount_note")};
   var ch=C[0], cI={id:idx(ch,"id"),dates:idx(ch,"dates"),tm:idx(ch,"time"),loc:idx(ch,"location"),pc:idx(ch,"price_class"),ps:idx(ch,"price_series"),bk:idx(ch,"booking_url")};
   var firstDate={}, cInfo={};
-  C.slice(1).forEach(function(r){ (r[cI.dates]||"").split(",").forEach(function(ds){ var d=dmy(ds); if(d&&d>=new Date()&&(!firstDate[r[cI.id]]||d<firstDate[r[cI.id]])) firstDate[r[cI.id]]=d; });
+  C.slice(1).forEach(function(r){ (r[cI.dates]||"").split(",").forEach(function(ds){ var d=dmy(ds); if(d&&d>=new Date(Date.now()-45*864e5)&&(!firstDate[r[cI.id]]||d<firstDate[r[cI.id]])) firstDate[r[cI.id]]=d; });
     if(!cInfo[r[cI.id]]) cInfo[r[cI.id]]={time:r[cI.tm]||"",loc:r[cI.loc]||"",fee:r[cI.pc]||"",series:r[cI.ps]||"",book:r[cI.bk]||""}; });
   T.slice(1).forEach(function(r){ if(!r[tI.id]) return; if(/draft/i.test(r[tI.st]||"")) return;
     var d=firstDate[r[tI.id]]; if(!d) return;
