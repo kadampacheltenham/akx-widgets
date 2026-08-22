@@ -1,4 +1,4 @@
-/* AKBC — Promotion planner (volunteer tool on /epc). v1.0.1 (22 Aug 2026)
+/* AKBC — Promotion planner (volunteer tool on /epc). v1.0.2 (22 Aug 2026)
  * Stub on the page:
  *   <div id="akx-promo"></div>
  *   <script src="https://kadampacheltenham.github.io/akx-widgets/epc-planner.js"><\/script>
@@ -27,7 +27,7 @@ var LSK="akx-promo-proto";
 var LS={get:function(){try{return localStorage.getItem(LSK);}catch(e){return null;}},set:function(v){try{localStorage.setItem(LSK,v);}catch(e){}}};
 var S=JSON.parse(LS.get()||"{}");
 S.log=S.log||[];               // {ev,ch,wk,who,at}
-S.team=S.team||["Guy","Sarah"]; S.rota=S.rota||{};  // {name:[channels]}
+S.team=S.team||["Guy (EPC)","Betsy"]; S.rota=S.rota||{};  // {name:[channels]}
 S.ann=S.ann||{slots:["","",""]};
 S.me=S.me||"";
 function save(){LS.set(JSON.stringify(S));}
@@ -110,11 +110,10 @@ function chip(ev,ch,wk,extra){
 }
 function render(model,events){
   var now=monday(new Date());
-  var h='<div class="pp-head-row"><h2>Promotion planner</h2>'
-    +'<span class="pp-whoSel">You are: <select id="pp-me"><option value="">choose…</option>'
+  var whoSel='<span class="pp-whoSel">You are: <select id="pp-me"><option value="">choose…</option>'
     +S.team.map(function(n){return '<option'+(S.me===n?' selected':'')+'>'+esc(n)+'</option>';}).join("")
-    +'</select></span></div>'
-    +'<p class="pp-sub">Suggestions computed from the events sheets & what’s been logged — tick as things go out; the plan flexes. <b id="pp-mode"></b></p>';
+    +'</select></span>';
+  var h='<div class="pp-head-row"><h2>Promotion planner</h2></div>';
   model.forEach(function(w){
     if(!w.current){
       var busy=w.rows.filter(function(r){return r.touch;}).length> (CAPS.whatsapp+CAPS.insta+CAPS.fbgroup);
@@ -122,13 +121,31 @@ function render(model,events){
       +'<div class="pp-wkbody" data-wkb="'+w.wk+'" style="display:none"></div>';
       return;
     }
-    h+='<div class="pp-now"><div class="pp-nowhead"><b>THIS WEEK · '+fwc(w.wd)+'</b><span>'
+    h+='<div class="pp-head-row" style="margin-top:10px"><span></span>'+whoSel+'</div>'
+      +'<p class="pp-sub" style="margin:4px 0 8px">Suggestions computed from the events sheets & what’s been logged — tick as things go out; the plan flexes. <b id="pp-mode"></b></p>'
+      +'<div class="pp-now"><div class="pp-nowhead"><b>THIS WEEK · '+fwc(w.wd)+'</b><span>'
       +w.rows.filter(function(r){return r.touch;}).length+' events with suggested actions</span></div>';
-    /* announcements strip */
-    var top3=w.rows.slice(0,3).map(function(r){return esc(r.ev.title);});
-    h+='<div class="pp-ann"><b>\u{1F4E3} Class announcements (Mon 12:30 email → info@ & teacher@):</b> '
-      +(top3.length?top3.join(" · "):"nothing on runway")
-      +' <span class="pp-annnote">auto-suggested · Guy can adjust or add non-event items (build step 2)</span></div>';
+    /* announcements strip: slot 1 blank for Guy; 2-3 pre-suggested; blanks auto-fill at Mon 12:30 send */
+    var sugs=w.rows.slice(0,6).map(function(r){return r.ev.title;});
+    var slots=(S.ann&&S.ann.slots)||["","",""];
+    var isGuy=/^guy/i.test(S.me||"");
+    var nm=new Date(); nm.setDate(nm.getDate()+((8-nm.getDay())%7||7)); nm.setHours(12,30,0,0);
+    if(nm-new Date()<0) nm.setDate(nm.getDate()+7);
+    var ms=nm-new Date(), cd=Math.floor(ms/864e5)+'d '+Math.floor(ms%864e5/36e5)+'h';
+    h+='<div class="pp-ann"><b>\u{1F4E3} Class announcements — emailed Mon 12:30 to info@ & teacher@ <span class="pp-annnote" style="display:inline">(sends in '+cd+')</span></b><div class="pp-annrow">';
+    for(var i=0;i<3;i++){
+      var val=slots[i]||"", dflt=i>0?(sugs[i-1]||""):"";
+      if(isGuy){
+        h+='<span class="pp-annslot">'+(i+1)+'. <select class="pp-annsel" data-i="'+i+'">'
+          +'<option value=""'+(val?'':' selected')+'>'+(i===0?'— your pick, Guy —':(dflt?'(suggested) '+esc(dflt):'— choose —'))+'</option>'
+          +sugs.map(function(t){return '<option'+(val===t?' selected':'')+'>'+esc(t)+'</option>';}).join("")
+          +'<option value="__other"'+(val&&sugs.indexOf(val)<0?' selected':'')+'>'+(val&&sugs.indexOf(val)<0?esc(val):'Other (type it)…')+'</option>'
+          +'</select></span>';
+      } else {
+        h+='<span class="pp-annslot">'+(i+1)+'. '+(val?esc(val):(i===0?'<i>Guy to choose</i>':(dflt?'(suggested) '+esc(dflt):'—')))+'</span>';
+      }
+    }
+    h+='</div><span class="pp-annnote">Blank slots auto-fill from the top suggestions at send time, so something always goes out.</span></div>';
     w.rows.forEach(function(r){
       var ev=r.ev, cls= r.missed?'pp-ev pp-warn' : (r.touch?'pp-ev':'pp-ev pp-quiet');
       h+='<div class="'+cls+'"><div class="pp-evtop"><b>'+esc(ev.title)+'</b>'+typeTag(ev)+tierBadge(ev)+'</div>';
@@ -147,7 +164,7 @@ function render(model,events){
       var u=used(ch),c=CAPS[ch];
       return '<div class="pp-capbox"><b>'+CHAN_LABEL[ch]+(ch==="enews"?" (next issue)":" this wk")+'</b><div class="pp-meter"><i style="width:'+Math.min(100,u/c*100)+'%"></i></div><span>'+u+' of '+c+'</span></div>';}).join("")+'</div>';
     /* team panel for Guy */
-    if(S.me==="Guy"){
+    if(/^guy/i.test(S.me||"")){
       h+='<div class="pp-team"><b>Team & rota (visible to Guy)</b><div class="pp-teamrow">'
         +S.team.map(function(n){return '<span class="pp-member">'+esc(n)+' <input class="pp-rota" data-n="'+esc(n)+'" placeholder="channels e.g. eNews, Insta" value="'+esc((S.rota[n]||[]).join(", "))+'"></span>';}).join("")
         +'<button id="pp-add">+ add person</button></div></div>';
