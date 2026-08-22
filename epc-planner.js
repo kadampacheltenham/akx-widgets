@@ -1,4 +1,4 @@
-/* AKBC — Promotion planner (volunteer tool on /epc). v1.0.4 (22 Aug 2026)
+/* AKBC — Promotion planner (volunteer tool on /epc). v1.0.5 (22 Aug 2026)
  * Stub on the page:
  *   <div id="akx-promo"></div>
  *   <script src="https://kadampacheltenham.github.io/akx-widgets/epc-planner.js"><\/script>
@@ -33,7 +33,13 @@ S.me=S.me||"";
 function save(){LS.set(JSON.stringify(S));}
 var API=root.dataset.api||"https://script.google.com/macros/s/AKfycbz3SDO43X4ZF6Tq489LrfUeqp13knlY4w3yWyZTLd7rZXIgtEbNh3zVwanfxlJTZXVwjQ/exec";
 var TOK=root.dataset.token||"cf38d295b1";
-function apiGet(cb){ if(!API){cb();return;} fetch(API+"?token="+encodeURIComponent(TOK)).then(function(r){return r.json();}).then(function(d){ if(d&&!d.error){ S.log=d.log||[]; S.team=d.team||S.team; S.rota=d.rota||S.rota; S.ann=d.ann||S.ann; save(); } cb(); }).catch(function(){cb();});}
+function apiGet(cb){ if(!API){cb();return;} fetch(API+"?token="+encodeURIComponent(TOK)).then(function(r){return r.json();}).then(function(d){ if(d&&!d.error){
+    var srv=d.log||[], local=S.log||[];
+    if(!S.synced&&local.length){ // one-time: push ticks made before shared mode
+      var have={}; srv.forEach(function(l){have[l.ev+"|"+l.ch+"|"+l.wk]=1;});
+      local.forEach(function(l){ if(!have[l.ev+"|"+l.ch+"|"+l.wk]){ srv.push(l); apiPost({action:"tick",ev:l.ev,ch:l.ch,wk:l.wk,who:l.who||""}); } });
+    }
+    S.synced=1; S.log=srv; S.team=d.team||S.team; S.rota=d.rota||S.rota; S.ann=d.ann||S.ann; save(); } cb(); }).catch(function(){cb();});}
 function apiPost(b,then){ if(!API){ if(then)then(); return; }
   fetch(API+"?token="+encodeURIComponent(TOK),{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(b)})
     .then(function(r){return r.json();}).then(function(d){ if(d&&!d.error){ S.log=d.log||S.log; S.team=d.team||S.team; S.rota=d.rota||S.rota; S.ann=d.ann||S.ann; save(); } if(then)then(); }).catch(function(){ if(then)then(); });}
@@ -147,11 +153,13 @@ function render(model,events){
       }
     }
     h+='</div><span class="pp-annnote">Blank slots auto-fill from the top suggestions at send time, so something always goes out.</span></div>';
-    /* events-promoted tallies */
-    var t7=Date.now()-7*864e5, t30=Date.now()-30*864e5;
+    /* events-promoted result pills: n of target, 5-segment bar */
+    var t7=Date.now()-7*864e5, t30=Date.now()-30*864e5, target=Math.max(w.count,1);
     function promoted(since){ var seen={}; S.log.forEach(function(l){ var t=Date.parse(l.at||""); if(t>=since) seen[l.ev]=1; }); return Object.keys(seen).length; }
-    h+='<div class="pp-stats"><div class="pp-stat"><span class="pp-statn">'+promoted(t7)+'</span><span class="pp-statl">events promoted \u00b7 7 days</span></div>'
-      +'<div class="pp-stat"><span class="pp-statn">'+promoted(t30)+'</span><span class="pp-statl">events promoted \u00b7 30 days</span></div></div>';
+    function spill(label,n,cls){ var pct=Math.min(100,Math.round(n/target*100)), fill=Math.round(pct/20), segs="";
+      for(var i2=0;i2<5;i2++) segs+='<i class="'+(i2<fill?'pp-on':'')+'"></i>';
+      return '<div class="pp-spill '+cls+'"><span class="pp-spn">'+n+'</span><span class="pp-spl">events promoted<br>'+label+' \u00b7 '+n+' of '+target+'</span><span class="pp-segs">'+segs+'</span><span class="pp-pct">'+pct+'%</span></div>'; }
+    h+='<div class="pp-stats">'+spill("7 days",promoted(t7),"pp-s7")+spill("30 days",promoted(t30),"pp-s30")+'</div>';
     /* capacity meters (tally of what's gone out this week) */
     function used(ch){ return S.log.filter(function(l){return l.ch===ch&&l.wk===w.wk;}).length; }
     h+='<div class="pp-caps">'+["enews","whatsapp","fbgroup","insta"].map(function(ch){
@@ -187,7 +195,7 @@ function render(model,events){
 /* ---------- shell + styles ---------- */
 root.innerHTML='<style>'
 +'#akx-promo{font-family:Inter,-apple-system,Segoe UI,Roboto,sans-serif;color:#1F2A3C;max-width:1000px;margin:0 auto;background:#fbfaf8;border-radius:12px;padding:24px 26px;}'
-+'#akx-promo h2{font-size:24px;font-weight:700;color:#2b4c70;margin:0;}'
++'#akx-promo h2{font-size:24px;font-weight:700;color:#2b4c70;margin:0 0 14px;}'
 +'#akx-promo .pp-head-row{display:flex;justify-content:space-between;align-items:center;}'
 +'#akx-promo .pp-whoSel{font-size:13px;font-weight:600;color:#2b4c70;}'
 +'#akx-promo .pp-whoSel select{font:inherit;border:1.4px solid #C9D4E2;border-radius:999px;padding:5px 10px;background:#fff;color:#2b4c70;}'
@@ -213,10 +221,15 @@ root.innerHTML='<style>'
 +'#akx-promo .pp-caps{display:flex;gap:10px;margin:12px 0 18px;flex-wrap:wrap;} #akx-promo .pp-capbox{flex:1;min-width:120px;background:#F6F3EC;border-radius:9px;padding:9px 12px;} #akx-promo .pp-capbox b{font-size:11.5px;font-weight:600;color:#4a5a6e;display:block;margin-bottom:5px;} #akx-promo .pp-meter{height:7px;border-radius:999px;background:#E4DFD2;overflow:hidden;} #akx-promo .pp-meter i{display:block;height:100%;border-radius:999px;background:#2b4c70;} #akx-promo .pp-capbox span{font-size:10.5px;color:#9aa0a6;}'
 +'#akx-promo .pp-team{margin-top:14px;background:#F6F3EC;border-radius:9px;padding:10px 13px;font-size:12px;color:#4a5a6e;} #akx-promo .pp-team b{display:block;margin-bottom:6px;} #akx-promo .pp-teamrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;} #akx-promo .pp-member{font-weight:600;} #akx-promo .pp-rota{font:inherit;font-size:11.5px;border:1px solid #D9D2C4;border-radius:7px;padding:4px 8px;margin-left:5px;width:180px;} #akx-promo .pp-team button{font:inherit;font-size:11.5px;font-weight:600;border:0;border-radius:999px;padding:5px 12px;background:#2b4c70;color:#fff;cursor:pointer;}'
 +'#akx-promo .pp-annhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;}'
-+'#akx-promo .pp-stats{display:flex;gap:14px;justify-content:center;margin:16px 0 4px;}'
-+'#akx-promo .pp-stat{background:#F6F3EC;border-radius:10px;padding:10px 26px;text-align:center;min-width:120px;}'
-+'#akx-promo .pp-statn{display:block;font-size:24px;font-weight:700;color:#2b4c70;line-height:1.1;}'
-+'#akx-promo .pp-statl{font-size:10.5px;color:#8a93a3;}'
++'#akx-promo .pp-stats{display:flex;gap:12px;justify-content:center;margin:16px 0 4px;flex-wrap:wrap;}'
++'#akx-promo .pp-spill{display:flex;align-items:center;gap:12px;border-radius:999px;padding:9px 20px;flex:1;min-width:250px;max-width:360px;}'
++'#akx-promo .pp-s7{background:#EAF4EF;color:#227A72;} #akx-promo .pp-s30{background:#F7EEDC;color:#8a5c12;}'
++'#akx-promo .pp-spn{font-size:26px;font-weight:700;line-height:1;}'
++'#akx-promo .pp-spl{font-size:10px;line-height:1.35;color:inherit;opacity:.85;font-weight:600;}'
++'#akx-promo .pp-segs{display:flex;gap:3px;margin-left:auto;}'
++'#akx-promo .pp-segs i{width:20px;height:9px;border-radius:5px;background:rgba(0,0,0,.10);display:inline-block;}'
++'#akx-promo .pp-segs i.pp-on{background:currentColor;}'
++'#akx-promo .pp-pct{font-size:13px;font-weight:700;}'
 +'#akx-promo .pp-cd{font-size:13.5px;font-weight:700;border-radius:999px;padding:6px 14px;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,.08);}'
 +'@keyframes ppPulse{50%{opacity:.55}} #akx-promo .pp-cd-r{animation:ppPulse 1.2s infinite;}'
 +'#akx-promo .pp-cd-g{background:#EAF4EF;color:#2E6B4F;} #akx-promo .pp-cd-a{background:#FBF3DC;color:#8a6d1f;} #akx-promo .pp-cd-r{background:#F9E3DC;color:#A33B1E;}'
