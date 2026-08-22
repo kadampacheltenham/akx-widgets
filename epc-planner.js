@@ -1,4 +1,4 @@
-/* AKBC — Promotion planner (volunteer tool on /epc). v1.0.3 (22 Aug 2026)
+/* AKBC — Promotion planner (volunteer tool on /epc). v1.0.4 (22 Aug 2026)
  * Stub on the page:
  *   <div id="akx-promo"></div>
  *   <script src="https://kadampacheltenham.github.io/akx-widgets/epc-planner.js"><\/script>
@@ -133,7 +133,7 @@ function render(model,events){
     if(nm-new Date()<0) nm.setDate(nm.getDate()+7);
     var ms=nm-new Date(), cd=Math.floor(ms/864e5)+'d '+Math.floor(ms%864e5/36e5)+'h';
     var cdc=ms<36*36e5?'pp-cd-r':(ms<60*36e5?'pp-cd-a':'pp-cd-g');
-    h+='<div class="pp-ann"><div class="pp-annhead"><b>\u{1F4E3} Weekly class announcements — emailed Mon 12 noon to info@ & teacher@</b><span class="pp-cd '+cdc+'">sends in '+cd+'</span></div><div class="pp-annrow">';
+    h+='<div class="pp-ann"><div class="pp-annhead"><b>\u{1F4E3} Weekly class announcements — emailed Mon 12 noon to info@ & teacher@</b><span class="pp-cd '+cdc+'">\u23F0 sends in '+cd+'</span></div><div class="pp-annrow">';
     for(var i=0;i<3;i++){
       var val=slots[i]||"", dflt=i>0?(sugs[i-1]||""):"";
       if(isGuy){
@@ -147,6 +147,11 @@ function render(model,events){
       }
     }
     h+='</div><span class="pp-annnote">Blank slots auto-fill from the top suggestions at send time, so something always goes out.</span></div>';
+    /* events-promoted tallies */
+    var t7=Date.now()-7*864e5, t30=Date.now()-30*864e5;
+    function promoted(since){ var seen={}; S.log.forEach(function(l){ var t=Date.parse(l.at||""); if(t>=since) seen[l.ev]=1; }); return Object.keys(seen).length; }
+    h+='<div class="pp-stats"><div class="pp-stat"><span class="pp-statn">'+promoted(t7)+'</span><span class="pp-statl">events promoted \u00b7 7 days</span></div>'
+      +'<div class="pp-stat"><span class="pp-statn">'+promoted(t30)+'</span><span class="pp-statl">events promoted \u00b7 30 days</span></div></div>';
     /* capacity meters (tally of what's gone out this week) */
     function used(ch){ return S.log.filter(function(l){return l.ch===ch&&l.wk===w.wk;}).length; }
     h+='<div class="pp-caps">'+["enews","whatsapp","fbgroup","insta"].map(function(ch){
@@ -161,9 +166,11 @@ function render(model,events){
       else if(r.touch) meta+=' · <span class="pp-stage">'+esc(r.touch.stage)+'</span>';
       else meta+=' · <span class="pp-quietnote">on runway — nothing due this week — promote early if space allows</span>';
       h+='<div class="pp-meta">'+meta+'</div>';
+      h+='<div class="pp-copy">Copy for socials: <a data-cp="1" data-ev="'+esc(ev.id)+'">blurb</a> · <a data-cp="2" data-ev="'+esc(ev.id)+'">+ what to expect</a> · <a data-cp="3" data-ev="'+esc(ev.id)+'">+ price & booking</a> · <a data-cp="3i" data-ev="'+esc(ev.id)+'">Insta version</a>'
+        +' · <a data-gfx="'+esc(ev.id)+'">get graphic \u2193</a>'
+        +(ev.tid?' · <a href="https://raw.githubusercontent.com/kadampacheltenham/akx-widgets/main/images/teachers/'+esc(ev.tid)+'.jpg" target="_blank" rel="noopener">teacher photo</a>':'')+'</div>';
       var chans=r.touch?r.touch.chans:(r.missed?["enews","insta"]:[]);
       if(chans.length){ h+='<div class="pp-acts">'+chans.filter(function(c){return c!=="announce";}).map(function(c){return chip(ev,c,w.wk);}).join("")+'</div>'; }
-      h+='<div class="pp-copy">Copy for socials: <a data-cp="1" data-ev="'+esc(ev.id)+'">blurb</a> · <a data-cp="2" data-ev="'+esc(ev.id)+'">+ what to expect</a> · <a data-cp="3" data-ev="'+esc(ev.id)+'">+ price & booking</a> · <a data-cp="3i" data-ev="'+esc(ev.id)+'">Insta version</a></div>';
       h+='</div>';
     });
     /* team panel for Guy */
@@ -203,17 +210,23 @@ root.innerHTML='<style>'
 +'#akx-promo .pp-bx{width:13px;height:13px;border:1.6px solid #9FB0C4;border-radius:3.5px;display:inline-block;position:relative;}'
 +'#akx-promo .pp-done{background:#EAF4EF;border-color:#9CC7B2;color:#2E6B4F;} #akx-promo .pp-done .pp-bx{background:#2E6B4F;border-color:#2E6B4F;} #akx-promo .pp-done .pp-bx:after{content:"✓";color:#fff;font-size:10px;position:absolute;left:1.5px;top:-2.5px;}'
 +'#akx-promo .pp-who{font-size:10.5px;font-weight:600;color:#fff;background:#7A8797;border-radius:999px;padding:2px 7px;}'
-+'#akx-promo .pp-caps{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;} #akx-promo .pp-capbox{flex:1;min-width:120px;background:#F6F3EC;border-radius:9px;padding:9px 12px;} #akx-promo .pp-capbox b{font-size:11.5px;font-weight:600;color:#4a5a6e;display:block;margin-bottom:5px;} #akx-promo .pp-meter{height:7px;border-radius:999px;background:#E4DFD2;overflow:hidden;} #akx-promo .pp-meter i{display:block;height:100%;border-radius:999px;background:#2b4c70;} #akx-promo .pp-capbox span{font-size:10.5px;color:#9aa0a6;}'
++'#akx-promo .pp-caps{display:flex;gap:10px;margin:12px 0 18px;flex-wrap:wrap;} #akx-promo .pp-capbox{flex:1;min-width:120px;background:#F6F3EC;border-radius:9px;padding:9px 12px;} #akx-promo .pp-capbox b{font-size:11.5px;font-weight:600;color:#4a5a6e;display:block;margin-bottom:5px;} #akx-promo .pp-meter{height:7px;border-radius:999px;background:#E4DFD2;overflow:hidden;} #akx-promo .pp-meter i{display:block;height:100%;border-radius:999px;background:#2b4c70;} #akx-promo .pp-capbox span{font-size:10.5px;color:#9aa0a6;}'
 +'#akx-promo .pp-team{margin-top:14px;background:#F6F3EC;border-radius:9px;padding:10px 13px;font-size:12px;color:#4a5a6e;} #akx-promo .pp-team b{display:block;margin-bottom:6px;} #akx-promo .pp-teamrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;} #akx-promo .pp-member{font-weight:600;} #akx-promo .pp-rota{font:inherit;font-size:11.5px;border:1px solid #D9D2C4;border-radius:7px;padding:4px 8px;margin-left:5px;width:180px;} #akx-promo .pp-team button{font:inherit;font-size:11.5px;font-weight:600;border:0;border-radius:999px;padding:5px 12px;background:#2b4c70;color:#fff;cursor:pointer;}'
 +'#akx-promo .pp-annhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;}'
-+'#akx-promo .pp-cd{font-size:11.5px;font-weight:700;border-radius:999px;padding:3px 10px;white-space:nowrap;}'
++'#akx-promo .pp-stats{display:flex;gap:14px;justify-content:center;margin:16px 0 4px;}'
++'#akx-promo .pp-stat{background:#F6F3EC;border-radius:10px;padding:10px 26px;text-align:center;min-width:120px;}'
++'#akx-promo .pp-statn{display:block;font-size:24px;font-weight:700;color:#2b4c70;line-height:1.1;}'
++'#akx-promo .pp-statl{font-size:10.5px;color:#8a93a3;}'
++'#akx-promo .pp-cd{font-size:13.5px;font-weight:700;border-radius:999px;padding:6px 14px;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,.08);}'
++'@keyframes ppPulse{50%{opacity:.55}} #akx-promo .pp-cd-r{animation:ppPulse 1.2s infinite;}'
 +'#akx-promo .pp-cd-g{background:#EAF4EF;color:#2E6B4F;} #akx-promo .pp-cd-a{background:#FBF3DC;color:#8a6d1f;} #akx-promo .pp-cd-r{background:#F9E3DC;color:#A33B1E;}'
 +'#akx-promo .pp-copy{font-size:11.5px;color:#8a93a3;margin-top:8px;} #akx-promo .pp-copy a{color:#2A66A6;cursor:pointer;text-decoration:underline;}'
 +'#akx-promo .pp-modal{position:fixed;inset:0;background:rgba(31,42,60,.45);display:flex;align-items:center;justify-content:center;z-index:9999;}'
 +'#akx-promo .pp-mbox{background:#fff;border-radius:12px;padding:18px;width:min(560px,92vw);box-shadow:0 12px 40px rgba(0,0,0,.25);}'
 +'#akx-promo .pp-mbox b{font-size:14px;color:#2b4c70;} #akx-promo .pp-mbox textarea{width:100%;box-sizing:border-box;height:260px;font:13px/1.5 Inter,sans-serif;border:1px solid #D9D2C4;border-radius:8px;padding:10px;margin:10px 0;color:#1F2A3C;}'
 +'#akx-promo .pp-mbtns{display:flex;gap:8px;justify-content:flex-end;} #akx-promo .pp-mbtns button{font:600 13px Inter,sans-serif;border:0;border-radius:999px;padding:8px 16px;cursor:pointer;} #akx-promo .pp-mcopy{background:#2b4c70;color:#fff;} #akx-promo .pp-mclose{background:#EDEAE2;color:#4a5a6e;}'
-+'@media(max-width:640px){#akx-promo{padding:14px 12px;} #akx-promo .pp-head-row{flex-direction:column;align-items:flex-start;gap:6px;}}'
++'@media(max-width:640px){#akx-promo{padding:14px 12px;} #akx-promo .pp-head-row{flex-direction:column;align-items:flex-start;gap:6px;}'
++' #akx-promo .pp-act{padding:9px 14px;font-size:13px;} #akx-promo .pp-copy{font-size:12.5px;line-height:2.1;} #akx-promo .pp-annsel{max-width:100%;width:100%;} #akx-promo .pp-annslot{width:100%;} #akx-promo .pp-mbox textarea{height:200px;} #akx-promo .pp-capbox{min-width:44%;}}'
 +'</style><div class="pp-body"><p style="color:#9aa0a6;font-size:13px">Loading events…</p></div>';
 
 /* ---------- events from sheets ---------- */
@@ -221,11 +234,11 @@ function fetchCSV(id,sheet){return fetch("https://docs.google.com/spreadsheets/d
 Promise.all([fetchCSV(WE_SHEET,"Events"),fetchCSV(WC_SHEET,"Talks & series"),fetchCSV(WC_SHEET,"Class times")]).then(function(res){
   var E=res[0],T=res[1],C=res[2],events=[];
   var eh=E[0];
-  var eI={id:idx(eh,"event id"),t:idx(eh,"title"),ty:idx(eh,"event type"),tag:idx(eh,"event tag"),d:idx(eh,"date"),free:idx(eh,"free"),f:idx(eh,"featured"),hp:idx(eh,"hp showcase"),st:idx(eh,"status"),loc:idx(eh,"location"),tm:idx(eh,"time"),sum:idx(eh,"summary"),wte:idx(eh,"what to expect"),fee:idx(eh,"fee"),disc:idx(eh,"discounts"),bk:idx(eh,"booking link")};
+  var eI={id:idx(eh,"event id"),t:idx(eh,"title"),ty:idx(eh,"event type"),tag:idx(eh,"event tag"),d:idx(eh,"date"),free:idx(eh,"free"),f:idx(eh,"featured"),hp:idx(eh,"hp showcase"),st:idx(eh,"status"),loc:idx(eh,"location"),tm:idx(eh,"time"),sum:idx(eh,"summary"),tid:idx(eh,"teacher id"),wte:idx(eh,"what to expect"),fee:idx(eh,"fee"),disc:idx(eh,"discounts"),bk:idx(eh,"booking link")};
   E.slice(1).forEach(function(r){ if(!r[eI.id]) return; if(/draft/i.test(r[eI.st]||"")) return;
     var d=dmy(r[eI.d]); if(!d||d<new Date()) return;
     events.push({id:r[eI.id],title:r[eI.t],type:r[eI.ty],tag:r[eI.tag],date:d,free:yes(r[eI.free]),feat:yes(r[eI.f]),hp:yes(r[eI.hp]),
-      loc:r[eI.loc]||"",time:r[eI.tm]||"",desc:r[eI.sum]||"",wte:r[eI.wte]||"",fee:r[eI.fee]||"",disc:r[eI.disc]||"",book:r[eI.bk]||""});
+      loc:r[eI.loc]||"",time:r[eI.tm]||"",tid:(r[eI.tid]||"").trim(),desc:r[eI.sum]||"",wte:r[eI.wte]||"",fee:r[eI.fee]||"",disc:r[eI.disc]||"",book:r[eI.bk]||""});
   });
   var th=T[0], tI={id:idx(th,"id"),t:idx(th,"title"),ty:idx(th,"type"),f:idx(th,"featured"),hp:idx(th,"hp showcase"),st:idx(th,"status"),desc:idx(th,"description"),wte:idx(th,"what_to_expect"),disc:idx(th,"discount_note")};
   var ch=C[0], cI={id:idx(ch,"id"),dates:idx(ch,"dates"),tm:idx(ch,"time"),loc:idx(ch,"location"),pc:idx(ch,"price_class"),ps:idx(ch,"price_series"),bk:idx(ch,"booking_url")};
@@ -284,6 +297,12 @@ Promise.all([fetchCSV(WE_SHEET,"Events"),fetchCSV(WC_SHEET,"Talks & series"),fet
   root.addEventListener("click",function(e){
     var cp=e.target.closest("[data-cp]");
     if(cp){ var ev2=evById[cp.dataset.ev]; if(ev2) openModal(ev2, parseInt(cp.dataset.cp), /i$/.test(cp.dataset.cp)); return; }
+    var gx=e.target.closest("[data-gfx]");
+    if(gx){ var ev3=evById[gx.dataset.ev];
+      if(ev3){ var ty=(ev3.type||"").toLowerCase(), g= /talk/.test(ty)?"talk": /course/.test(ty)?"course": /retreat|away/.test(ty)?"retreat": /silent|depth/.test(ty)?"study": ev3.free?"free":"special";
+        try{ location.hash="egm="+encodeURIComponent(JSON.stringify({ty:g,t:ev3.title,d:fdate(ev3.date)+(ev3.time?" \u00b7 "+ev3.time:""),loc:ev3.loc||""})); }catch(err){}
+        var tgt=document.getElementById("akx-egm"); if(tgt) tgt.scrollIntoView({behavior:"smooth"}); }
+      return; }
     var act=e.target.closest(".pp-act");
     if(act){ var ev=act.dataset.ev,ch2=act.dataset.ch,wk=act.dataset.wk;
       var i=S.log.findIndex(function(l){return l.ev===ev&&l.ch===ch2&&l.wk===wk;});
