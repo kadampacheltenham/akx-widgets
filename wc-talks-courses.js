@@ -1,4 +1,4 @@
-/* Akanishta &mdash; TALKS & SHORT COURSES widget (the programme of talks / courses / free / in-depth / special).
+/* Akanishta &mdash; TALKS & SHORT COURSES widget  [23 Aug 2026: swirl motif option E — opacity .28, 187.5% scale] (the programme of talks / courses / free / in-depth / special).
    (Was wc-programme.js &mdash; renamed to wc-talks-courses.js so "programme" can't be confused with the page/section.)
    Reads a public Google Sheet (tabs "Talks & series" + "Class times") and renders flyer cards.
    The event TYPE (col C) sets colour + motif via the shared taxonomy in event-graphics.js.
@@ -43,7 +43,7 @@
   .gfx{grid-area:gfx;width:190px;height:190px;border-radius:14px;overflow:hidden;flex:none;position:relative;background:var(--type);}
   .gfx img{width:100%;height:100%;object-fit:cover;display:block;}
   .gfx img.byid{position:absolute;inset:0;z-index:1;}
-  .gfx .motif{position:absolute;top:50%;left:50%;width:150%;height:150%;transform:translate(-50%,-50%);opacity:.20;pointer-events:none;}
+  .gfx .motif{position:absolute;top:50%;left:50%;width:187.5%;height:187.5%;transform:translate(-50%,-50%);opacity:.28;pointer-events:none;}
   /* mini-poster text (Fable recipe): type label + title + date, over the type colour or a photo */
   .gfx .gtxt{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;padding:16px;color:#fff;background:linear-gradient(to top,rgba(0,0,0,.30),rgba(0,0,0,0) 46%);pointer-events:none;}
   .gfx .glabel{font-family:'Inter',system-ui,sans-serif;font-weight:700;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;opacity:.92;}
