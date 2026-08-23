@@ -1,4 +1,4 @@
-/* AKBC — Promotion planner (volunteer tool on /epc). v1.1.1 (22 Aug 2026)
+/* AKBC — Promotion planner (volunteer tool on /epc). v1.1.2 (23 Aug 2026)
  * Stub on the page:
  *   <div id="akx-promo"></div>
  *   <script src="https://kadampacheltenham.github.io/akx-widgets/epc-planner.js"><\/script>
@@ -16,12 +16,13 @@ var WE_SHEET="1g8VSqkv9zIR375RDf9R-B-34zMhsHXoZUxYZ"; // placeholder overwritten
 WE_SHEET="1g8VSqkv9zIR375RDf9R-B-34zMhsHXoUYx7ZYhuXlmk";
 var WC_SHEET="1YArubV8QgCvPUIIvHOHWhCN2fYLRz0DDPSRSHD_tSmY";
 var WEEKS_AHEAD=5;
-var CAPS={enews:4,whatsapp:2,fbgroup:3,insta:2,fbpost:3,announce:3};
+var CAPS={enews:4,whatsapp:2,fbgroup:0,insta:2,fbpost:2,announce:3}; // fbgroup 0 = no weekly goal
+var FB_EVENT_GOAL=5;   // "Fb this week": events promoted on Facebook (organic OR groups)
 var CHAN_LABEL={enews:"eNews",whatsapp:"WhatsApp",fbpost:"FB post",fbgroup:"FB group",insta:"Insta",announce:"Announce"};
 /* which channels suit which weeks-out (windows; refine later) */
 var CHAN_WINDOW={enews:[10,6,4,2],insta:[10,6,4,2,1,0],fbpost:[2,1,0],fbgroup:[4,2,1],whatsapp:[2,1,0],announce:[4,2,1,0]};
 var STAGE={10:"save the date",6:"save the date",4:"announcement + booking link",2:"two weeks — reminder",1:"one week — final push",0:"it’s this week!"};
-var LSK="akx-promo-proto", VER="1.1.1";
+var LSK="akx-promo-proto", VER="1.1.2";
 
 /* ---------- state (prototype: this device only) ---------- */
 var LS={get:function(){try{return localStorage.getItem(LSK);}catch(e){return null;}},set:function(v){try{localStorage.setItem(LSK,v);}catch(e){}}};
@@ -145,7 +146,7 @@ function render(model,events){
   var h='<div class="pp-head-row"><h2>Promotion planner</h2></div>';
   model.forEach(function(w){
     if(!w.current){
-      var busy=w.rows.filter(function(r){return r.touch;}).length> (CAPS.whatsapp+CAPS.insta+CAPS.fbgroup);
+      var busy=w.rows.filter(function(r){return r.touch;}).length> (CAPS.whatsapp+CAPS.insta+FB_EVENT_GOAL);
       h+='<div class="pp-wk" data-wk="'+w.wk+'"><span><b>'+fwc(w.wd)+'</b> <span class="pp-d">· '+w.count+' event'+(w.count!==1?'s':'')+' on runway</span>'+(busy?' <span class="pp-load">· busy week</span>':'')+'</span><span class="pp-ch">▸</span></div>'
       +'<div class="pp-wkbody" data-wkb="'+w.wk+'" style="display:none"></div>';
       return;
@@ -203,10 +204,22 @@ function render(model,events){
     } else { h+='<div class="pp-donenone">Nothing logged yet this week \u2014 tick a channel below as things go out.</div>'; }
     h+='</div>';
     /* capacity meters (tally of what's gone out this week) */
-    function used(ch){ return S.log.filter(function(l){return l.ch===ch&&l.wk===w.wk;}).length; }
-    h+='<div class="pp-caps">'+["enews","whatsapp","fbgroup","insta"].map(function(ch){
-      var u=used(ch),c=CAPS[ch];
-      return '<div class="pp-capbox"><b>'+CHAN_LABEL[ch]+(ch==="enews"?" (next issue)":" this wk")+'</b><div class="pp-meter"><i style="width:'+Math.min(100,u/c*100)+'%"></i></div><span>'+u+' of '+c+'</span></div>';}).join("")+'</div>';
+    function used(ch){ return S.log.filter(function(l){return l.ch===ch&&wkOf(l.wk)===w.wk;}).length; }
+    /* Fb this week = EVENTS promoted on Facebook (organic or groups), goal 5.
+       Organic has its own goal of 2/wk; groups deliberately has no goal. */
+    function fbEvents(){ var seen={}; S.log.forEach(function(l){
+      if(wkOf(l.wk)===w.wk&&(l.ch==="fbpost"||l.ch==="fbgroup")) seen[l.ev]=1; }); return Object.keys(seen).length; }
+    function capbox(lab,n,goal,sub){
+      var bar=goal?'<div class="pp-meter"><i style="width:'+Math.min(100,n/goal*100)+'%"></i></div>':'<div class="pp-meter pp-nogoal"><i style="width:100%"></i></div>';
+      return '<div class="pp-capbox"><b>'+lab+'</b>'+bar+'<span>'+n+(goal?' of '+goal:'')+(sub?' <em>'+sub+'</em>':'')+'</span></div>';
+    }
+    var fbN=fbEvents(), fbO=used("fbpost"), fbG=used("fbgroup");
+    h+='<div class="pp-caps">'
+      +capbox("eNews (next issue)",used("enews"),CAPS.enews,"")
+      +capbox("WhatsApp this wk",used("whatsapp"),CAPS.whatsapp,"")
+      +capbox("Fb this week",fbN,FB_EVENT_GOAL,"events · organic "+fbO+" of "+CAPS.fbpost+" · groups "+fbG)
+      +capbox("Insta this wk",used("insta"),CAPS.insta,"")
+      +'</div>';
 
     w.rows.forEach(function(r){
       var ev=r.ev, cls= r.missed?'pp-ev pp-warn' : (r.touch?'pp-ev':'pp-ev pp-quiet');
@@ -261,7 +274,7 @@ root.innerHTML='<style>'
 +'#akx-promo .pp-done{background:#EAF4EF;border-color:#9CC7B2;color:#2E6B4F;} #akx-promo .pp-done .pp-bx{background:#2E6B4F;border-color:#2E6B4F;} #akx-promo .pp-done .pp-bx:after{content:"✓";color:#fff;font-size:10px;position:absolute;left:1.5px;top:-2.5px;}'
 +'#akx-promo .pp-who{font-size:10.5px;font-weight:600;color:#fff;background:#7A8797;border-radius:999px;padding:2px 7px;}'
 +'#akx-promo .pp-unsaved{border-color:#E0A0A0;background:#FBF0EE;} #akx-promo .pp-warn{font-size:10px;font-weight:700;color:#A33B1E;}'
-+'#akx-promo .pp-caps{display:flex;gap:10px;margin:12px 0 18px;flex-wrap:wrap;} #akx-promo .pp-capbox{flex:1;min-width:120px;background:#F6F3EC;border-radius:9px;padding:9px 12px;} #akx-promo .pp-capbox b{font-size:11.5px;font-weight:600;color:#4a5a6e;display:block;margin-bottom:5px;} #akx-promo .pp-meter{height:7px;border-radius:999px;background:#E4DFD2;overflow:hidden;} #akx-promo .pp-meter i{display:block;height:100%;border-radius:999px;background:#2b4c70;} #akx-promo .pp-capbox span{font-size:10.5px;color:#9aa0a6;}'
++'#akx-promo .pp-caps{display:flex;gap:10px;margin:12px 0 18px;flex-wrap:wrap;} #akx-promo .pp-capbox{flex:1;min-width:120px;background:#F6F3EC;border-radius:9px;padding:9px 12px;} #akx-promo .pp-capbox b{font-size:11.5px;font-weight:600;color:#4a5a6e;display:block;margin-bottom:5px;} #akx-promo .pp-meter{height:7px;border-radius:999px;background:#E4DFD2;overflow:hidden;} #akx-promo .pp-meter i{display:block;height:100%;border-radius:999px;background:#2b4c70;} #akx-promo .pp-capbox span{font-size:10.5px;color:#9aa0a6;} #akx-promo .pp-capbox span em{font-style:normal;color:#b0b6bd;} #akx-promo .pp-meter.pp-nogoal i{background:#C9D4E2;}'
 +'#akx-promo .pp-team{margin-top:14px;background:#F6F3EC;border-radius:9px;padding:10px 13px;font-size:12px;color:#4a5a6e;} #akx-promo .pp-team b{display:block;margin-bottom:6px;} #akx-promo .pp-teamrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center;} #akx-promo .pp-member{font-weight:600;} #akx-promo .pp-rota{font:inherit;font-size:11.5px;border:1px solid #D9D2C4;border-radius:7px;padding:4px 8px;margin-left:5px;width:180px;} #akx-promo .pp-team button{font:inherit;font-size:11.5px;font-weight:600;border:0;border-radius:999px;padding:5px 12px;background:#2b4c70;color:#fff;cursor:pointer;}'
 +'#akx-promo .pp-annhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;}'
 +'#akx-promo .pp-done-wrap{background:#F3F8F5;border:1px solid #CFE3D8;border-radius:10px;padding:10px 14px;margin:12px 0 16px;}'
