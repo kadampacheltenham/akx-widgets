@@ -1,4 +1,4 @@
-/* Akanishta — Weekend Courses & Retreats widget. v2.2 (20 Aug 2026): sheet colour overrides — "Title colour" (titles/accent; old "Colour" still accepted; names or hex) + "Background colour" (generated tile background). v2.1: no photo -> generated type graphic (event-graphics.js).
+/* Akanishta — Weekend Courses & Retreats widget. v2.3 (23 Aug 2026: swirl motif option E). v2.2 (20 Aug 2026): sheet colour overrides — "Title colour" (titles/accent; old "Colour" still accepted; names or hex) + "Background colour" (generated tile background). v2.1: no photo -> generated type graphic (event-graphics.js).
    Reads a public Google Sheet (tabs "Events", "Timetables", "Teachers")
    and renders poster tiles.
    Include with:  <div id="akx-events"></div>
@@ -41,7 +41,7 @@
   #akx-events .img .gfx{position:absolute;inset:0;overflow:hidden;color:#fff;font-family:'Inter',system-ui,sans-serif;}
   #akx-events .img .gfx.g-course{background:#2A66A6;}#akx-events .img .gfx.g-talk{background:#C56B45;}#akx-events .img .gfx.g-retreat{background:#227A72;}
   #akx-events .img .gfx.g-free{background:#4FA35A;}#akx-events .img .gfx.g-study{background:#6A4A9C;}#akx-events .img .gfx.g-special{background:#B5771E;}
-  #akx-events .img .gfx .motif{position:absolute;top:50%;right:-6%;height:210%;transform:translateY(-50%);opacity:.17;pointer-events:none;}
+  #akx-events .img .gfx .motif{position:absolute;top:50%;right:2%;height:262.5%;transform:translateY(-50%);opacity:.28;pointer-events:none;}
   #akx-events .img .gfx .gtxt{position:absolute;left:20px;right:116px;top:20px;} #akx-events .img.has-chip .gfx .gtxt{left:88px;}
   #akx-events .img .gfx .gt{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:22px;line-height:1.16;letter-spacing:-.01em;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
   #akx-events .img .gfx .gm{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px;margin-top:8px;opacity:.85;}
