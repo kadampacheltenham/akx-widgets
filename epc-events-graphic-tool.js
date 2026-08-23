@@ -3,6 +3,7 @@
  *   <div id="akx-egm"></div>
  *   <script src="https://kadampacheltenham.github.io/akx-widgets/epc-events-graphic-tool.js"><\/script>
  * Fill the form -> three PNGs (1080x1080, 1200x628, 1920x600) in the locked type colours/fonts/motifs.
+ * v1.6 (23 Aug 2026): swirl motif option E — opacity .28, stroke 2.2, 125% scale.
  * v1.5 (22 Aug 2026): prefill via #egm= hash (planner "get graphic" link). v1.4: quiet colour overrides — background + text (colour name or hex); swirl style still follows the type.
  */
 (function(){
@@ -43,10 +44,10 @@
     return ""; }
 
   function drawMotif(ctx,W,H,name,ink){
-    var paths=MOTIF[name]; var box=H*1.7; var x=W-box*0.85, y=(H-box)/2;   // right side, oversized like the site cards
-    if(W/H>2.5){box=H*2.3;x=W-box*0.9;y=(H-box)/2;}
+    var paths=MOTIF[name]; var box=H*1.7*1.25; var x=W-box*0.80, y=(H-box)/2;   // right side, oversized like the site cards
+    if(W/H>2.5){box=H*2.3*1.25;x=W-box*0.86;y=(H-box)/2;}
     ctx.save();ctx.translate(x,y);ctx.scale(box/200,box/200);
-    ctx.strokeStyle=ink||"#fff";ctx.globalAlpha=.2;ctx.lineWidth=1.5*200/box*Math.max(1.6,box/700);ctx.lineCap="round";ctx.lineJoin="round";
+    ctx.strokeStyle=ink||"#fff";ctx.globalAlpha=.28;ctx.lineWidth=2.2*200/box*Math.max(1.6,box/700);ctx.lineCap="round";ctx.lineJoin="round";
     paths.forEach(function(p){ctx.stroke(new Path2D(p));});
     ctx.restore();
   }
