@@ -1,4 +1,4 @@
-/* Akanishta KBC — shared EVENT-GRAPHIC module v1.1 (bg/ink overrides; motifs use currentColor) (single source of truth for the
+/* Akanishta KBC — shared EVENT-GRAPHIC module v1.2 (23 Aug 2026: swirl motif option E — opacity .28, stroke 2.2, 125% scale) (bg/ink overrides; motifs use currentColor) (single source of truth for the
  * type -> colour + motif taxonomy used on BOTH Weekly Classes and Courses & Retreats).
  *
  * Load once per page (site-wide footer is fine), then either:
@@ -60,41 +60,41 @@
   var DEFS =
     '<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>' +
     '<symbol id="m-talk" viewBox="0 0 200 200"><g fill="none" stroke="currentColor" stroke-linecap="round">' +
-      '<circle cx="100" cy="100" r="16" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' +
-      '<circle cx="100" cy="100" r="34" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' +
-      '<circle cx="100" cy="100" r="52" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' +
-      '<circle cx="100" cy="100" r="70" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' +
-      '<circle cx="100" cy="100" r="88" stroke-width="1.5" vector-effect="non-scaling-stroke"/></g></symbol>' +
+      '<circle cx="100" cy="100" r="16" stroke-width="2.2" vector-effect="non-scaling-stroke"/>' +
+      '<circle cx="100" cy="100" r="34" stroke-width="2.2" vector-effect="non-scaling-stroke"/>' +
+      '<circle cx="100" cy="100" r="52" stroke-width="2.2" vector-effect="non-scaling-stroke"/>' +
+      '<circle cx="100" cy="100" r="70" stroke-width="2.2" vector-effect="non-scaling-stroke"/>' +
+      '<circle cx="100" cy="100" r="88" stroke-width="2.2" vector-effect="non-scaling-stroke"/></g></symbol>' +
     '<symbol id="m-course" viewBox="0 0 200 200"><g fill="none" stroke="currentColor" stroke-linecap="round">' +
-      '<path d="M-20 40 C10 26 40 54 70 40 S130 26 160 40 S220 54 250 40" stroke-width="1.5" vector-effect="non-scaling-stroke"/><path d="M-20 66 C10 52 40 80 70 66 S130 52 160 66 S220 80 250 66" stroke-width="1.5" vector-effect="non-scaling-stroke"/><path d="M-20 92 C10 78 40 106 70 92 S130 78 160 92 S220 106 250 92" stroke-width="1.5" vector-effect="non-scaling-stroke"/><path d="M-20 118 C10 104 40 132 70 118 S130 104 160 118 S220 132 250 118" stroke-width="1.5" vector-effect="non-scaling-stroke"/><path d="M-20 144 C10 130 40 158 70 144 S130 130 160 144 S220 158 250 144" stroke-width="1.5" vector-effect="non-scaling-stroke"/><path d="M-20 170 C10 156 40 184 70 170 S130 156 160 170 S220 184 250 170" stroke-width="1.5" vector-effect="non-scaling-stroke"/></g></symbol>' +
+      '<path d="M-20 40 C10 26 40 54 70 40 S130 26 160 40 S220 54 250 40" stroke-width="2.2" vector-effect="non-scaling-stroke"/><path d="M-20 66 C10 52 40 80 70 66 S130 52 160 66 S220 80 250 66" stroke-width="2.2" vector-effect="non-scaling-stroke"/><path d="M-20 92 C10 78 40 106 70 92 S130 78 160 92 S220 106 250 92" stroke-width="2.2" vector-effect="non-scaling-stroke"/><path d="M-20 118 C10 104 40 132 70 118 S130 104 160 118 S220 132 250 118" stroke-width="2.2" vector-effect="non-scaling-stroke"/><path d="M-20 144 C10 130 40 158 70 144 S130 130 160 144 S220 158 250 144" stroke-width="2.2" vector-effect="non-scaling-stroke"/><path d="M-20 170 C10 156 40 184 70 170 S130 156 160 170 S220 184 250 170" stroke-width="2.2" vector-effect="non-scaling-stroke"/></g></symbol>' +
     '<symbol id="m-retreat" viewBox="0 0 200 200"><g fill="none" stroke="currentColor" stroke-linecap="round">' +
-      '<path d="M70 172 a30 30 0 0 1 60 0" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' +
-      '<path d="M42 172 a58 58 0 0 1 116 0" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' +
-      '<path d="M14 172 a86 86 0 0 1 172 0" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' +
-      '<path d="M-14 172 a114 114 0 0 1 228 0" stroke-width="1.5" vector-effect="non-scaling-stroke"/></g></symbol>' +
+      '<path d="M70 172 a30 30 0 0 1 60 0" stroke-width="2.2" vector-effect="non-scaling-stroke"/>' +
+      '<path d="M42 172 a58 58 0 0 1 116 0" stroke-width="2.2" vector-effect="non-scaling-stroke"/>' +
+      '<path d="M14 172 a86 86 0 0 1 172 0" stroke-width="2.2" vector-effect="non-scaling-stroke"/>' +
+      '<path d="M-14 172 a114 114 0 0 1 228 0" stroke-width="2.2" vector-effect="non-scaling-stroke"/></g></symbol>' +
     '<symbol id="m-free" viewBox="0 0 200 200"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">' +
-      '<path d="M100 190 C100 155 94 120 100 60" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' +
-      '<path d="M98 152 C81 148 69 134 65 114 C85 120 96 134 98 152 Z" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' +
-      '<path d="M99 122 C116 118 128 104 132 84 C112 90 101 104 99 122 Z" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' +
-      '<path d="M99 96 C86 92 77 81 74 66 C89 71 97 81 99 96 Z" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' +
-      '<path d="M100 60 C95 50 95 42 100 32 C105 42 105 50 100 60 Z" stroke-width="1.5" vector-effect="non-scaling-stroke"/></g></symbol>' +
+      '<path d="M100 190 C100 155 94 120 100 60" stroke-width="2.2" vector-effect="non-scaling-stroke"/>' +
+      '<path d="M98 152 C81 148 69 134 65 114 C85 120 96 134 98 152 Z" stroke-width="2.2" vector-effect="non-scaling-stroke"/>' +
+      '<path d="M99 122 C116 118 128 104 132 84 C112 90 101 104 99 122 Z" stroke-width="2.2" vector-effect="non-scaling-stroke"/>' +
+      '<path d="M99 96 C86 92 77 81 74 66 C89 71 97 81 99 96 Z" stroke-width="2.2" vector-effect="non-scaling-stroke"/>' +
+      '<path d="M100 60 C95 50 95 42 100 32 C105 42 105 50 100 60 Z" stroke-width="2.2" vector-effect="non-scaling-stroke"/></g></symbol>' +
     '<symbol id="m-study" viewBox="0 0 200 200"><g fill="none" stroke="currentColor" stroke-linecap="round">' +
-      '<ellipse cx="100" cy="158" rx="46" ry="19" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' +
-      '<ellipse cx="97" cy="124" rx="36" ry="16" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' +
-      '<ellipse cx="102" cy="96" rx="26" ry="13" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' +
-      '<ellipse cx="99" cy="72" rx="17" ry="10" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' +
-      '<ellipse cx="101" cy="53" rx="10" ry="7" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' +
-      '<path d="M44 182 C68 177 132 177 156 182" stroke-width="1.5" vector-effect="non-scaling-stroke"/></g></symbol>' +
+      '<ellipse cx="100" cy="158" rx="46" ry="19" stroke-width="2.2" vector-effect="non-scaling-stroke"/>' +
+      '<ellipse cx="97" cy="124" rx="36" ry="16" stroke-width="2.2" vector-effect="non-scaling-stroke"/>' +
+      '<ellipse cx="102" cy="96" rx="26" ry="13" stroke-width="2.2" vector-effect="non-scaling-stroke"/>' +
+      '<ellipse cx="99" cy="72" rx="17" ry="10" stroke-width="2.2" vector-effect="non-scaling-stroke"/>' +
+      '<ellipse cx="101" cy="53" rx="10" ry="7" stroke-width="2.2" vector-effect="non-scaling-stroke"/>' +
+      '<path d="M44 182 C68 177 132 177 156 182" stroke-width="2.2" vector-effect="non-scaling-stroke"/></g></symbol>' +
     '<symbol id="m-special" viewBox="0 0 200 200"><g fill="none" stroke="currentColor" stroke-linecap="round">' +
-      '<circle cx="100" cy="100" r="14" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' +
-      '<path d="M128 100 H180" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' +
-      '<path d="M20 100 H72" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' +
-      '<path d="M100 20 V72" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' +
-      '<path d="M100 128 V180" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' +
-      '<path d="M120 80 L141 59" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' +
-      '<path d="M80 80 L59 59" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' +
-      '<path d="M80 120 L59 141" stroke-width="1.5" vector-effect="non-scaling-stroke"/>' +
-      '<path d="M120 120 L141 141" stroke-width="1.5" vector-effect="non-scaling-stroke"/></g></symbol>' +
+      '<circle cx="100" cy="100" r="14" stroke-width="2.2" vector-effect="non-scaling-stroke"/>' +
+      '<path d="M128 100 H180" stroke-width="2.2" vector-effect="non-scaling-stroke"/>' +
+      '<path d="M20 100 H72" stroke-width="2.2" vector-effect="non-scaling-stroke"/>' +
+      '<path d="M100 20 V72" stroke-width="2.2" vector-effect="non-scaling-stroke"/>' +
+      '<path d="M100 128 V180" stroke-width="2.2" vector-effect="non-scaling-stroke"/>' +
+      '<path d="M120 80 L141 59" stroke-width="2.2" vector-effect="non-scaling-stroke"/>' +
+      '<path d="M80 80 L59 59" stroke-width="2.2" vector-effect="non-scaling-stroke"/>' +
+      '<path d="M80 120 L59 141" stroke-width="2.2" vector-effect="non-scaling-stroke"/>' +
+      '<path d="M120 120 L141 141" stroke-width="2.2" vector-effect="non-scaling-stroke"/></g></symbol>' +
     '<symbol id="mk-lotus" viewBox="0 0 34 22"><g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">' +
       '<path d="M17 2 C13.5 6.5 13.5 12.5 17 17 C20.5 12.5 20.5 6.5 17 2 Z"/>' +
       '<path d="M8 7 C8.8 12 12 15.6 17 17 C15.2 12.4 12.4 9 8 7 Z"/>' +
@@ -111,8 +111,8 @@
     ".evg--wide{aspect-ratio:2.6/1;padding:16px 22px 18px;}" +
     ".evg.g-course{background:#2A66A6;}.evg.g-talk{background:#C56B45;}.evg.g-retreat{background:#227A72;}" +
     ".evg.g-free{background:#4FA35A;}.evg.g-study{background:#6A4A9C;}.evg.g-special{background:#B5771E;}" +
-    ".evg .motif{position:absolute;top:50%;right:-14%;height:170%;transform:translateY(-50%);opacity:.17;pointer-events:none;}" +
-    ".evg--wide .motif{height:230%;right:-2%;}" +
+    ".evg .motif{position:absolute;top:50%;right:-4%;height:212%;transform:translateY(-50%);opacity:.28;pointer-events:none;}" +
+    ".evg--wide .motif{height:288%;right:6%;}" +
     ".evg .evg-k{position:relative;z-index:1;font-size:10.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;opacity:.92;}" +
     ".evg .evg-btm{position:relative;z-index:1;}" +
     ".evg .evg-t{font-family:"+SERIF+";font-weight:600;font-size:21px;line-height:1.16;letter-spacing:-.01em;max-width:12ch;}" +
