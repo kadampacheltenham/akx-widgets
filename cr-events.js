@@ -1,4 +1,4 @@
-/* Akanishta — Weekend Courses & Retreats widget. v2.3 (23 Aug 2026: swirl motif option E). v2.2 (20 Aug 2026): sheet colour overrides — "Title colour" (titles/accent; old "Colour" still accepted; names or hex) + "Background colour" (generated tile background). v2.1: no photo -> generated type graphic (event-graphics.js).
+/* Akanishta — Weekend Courses & Retreats widget. v2.4 (23 Aug 2026: "Book your Spot" button). v2.3 (swirl motif option E). v2.2 (20 Aug 2026): sheet colour overrides — "Title colour" (titles/accent; old "Colour" still accepted; names or hex) + "Background colour" (generated tile background). v2.1: no photo -> generated type graphic (event-graphics.js).
    Reads a public Google Sheet (tabs "Events", "Timetables", "Teachers")
    and renders poster tiles.
    Include with:  <div id="akx-events"></div>
@@ -236,7 +236,7 @@
 
     var feeTxt = isFree ? 'Free' : esc(ev['Fee']||'');
     var cta = ev['Booking link']
-        ? '<a class="book" href="'+esc(ev['Booking link'])+'" target="_blank" rel="noopener">Book &rarr;</a>'
+        ? '<a class="book" href="'+esc(ev['Booking link'])+'" target="_blank" rel="noopener">Book your Spot &rarr;</a>'
         : '<span class="dropin"><span class="dot"></span>Drop-in event</span>';
 
     var loc = ev['Location'] || 'Akanishta Centre';
