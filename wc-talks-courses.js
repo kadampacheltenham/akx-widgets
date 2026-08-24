@@ -1,4 +1,4 @@
-/* Akanishta &mdash; TALKS & SHORT COURSES widget  [23 Aug 2026: swirl motif option E — opacity .28, 187.5% scale] (the programme of talks / courses / free / in-depth / special).
+/* Akanishta &mdash; TALKS & SHORT COURSES widget  [23 Aug 2026: swirl motif option E — opacity .28, 187.5% scale] [23 Aug: "Book your Spot" button; drop-in price moved to the left column; "Online discounts available"] (the programme of talks / courses / free / in-depth / special).
    (Was wc-programme.js &mdash; renamed to wc-talks-courses.js so "programme" can't be confused with the page/section.)
    Reads a public Google Sheet (tabs "Talks & series" + "Class times") and renders flyer cards.
    The event TYPE (col C) sets colour + motif via the shared taxonomy in event-graphics.js.
@@ -88,6 +88,8 @@
   .d-tt{font-weight:700;font-size:1.1rem;} .d-tt .dur{font-weight:500;color:#8a857c;font-size:.92rem;}
   .d-meta{font-size:.95rem;color:var(--ink);margin-top:4px;} .d-meta a{color:var(--ink);font-weight:700;text-decoration:underline;text-decoration-color:rgba(0,0,0,.28);text-underline-offset:3px;}
   .d-dates{font-size:.95rem;color:var(--ink);margin-top:4px;}   /* same weight & colour as the 'with' line */
+  .d-drop{font-size:.95rem;color:var(--ink);margin-top:4px;}   /* drop-in price, left column */
+  .d-drop .d-lbl{font-weight:700;}
   .d-dates .d-lbl{font-weight:700;}
   .d-price{padding:18px 22px;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:9px;min-width:170px;background:#fbfaf7;}
   .d-price .pp{font-weight:700;font-size:1.02rem;}
@@ -118,7 +120,7 @@
     .picker.inline{display:block;text-align:left;} .picker.inline .pk-chip{margin-bottom:13px;} .picker.inline .tabs{justify-content:flex-start;}
     .detail{margin:14px 20px 4px;} .pane.on{grid-template-columns:1fr;}
     .d-price{flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:space-between;width:100%;gap:10px;}
-    .d-price .pp{order:1;} .d-price .book{order:2;} .d-price .d-offer{order:3;flex-basis:100%;text-align:left;}
+    .d-price .book{order:2;} .d-price .d-offer{order:3;flex-basis:100%;text-align:left;}
     .tbc,.foot{margin-left:20px;margin-right:20px;padding-left:18px;padding-right:18px;} .foot{padding:8px 0 22px;}
     /* discounts: full width (match the detail above) + label as a bar across the top */
     #akx-programme .gfx .gtxt{display:none;}  /* mobile: square too small for the poster text; title shows in the body */
@@ -299,17 +301,18 @@
   function pane(cl,i,on){
     var c=isCiren(cl.location), dates=splitList(cl.dates), n=dates.length;
     var datesHtml = n>1 ? esc(n+' classes')+' &middot; '+esc(dates.join(', ')) : (n===1 ? '<span class="d-lbl">Date:</span> '+esc(formatDate(dates[0])) : '');
-    var pp = cl.price_class ? '<span class="pp">'+esc(cl.price_class)+' / class</span>' : '';
+    var pp = cl.price_class ? '<div class="d-drop"><span class="d-lbl">Drop-in price</span> \u00b7 '+esc(cl.price_class)+'</div>' : '';
     var offer = (cl.price_series && n>1) ? '<span class="d-offer">Special offer '+n+' classes only '+esc(cl.price_series)+'</span>' : '';
-    var book = cl.booking_url ? '<a class="book" href="'+esc(cl.booking_url)+'" target="_blank" rel="noopener">Book &rarr;</a>' : '';
+    var book = cl.booking_url ? '<a class="book" href="'+esc(cl.booking_url)+'" target="_blank" rel="noopener">Book your Spot &rarr;</a>' : '';
     return '<div class="pane'+(c?' ciren':'')+(on?' on':'')+'" data-i="'+i+'">'
       +'<div class="d-main">'
         +'<div class="d-loc'+(c?' ciren':'')+'"><svg viewBox="0 0 24 24" fill="'+(c?'#7AA84A':'#4E938C')+'">'+PIN+'</svg>'+esc(cl.location||'')+'<a class="dir" href="'+DIRECTIONS_URL+'">Get directions</a></div>'
         +(cl.teacher?'<div class="d-meta">with <a href="/about-us#teachers">'+esc(cl.teacher)+'</a></div>':'')
         +'<div class="d-tt">'+esc(fullDay(cl.day))+' '+esc(cl.time)+(cl.duration?' <span class="dur">| '+esc(cl.duration)+'</span>':'')+'</div>'
         +(datesHtml?'<div class="d-dates">'+datesHtml+'</div>':'')
+        +pp
       +'</div>'
-      +(pp||offer||book?'<div class="d-price">'+pp+offer+book+'</div>':'')
+      +(offer||book?'<div class="d-price">'+offer+book+'</div>':'')
     +'</div>';
   }
   function discFmt(s){ return esc(s).replace(/\s*\|\s*/g,'<span class="sep">|</span>'); }
@@ -382,7 +385,7 @@
           + classes.map(function(cl,i){return pill(cl,i,i===0,isTalk);}).join('') + '</div></div>'
           + '<div class="detail">'+classes.map(function(cl,i){return pane(cl,i,i===0);}).join('')+'</div>';
     }
-    var discHtml = item.discount_note ? '<div class="disc"><span class="disc-star">&#9733;</span> <b>Discounts available</b> &mdash; <span>'+discInline(item.discount_note.replace(/^\s*discounts?\s*:\s*/i,''))+'</span></div>' : '';
+    var discHtml = item.discount_note ? '<div class="disc"><span class="disc-star">&#9733;</span> <b>Online discounts available</b> &mdash; <span>'+discInline(item.discount_note.replace(/^\s*discounts?\s*:\s*/i,''))+'</span></div>' : '';
     var foot = '<div class="foot">'+discHtml+shareRow(item)+'</div>';
     // mobile collapse: top summary (dates + Show more) when collapsed; a 'Show less' control at the BOTTOM when expanded
     var sumD = summaryDates(isTalk, classes, showFrom);
