@@ -1,4 +1,4 @@
-/* AKBC page-status card v5.4 (mobile: one-line row, tap to expand) — plain-language sheet columns (headers: page | state | update summary | how it affects website visitors | recent updates | outstanding | show until | updated) — self-injecting widget
+/* AKBC page-status card v5.5 ("Working normally" state = no banner; 25 Aug 2026). v5.4 (mobile: one-line row, tap to expand) — plain-language sheet columns (headers: page | state | update summary | how it affects website visitors | recent updates | outstanding | show until | updated) — self-injecting widget
  * Reads a published Google Sheet (CSV) and shows a slim colour strip under the site header
  * on pages that have a row. Sheet columns (header row, any order, case-insensitive):
  *   page      — slug, e.g. courses-retreats  ("home" for the homepage)
@@ -65,7 +65,8 @@
     // v5 columns: page | state | what's happening | what it means for you | done recently | still to do | show until | updated
     // (old columns status/note/improved/todo still accepted)
     var state = (rec.state || rec.status || "").trim().toLowerCase();
-    var cls = /problem|red|broken/.test(state) ? "r" : /heads|amber|orange|working|progress/.test(state) ? "a" : /updated|green|new/.test(state) ? "g" : "";
+    if (/normal/.test(state)) return;   // "Working normally" = no notice on the page
+    var cls = /problem|red|broken/.test(state) ? "r" : /heads|amber|orange|progress/.test(state) ? "a" : /updated|green|new/.test(state) ? "g" : "";
     if (!cls) return;
     var what = (rec["update summary"] || rec["update headline"] || rec["what's happening"] || rec.whats_happening || rec.what || rec.note || "").trim();
     var means = (rec["how it affects website visitors"] || rec["what it means for you"] || rec.means || rec.so_what || "").trim();
