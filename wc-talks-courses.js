@@ -1,5 +1,6 @@
 /* Akanishta &mdash; TALKS & SHORT COURSES widget  [23 Aug 2026: swirl motif option E — opacity .28, 187.5% scale] [23 Aug: "Book your Spot" button; drop-in price moved to the left column; "Online discounts available"]
-   [24 Aug: "Get directions" now a dynamic map link per venue — replaces the /visit-us link, which was a 404] (the programme of talks / courses / free / in-depth / special).
+   [24 Aug: "Get directions" now a dynamic map link per venue — replaces the /visit-us link, which was a 404]
+   [24 Aug: classes tab renamed "Class details" — reads new name, falls back to "Class times"] (the programme of talks / courses / free / in-depth / special).
    (Was wc-programme.js &mdash; renamed to wc-talks-courses.js so "programme" can't be confused with the page/section.)
    Reads a public Google Sheet (tabs "Talks & series" + "Class times") and renders flyer cards.
    The event TYPE (col C) sets colour + motif via the shared taxonomy in event-graphics.js.
@@ -16,7 +17,8 @@
   var SHEET_ID = '1YArubV8QgCvPUIIvHOHWhCN2fYLRz0DDPSRSHD_tSmY';
   var MOUNT_ID = 'akx-programme';
   var TAB_ITEMS = 'Talks & series';
-  var TAB_CLASSES = 'Class times';
+  var TAB_CLASSES = 'Class details';        // renamed 24 Aug 2026; old name kept as fallback
+  var TAB_CLASSES_OLD = 'Class times';      // gviz silently serves the FIRST tab for a bad name, so we validate the header
   /* Directions: Apple devices (iPhone, iPad, Mac) -> Apple Maps, everything else -> Google Maps.
      Venue addresses live here for now; when the Weekly Classes sheet gains a Venues tab this
      becomes a lookup by the venue name already in the "location" column. */
@@ -528,6 +530,7 @@
     Promise.all([
       fetch(csvUrl(TAB_ITEMS)).then(function(r){return r.text();}),
       fetch(csvUrl(TAB_CLASSES)).then(function(r){return r.text();})
+        .then(function(t){ return /"location"/i.test((t.split('\n')[0]||'')) ? t : fetch(csvUrl(TAB_CLASSES_OLD)).then(function(r){return r.text();}); })
     ]).then(function(res){
       var items=toObjs(parseCSV(res[0])), classes=toObjs(parseCSV(res[1]));
       render(mount, items, classes);
