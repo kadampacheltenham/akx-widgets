@@ -1,4 +1,5 @@
-/* Akanishta &mdash; TALKS & SHORT COURSES widget  [23 Aug 2026: swirl motif option E — opacity .28, 187.5% scale] [23 Aug: "Book your Spot" button; drop-in price moved to the left column; "Online discounts available"] (the programme of talks / courses / free / in-depth / special).
+/* Akanishta &mdash; TALKS & SHORT COURSES widget  [23 Aug 2026: swirl motif option E — opacity .28, 187.5% scale] [23 Aug: "Book your Spot" button; drop-in price moved to the left column; "Online discounts available"]
+   [24 Aug: "Get directions" now a dynamic map link per venue — replaces the /visit-us link, which was a 404] (the programme of talks / courses / free / in-depth / special).
    (Was wc-programme.js &mdash; renamed to wc-talks-courses.js so "programme" can't be confused with the page/section.)
    Reads a public Google Sheet (tabs "Talks & series" + "Class times") and renders flyer cards.
    The event TYPE (col C) sets colour + motif via the shared taxonomy in event-graphics.js.
@@ -16,7 +17,22 @@
   var MOUNT_ID = 'akx-programme';
   var TAB_ITEMS = 'Talks & series';
   var TAB_CLASSES = 'Class times';
-  var DIRECTIONS_URL = '/visit-us';
+  /* Directions: Apple devices (iPhone, iPad, Mac) -> Apple Maps, everything else -> Google Maps.
+     Venue addresses live here for now; when the Weekly Classes sheet gains a Venues tab this
+     becomes a lookup by the venue name already in the "location" column. */
+  var VENUE_Q={
+    cheltenham:'59 Whaddon Road, Cheltenham GL52 5NE',
+    cirencester:'28 King Street, Cirencester, Gloucestershire GL7 1JT'
+  };
+  var _ua=(typeof navigator!=='undefined'&&navigator.userAgent)||'';
+  var IS_APPLE=/iphone|ipad|ipod|macintosh|mac os x/i.test(_ua);
+  function mapsURL(q){ return IS_APPLE
+    ? 'https://maps.apple.com/?q='+encodeURIComponent(q)
+    : 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q); }
+  function directionsURL(loc){
+    var q=VENUE_Q[String(loc||'').trim().toLowerCase()] || VENUE_Q.cheltenham;
+    return mapsURL(q);
+  }
   var IMG_BASE = 'https://kadampacheltenham.github.io/akx-widgets/images/'; // auto image by id: images/<id>.jpg
   var STYLE = String.raw`
   #akx-programme{--ink:#2B2A28;--dteal:#2E7C7C;--lteal:#0c9d94;--coral:#E2886A;--blue:#22B8F0;--bluedk:#0E90CC;--coral2:#FF7A4D;--coraldk:#E85C2E;font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);max-width:1000px;margin:0 auto;}   /* lotus/content width &mdash; matches glance + calendars */
@@ -306,7 +322,7 @@
     var book = cl.booking_url ? '<a class="book" href="'+esc(cl.booking_url)+'" target="_blank" rel="noopener">Book your Spot &rarr;</a>' : '';
     return '<div class="pane'+(c?' ciren':'')+(on?' on':'')+'" data-i="'+i+'">'
       +'<div class="d-main">'
-        +'<div class="d-loc'+(c?' ciren':'')+'"><svg viewBox="0 0 24 24" fill="'+(c?'#7AA84A':'#4E938C')+'">'+PIN+'</svg>'+esc(cl.location||'')+'<a class="dir" href="'+DIRECTIONS_URL+'">Get directions</a></div>'
+        +'<div class="d-loc'+(c?' ciren':'')+'"><svg viewBox="0 0 24 24" fill="'+(c?'#7AA84A':'#4E938C')+'">'+PIN+'</svg>'+esc(cl.location||'')+'<a class="dir" href="'+directionsURL(cl.location)+'" target="_blank" rel="noopener">Get directions</a></div>'
         +(cl.teacher?'<div class="d-meta">with <a href="/about-us#teachers">'+esc(cl.teacher)+'</a></div>':'')
         +'<div class="d-tt">'+esc(fullDay(cl.day))+' '+esc(cl.time)+(cl.duration?' <span class="dur">| '+esc(cl.duration)+'</span>':'')+'</div>'
         +(datesHtml?'<div class="d-dates">'+datesHtml+'</div>':'')
