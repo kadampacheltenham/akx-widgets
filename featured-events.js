@@ -82,14 +82,17 @@
     return rows;
   }
   function toObjs(rows){ if(!rows.length) return []; var h=rows[0].map(function(x){return (x||'').trim();});
-    return rows.slice(1).map(function(r){var o={};h.forEach(function(k,i){o[k]=(r[i]||'').trim();});return o;})
+    return rows.slice(1).map(function(r){var o={};h.forEach(function(k,i){o[k]=(r[i]||'').trim();});
+      if(o['Event ID']!=null&&o.id==null)o.id=o['Event ID'];           /* volunteer-friendly headers */
+      if(o['Location ID']!=null&&o.location==null)o.location=o['Location ID'];
+      return o;})
       .filter(function(o){return Object.keys(o).some(function(k){return o[k];});}); }
   function csvUrl(id,tab){return 'https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:csv&headers=1&sheet='+encodeURIComponent(tab);}
   function get(u){return fetch(u,{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){return toObjs(parseCSV(t));});}
   /* the classes tab was renamed "Class details" (24 Aug 2026); gviz serves the FIRST tab for an
      unknown name, so validate the header and fall back to the old name */
   function getClasses(){return fetch(csvUrl(WC_SHEET,WC_CLASSES),{cache:'no-store'}).then(function(r){return r.text();})
-    .then(function(t){ return /"location"/i.test((t.split('\n')[0]||'')) ? toObjs(parseCSV(t)) : get(csvUrl(WC_SHEET,WC_CLASSES_OLD)); });}
+    .then(function(t){ return /"location( id)?"/i.test((t.split('\n')[0]||'')) ? toObjs(parseCSV(t)) : get(csvUrl(WC_SHEET,WC_CLASSES_OLD)); });}
 
   // ---------- weekly class (talk / short course) ----------
   function colYes(row,col){ var k=Object.keys(row).find(function(h){return low(h)===low(col);}); return k?yes(row[k]):false; }
