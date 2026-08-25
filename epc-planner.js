@@ -1,4 +1,4 @@
-/* AKBC — Promotion planner (volunteer tool on /epc). v1.1.2 (23 Aug 2026)
+/* AKBC — Promotion planner (volunteer tool on /epc). v1.1.3 (24 Aug 2026): classes tab rename fallback. v1.1.2 (23 Aug)
  * Stub on the page:
  *   <div id="akx-promo"></div>
  *   <script src="https://kadampacheltenham.github.io/akx-widgets/epc-planner.js"><\/script>
@@ -22,7 +22,7 @@ var CHAN_LABEL={enews:"eNews",whatsapp:"WhatsApp",fbpost:"FB post",fbgroup:"FB g
 /* which channels suit which weeks-out (windows; refine later) */
 var CHAN_WINDOW={enews:[10,6,4,2],insta:[10,6,4,2,1,0],fbpost:[2,1,0],fbgroup:[4,2,1],whatsapp:[2,1,0],announce:[4,2,1,0]};
 var STAGE={10:"save the date",6:"save the date",4:"announcement + booking link",2:"two weeks — reminder",1:"one week — final push",0:"it’s this week!"};
-var LSK="akx-promo-proto", VER="1.1.2";
+var LSK="akx-promo-proto", VER="1.1.3";
 
 /* ---------- state (prototype: this device only) ---------- */
 var LS={get:function(){try{return localStorage.getItem(LSK);}catch(e){return null;}},set:function(v){try{localStorage.setItem(LSK,v);}catch(e){}}};
@@ -306,7 +306,11 @@ root.innerHTML='<style>'
 
 /* ---------- events from sheets ---------- */
 function fetchCSV(id,sheet){return fetch("https://docs.google.com/spreadsheets/d/"+id+"/gviz/tq?tqx=out:csv&headers=1&sheet="+encodeURIComponent(sheet)).then(function(r){return r.text();}).then(csv);}
-Promise.all([fetchCSV(WE_SHEET,"Events"),fetchCSV(WC_SHEET,"Talks & series"),fetchCSV(WC_SHEET,"Class times")]).then(function(res){
+/* classes tab renamed "Class details" (24 Aug 2026); gviz serves the FIRST tab for an unknown
+   name, so validate the header and fall back to the old name */
+function fetchClasses(id){return fetchCSV(id,"Class details").then(function(rows){
+  return (rows[0]||[]).join(",").toLowerCase().indexOf("location")>-1 ? rows : fetchCSV(id,"Class times"); });}
+Promise.all([fetchCSV(WE_SHEET,"Events"),fetchCSV(WC_SHEET,"Talks & series"),fetchClasses(WC_SHEET)]).then(function(res){
   var E=res[0],T=res[1],C=res[2],events=[];
   var eh=E[0];
   var eI={id:idx(eh,"event id"),t:idx(eh,"title"),ty:idx(eh,"event type"),tag:idx(eh,"event tag"),d:idx(eh,"date"),free:idx(eh,"free"),f:idx(eh,"featured"),hp:idx(eh,"hp showcase"),st:idx(eh,"status"),loc:idx(eh,"location"),tm:idx(eh,"time"),sum:idx(eh,"summary"),tid:idx(eh,"teacher id"),wte:idx(eh,"what to expect"),fee:idx(eh,"fee"),disc:idx(eh,"discounts"),bk:idx(eh,"booking link")};
