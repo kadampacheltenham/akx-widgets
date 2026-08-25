@@ -128,8 +128,8 @@
   .cc-share .sh-lbl{font-size:.82rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#8a857c;margin-right:2px;}
   .cc .cc-share .sh-lbl{color:var(--typedk);}
   .sh-btn{width:34px;height:34px;border-radius:50%;border:1px solid transparent;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;text-decoration:none;transition:background .15s,color .15s,border-color .15s;}
-  .cc .sh-btn{background:var(--typedk);color:#fff;border-color:var(--typedk);}
-  .cc .sh-btn:hover{background:#fff;color:var(--typedk);}
+  .cc .sh-btn{background:var(--type);color:#fff;border-color:var(--type);}   /* icons in the lighter type colour; Share label keeps the darker */
+  .cc .sh-btn:hover{background:#fff;color:var(--type);}
   .sh-btn svg{width:16px;height:16px;}
   .sh-btn.copied{background:#2C8A34;color:#fff;border-color:#2C8A34;}
   @media(max-width:640px){
