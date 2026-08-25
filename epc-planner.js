@@ -59,6 +59,7 @@ function csv(t){var rows=[],row=[],cur="",q=false;for(var i=0;i<t.length;i++){va
   else { if(c=='"')q=true; else if(c==","){row.push(cur);cur="";} else if(c=="\n"){row.push(cur);rows.push(row);row=[];cur="";} else if(c!="\r")cur+=c; } }
   if(cur||row.length){row.push(cur);rows.push(row);} return rows;}
 function idx(head,name){name=name.toLowerCase();for(var i=0;i<head.length;i++)if(head[i].toLowerCase().trim()===name)return i;return -1;}
+function idx2(head,a,b){var i=idx(head,a);return i>-1?i:idx(head,b);} // volunteer-friendly header aliases
 function dmy(s){ s=(s||"").trim(); var m=s.match(/^(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?$/); if(!m) return null;
   var y=m[3]?(+m[3]<100?2000+ +m[3]:+m[3]):(new Date()).getFullYear();
   var d=new Date(y,+m[2]-1,+m[1]); if(!m[3]&&d<new Date(Date.now()-45*864e5)) d=new Date(y+1,+m[2]-1,+m[1]); return d;}
@@ -319,8 +320,8 @@ Promise.all([fetchCSV(WE_SHEET,"Events"),fetchCSV(WC_SHEET,"Talks & series"),fet
     events.push({id:r[eI.id],title:r[eI.t],type:r[eI.ty],tag:r[eI.tag],date:d,free:yes(r[eI.free]),feat:yes(r[eI.f]),hp:yes(r[eI.hp]),
       loc:r[eI.loc]||"",time:r[eI.tm]||"",tid:(r[eI.tid]||"").trim(),desc:r[eI.sum]||"",wte:r[eI.wte]||"",fee:r[eI.fee]||"",disc:r[eI.disc]||"",book:r[eI.bk]||""});
   });
-  var th=T[0], tI={id:idx(th,"id"),t:idx(th,"title"),ty:idx(th,"type"),f:idx(th,"featured"),hp:idx(th,"hp showcase"),st:idx(th,"status"),desc:idx(th,"description"),wte:idx(th,"what_to_expect"),disc:idx(th,"discount_note")};
-  var ch=C[0], cI={id:idx(ch,"id"),dates:idx(ch,"dates"),tm:idx(ch,"time"),loc:idx(ch,"location"),pc:idx(ch,"price_class"),ps:idx(ch,"price_series"),bk:idx(ch,"booking_url")};
+  var th=T[0], tI={id:idx2(th,"event id","id"),t:idx(th,"title"),ty:idx(th,"type"),f:idx(th,"featured"),hp:idx(th,"hp showcase"),st:idx(th,"status"),desc:idx(th,"description"),wte:idx(th,"what_to_expect"),disc:idx(th,"discount_note")};
+  var ch=C[0], cI={id:idx2(ch,"event id","id"),dates:idx(ch,"dates"),tm:idx(ch,"time"),loc:idx2(ch,"location id","location"),pc:idx(ch,"price_class"),ps:idx(ch,"price_series"),bk:idx(ch,"booking_url")};
   var firstDate={}, cInfo={};
   C.slice(1).forEach(function(r){ (r[cI.dates]||"").split(",").forEach(function(ds){ var d=dmy(ds); if(d&&d>=new Date(Date.now()-45*864e5)&&(!firstDate[r[cI.id]]||d<firstDate[r[cI.id]])) firstDate[r[cI.id]]=d; });
     if(!cInfo[r[cI.id]]) cInfo[r[cI.id]]={time:r[cI.tm]||"",loc:r[cI.loc]||"",fee:r[cI.pc]||"",series:r[cI.ps]||"",book:r[cI.bk]||""}; });
