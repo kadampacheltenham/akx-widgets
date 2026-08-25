@@ -1,3 +1,5 @@
+/* [24 Aug 2026] Directions links are now dynamic: Apple devices -> Apple Maps, everything else -> Google Maps.
+   Cirencester venue address added (28 King Street, GL7 1JT). Venue addresses in VENUE_Q, ready to move to a sheet tab. */
 /* Akanishta &mdash; Week at a Glance widget (v8.1 &mdash; slim, unified, semi-live)
    - ONE list, filter tabs on a single line (centred on desktop, scrollable on
      mobile): All | Get started | AM | PM | In-depth | Cheltenham | Branches.
@@ -17,8 +19,20 @@
 (function(){
   var MOUNT_ID='akx-glance';
   var OH_INVITE='Let us welcome you and show you around before the class.';
-  var DIR_CH='https://maps.google.com/?q=59+Whaddon+Road,+Cheltenham';
-  var DIR_CI='https://maps.google.com/?q=Cirencester';   /* TODO: exact Cirencester venue address */
+  /* Directions: one rule for the whole site — Apple devices (iPhone, iPad, Mac) get Apple Maps,
+     everything else gets Google Maps. Venue addresses live here for now; when the Weekly Classes
+     sheet gains a Venues tab these two constants become a lookup by venue id. */
+  var VENUE_Q={
+    chelt:'59 Whaddon Road, Cheltenham GL52 5NE',
+    ciren:'28 King Street, Cirencester, Gloucestershire GL7 1JT'
+  };
+  var _ua=(typeof navigator!=='undefined'&&navigator.userAgent)||'';
+  var IS_APPLE=/iphone|ipad|ipod|macintosh|mac os x/i.test(_ua);
+  function mapsURL(q){ return IS_APPLE
+    ? 'https://maps.apple.com/?q='+encodeURIComponent(q)
+    : 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q); }
+  var DIR_CH=mapsURL(VENUE_Q.chelt);
+  var DIR_CI=mapsURL(VENUE_Q.ciren);
 
   /* ---- live calendar (same feeds/key as the calendar widget) ---- */
   var API_KEY='AIzaSyAVm0epUASAL2aNbAN_aBmpDDPxoPJVOwA';
@@ -33,22 +47,22 @@
   var EVENTS=[
     {day:'Mon',time:'12:30',name:'Simply Meditate',dur:'30 min',loc:'chelt',feed:'weekly',start:1,
      sum:'Reduce stress and cultivate inner peace|Come as you are|Perfect if you are just getting started',
-     cta:{label:'Get directions',url:DIR_CH,ext:1}},
+     cta:{label:'Get directions',url:DIR_CH,ext:1,dir:1}},
     {day:'Mon',time:'18:30',name:'Evening meditation class',dur:'75 min',loc:'chelt',feed:'weekly',oh:'5:45&ndash;6:15 pm',
      sum:'One-off talks &amp; short courses on a theme or topic|See the programme or calendar below for details',
-     cta:{label:'Get directions',url:DIR_CH,ext:1}},
+     cta:{label:'Get directions',url:DIR_CH,ext:1,dir:1}},
     {day:'Tue',time:'10:30',name:'Daytime meditation class',dur:'75 min',loc:'chelt',feed:'weekly',
      sum:'One-off talks &amp; short courses on a theme or topic|See the programme or calendar below for details',
-     cta:{label:'Get directions',url:DIR_CH,ext:1}},
+     cta:{label:'Get directions',url:DIR_CH,ext:1,dir:1}},
     {day:'Wed',time:'19:00',name:'Young Adults',dur:'60 min',loc:'chelt',feed:'weekly',
      sum:'Aimed at young adults 18&ndash;35|Check the programme or calendar below for details',
-     cta:{label:'Get directions',url:DIR_CH,ext:1}},
+     cta:{label:'Get directions',url:DIR_CH,ext:1,dir:1}},
     {day:'Thu',time:'18:30',name:'Cirencester evening class',dur:'75 min',loc:'ciren',feed:'branch',
      sum:'Talks &amp; meditations following a theme|Check the programme or calendar for dates',
-     cta:{label:'Get directions',url:DIR_CI,ext:1}},
+     cta:{label:'Get directions',url:DIR_CI,ext:1,dir:1}},
     {day:'Fri',time:'12:00',name:'Free guided meditation',dur:'15 min',loc:'chelt',feed:'weekly',free:1,start:1,oh:'11:30&ndash;12:00',
      sum:'Free &mdash; nothing to book, just turn up|Perfect if you are just getting started',
-     cta:{label:'Get directions',url:DIR_CH,ext:1}},
+     cta:{label:'Get directions',url:DIR_CH,ext:1,dir:1}},
     {day:'Sat',time:'10:00',name:'Weekend courses &amp; retreats',dur:'',loc:'chelt',feed:'weekend',
      sum:'Day &amp; half-day courses and retreats throughout the year.',
      cta:{label:'Courses &amp; retreats page &rarr;',url:'/courses-retreats',coral:1}},
@@ -174,7 +188,7 @@
   /* venue line: location + a quiet "tap for venue & directions" (Cheltenham -> maps;
      branches suppressed for now). Page-pointer events keep their page link. */
   function venueHTML(e){
-    var isDir = e.cta && /maps\./.test(e.cta.url);
+    var isDir = e.cta && e.cta.dir;
     if(isDir){
       return e.loc==='ciren'
         ? locHTML(e)
