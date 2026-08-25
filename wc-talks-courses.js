@@ -32,8 +32,8 @@
     ? 'https://maps.apple.com/?q='+encodeURIComponent(q)
     : 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q); }
   function directionsURL(loc){
-    var q=VENUE_Q[String(loc||'').trim().toLowerCase()] || VENUE_Q.cheltenham;
-    return mapsURL(q);
+    var q=VENUE_Q[String(loc||'').trim().toLowerCase()];
+    return q ? mapsURL(q) : '';   // unknown venue (e.g. Tewkesbury until its address is added): no link, never the wrong town
   }
   var IMG_BASE = 'https://kadampacheltenham.github.io/akx-widgets/images/'; // auto image by id: images/<id>.jpg
   var STYLE = String.raw`
@@ -176,7 +176,12 @@
     return rows;
   }
   function toObjs(rows){ if(!rows.length) return []; var h=rows[0].map(function(x){return (x||'').trim();});
-    return rows.slice(1).map(function(r){var o={};h.forEach(function(k,i){o[k]=(r[i]||'').trim();});return o;})
+    return rows.slice(1).map(function(r){var o={};h.forEach(function(k,i){o[k]=(r[i]||'').trim();});
+      /* volunteer-friendly headers (24 Aug 2026): 'Event ID' and 'Location ID' map onto the
+         internal names, so the sheet can use either */
+      if(o['Event ID']!=null&&o.id==null)o.id=o['Event ID'];
+      if(o['Location ID']!=null&&o.location==null)o.location=o['Location ID'];
+      return o;})
       .filter(function(o){return Object.keys(o).some(function(k){return o[k];});}); }
   function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
   function splitList(s){return (s||'').split(/[;,]|\r?\n/).map(function(x){return x.trim();}).filter(Boolean);}
@@ -324,7 +329,7 @@
     var book = cl.booking_url ? '<a class="book" href="'+esc(cl.booking_url)+'" target="_blank" rel="noopener">Book your Spot &rarr;</a>' : '';
     return '<div class="pane'+(c?' ciren':'')+(on?' on':'')+'" data-i="'+i+'">'
       +'<div class="d-main">'
-        +'<div class="d-loc'+(c?' ciren':'')+'"><svg viewBox="0 0 24 24" fill="'+(c?'#7AA84A':'#4E938C')+'">'+PIN+'</svg>'+esc(cl.location||'')+'<a class="dir" href="'+directionsURL(cl.location)+'" target="_blank" rel="noopener">Get directions</a></div>'
+        +'<div class="d-loc'+(c?' ciren':'')+'"><svg viewBox="0 0 24 24" fill="'+(c?'#7AA84A':'#4E938C')+'">'+PIN+'</svg>'+esc(cl.location||'')+(directionsURL(cl.location)?'<a class="dir" href="'+directionsURL(cl.location)+'" target="_blank" rel="noopener">Get directions</a>':'')+'</div>'
         +(cl.teacher?'<div class="d-meta">with <a href="/about-us#teachers">'+esc(cl.teacher)+'</a></div>':'')
         +'<div class="d-tt">'+esc(fullDay(cl.day))+' '+esc(cl.time)+(cl.duration?' <span class="dur">| '+esc(cl.duration)+'</span>':'')+'</div>'
         +(datesHtml?'<div class="d-dates">'+datesHtml+'</div>':'')
@@ -530,7 +535,7 @@
     Promise.all([
       fetch(csvUrl(TAB_ITEMS)).then(function(r){return r.text();}),
       fetch(csvUrl(TAB_CLASSES)).then(function(r){return r.text();})
-        .then(function(t){ return /"location"/i.test((t.split('\n')[0]||'')) ? t : fetch(csvUrl(TAB_CLASSES_OLD)).then(function(r){return r.text();}); })
+        .then(function(t){ return /"location( id)?"/i.test((t.split('\n')[0]||'')) ? t : fetch(csvUrl(TAB_CLASSES_OLD)).then(function(r){return r.text();}); })
     ]).then(function(res){
       var items=toObjs(parseCSV(res[0])), classes=toObjs(parseCSV(res[1]));
       render(mount, items, classes);
