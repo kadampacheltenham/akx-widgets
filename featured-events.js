@@ -1,7 +1,7 @@
 /* Akanishta — FEATURED "Coming up" block (v1.1, 18 Aug 2026 — Book → goes straight to the booking form; rest of card opens the page)
    Shows the next Featured weekly class (talk / short course) and the next Featured weekend event
    as two "ticket" cards, side by side (stacked on phones).
-   Reads: Weekly Classes sheet (tabs "Talks & series" + "Class times", column Featured = yes)
+   Reads: Weekly Classes sheet (tabs "Talks & series" + "Class details" — falls back to old name "Class times", column Featured = yes)
           Weekend Events sheet (tab "Events", column Featured = yes)
    Embed:  <div id="akx-featured"></div>
            <script src="https://kadampacheltenham.github.io/akx-widgets/featured-events.js?v=1" defer></script>
@@ -12,7 +12,7 @@
 */
 (function(){
   var MOUNT_ID='akx-featured';
-  var WC_SHEET='1YArubV8QgCvPUIIvHOHWhCN2fYLRz0DDPSRSHD_tSmY', WC_ITEMS='Talks & series', WC_CLASSES='Class times';
+  var WC_SHEET='1YArubV8QgCvPUIIvHOHWhCN2fYLRz0DDPSRSHD_tSmY', WC_ITEMS='Talks & series', WC_CLASSES='Class details', WC_CLASSES_OLD='Class times';
   var EV_SHEET='1g8VSqkv9zIR375RDf9R-B-34zMhsHXoUYx7ZYhuXlmk', EV_TAB='Events', EV_TE='Teachers';
   var BASE='https://kadampacheltenham.github.io/akx-widgets/', IMG=BASE+'images/';
   var LINK_WC='/weekly-classes', LINK_EV='/courses-retreats';
@@ -86,6 +86,10 @@
       .filter(function(o){return Object.keys(o).some(function(k){return o[k];});}); }
   function csvUrl(id,tab){return 'https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:csv&headers=1&sheet='+encodeURIComponent(tab);}
   function get(u){return fetch(u,{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){return toObjs(parseCSV(t));});}
+  /* the classes tab was renamed "Class details" (24 Aug 2026); gviz serves the FIRST tab for an
+     unknown name, so validate the header and fall back to the old name */
+  function getClasses(){return fetch(csvUrl(WC_SHEET,WC_CLASSES),{cache:'no-store'}).then(function(r){return r.text();})
+    .then(function(t){ return /"location"/i.test((t.split('\n')[0]||'')) ? toObjs(parseCSV(t)) : get(csvUrl(WC_SHEET,WC_CLASSES_OLD)); });}
 
   // ---------- weekly class (talk / short course) ----------
   function colYes(row,col){ var k=Object.keys(row).find(function(h){return low(h)===low(col);}); return k?yes(row[k]):false; }
@@ -190,7 +194,7 @@
     if(!document.getElementById('akx-fonts')){var lf=document.createElement('link');lf.id='akx-fonts';lf.rel='stylesheet';lf.href='https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Inter:wght@400;500;600;700;800&display=swap';document.head.appendChild(lf);}
     var gfxReady=new Promise(function(res){ if(window.AKX_GFX) return res(); var s=document.getElementById('akx-gfx-loader')||document.createElement('script');
       if(!s.id){s.id='akx-gfx-loader'; s.src=BASE+'event-graphics.js'; document.head.appendChild(s);} s.addEventListener('load',res); });
-    Promise.all([gfxReady, get(csvUrl(WC_SHEET,WC_ITEMS)), get(csvUrl(WC_SHEET,WC_CLASSES)), get(csvUrl(EV_SHEET,EV_TAB)), get(csvUrl(EV_SHEET,EV_TE))])
+    Promise.all([gfxReady, get(csvUrl(WC_SHEET,WC_ITEMS)), getClasses(), get(csvUrl(EV_SHEET,EV_TAB)), get(csvUrl(EV_SHEET,EV_TE))])
       .then(function(r){ window.AKX_GFX.injectCSS(); render(mount,{items:r[1],classes:r[2],events:r[3],teachers:r[4]}); })
       .catch(function(){ mount.style.display='none'; });
   }
