@@ -27,6 +27,10 @@
   <p class="lede" id="lede">A friendly weekly meditation class in the middle of Cirencester. No experience needed and nothing to join — you can simply turn up.</p>
 </div>
 
+<div class="sec">
+  <div id="akx-branch-when" data-town="cirencester" data-name="Cirencester"></div>
+</div>
+
 <div class="sec"><div class="placeholder"><b>Why meditate — the three lotus benefits</b>existing homepage block (to be hosted as a widget)</div></div>
 
 <!-- THE NEW WIDGET -->
@@ -52,6 +56,7 @@ document.getElementById('sw').addEventListener('click', function(){
   var r=document.getElementById('akx-branch');
   var toStroud = r.getAttribute('data-town')!=='stroud';
   r.setAttribute('data-town', toStroud?'stroud':'cirencester');
+  var w=document.getElementById('akx-branch-when'); w.setAttribute('data-town', toStroud?'stroud':'cirencester'); w.setAttribute('data-name', toStroud?'Stroud':'Cirencester'); w.removeAttribute('data-done'); w.innerHTML='';
   r.setAttribute('data-name', toStroud?'Stroud':'Cirencester');
   document.getElementById('ttl').textContent = toStroud?'Meditate in Stroud':'Meditate in Cirencester';
   document.getElementById('lede').textContent = toStroud
