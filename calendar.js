@@ -40,7 +40,7 @@
     /* branch pages — Cirencester, Stroud, Gloucester, Tewkesbury, Evesham.
        Branch classes and Cheltenham on; Courses & retreats available but off. */
     branch:   { title:'Classes in Gloucestershire', mode:'list',
-                feeds:[ {k:'branch'}, {k:'weekly'}, {k:'weekend',on:false}, {k:'prayers',on:false}, {k:'volunteer',on:false}, {k:'announce'} ] }
+                feeds:[ {k:'branch'}, {k:'weekly',on:false}, {k:'weekend',on:false}, {k:'prayers',on:false}, {k:'volunteer',on:false}, {k:'announce'} ] }
   };
 
   var root = document.getElementById('akx-cal');
