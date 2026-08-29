@@ -14,6 +14,8 @@
      data-heading="Stay in touch"     heading text; data-heading="" hides it
      data-channels="whatsapp,enews,facebook,instagram"
                                      which cards, in this order
+     data-maxwidth="1040"            cap the width; default is to fill the
+                                     block it sits in, like every other block
      data-align="center"             "center" (default) or "left"
 
    Multiple mounts on one page are fine — use class="akx-social" instead of id.
@@ -129,7 +131,7 @@
      Styles — injected once, all selectors namespaced .akxs-
      --------------------------------------------------------------------- */
   var CSS = [
-    '.akxs-wrap{max-width:1040px;margin:0 auto;font-family:inherit}',
+    '.akxs-wrap{width:100%;margin:0 auto;font-family:inherit}',
     '.akxs-h{font-family:Fraunces,Georgia,serif;font-size:1.75rem;color:#2A66A6;text-align:center;margin:0 0 1.5rem}',
     '.akxs-grid{display:grid;grid-template-columns:repeat(var(--akxs-cols,4),1fr);gap:16px;align-items:stretch}',
     '.akxs-card{position:relative;display:flex;flex-direction:column;text-align:center;',
@@ -143,8 +145,8 @@
     '.akxs-pin{white-space:nowrap;font-size:10.5px;font-weight:700;',
     'letter-spacing:.07em;text-transform:uppercase;padding:4px 12px;border-radius:999px;background:#fff}',
     '.akxs-pin{color:#8A6B3A;border:1px solid rgba(232,183,90,.60)}',
-    '.akxs-icorow{position:relative;display:flex;justify-content:center;align-items:center}',
-    '.akxs-flash{position:absolute;left:2px;top:50%;transform:translateY(-50%);',
+    '.akxs-icorow{display:grid;grid-template-columns:1fr auto 1fr;align-items:center}',
+    '.akxs-flash{grid-column:1;justify-self:center;',
     'font-family:Inter,Helvetica,Arial,sans-serif;font-size:11.5px;font-weight:700;',
     'letter-spacing:.10em;text-transform:uppercase;color:#4E9E58}',
     '.akxs-ico{width:66px;height:66px;margin:6px auto 16px}',
@@ -166,7 +168,7 @@
     '.akxs-note{font-size:11.2px;line-height:1.35;min-height:32px;margin-bottom:12px;padding:0}',
     '.akxs-cta{font-size:13px;padding:10px 8px}',
     '.akxs-pin{font-size:9px;padding:3px 8px;letter-spacing:.05em}',
-    '.akxs-flash{font-size:9.5px;left:0;letter-spacing:.07em}',
+    '.akxs-flash{font-size:9.5px;letter-spacing:.06em}',
     '.akxs-full{display:none}.akxs-short{display:inline}}',
     '@media (prefers-reduced-motion:reduce){.akxs-card{transition:none}.akxs-card:hover{transform:none}}'
   ].join('');
@@ -197,7 +199,7 @@
 
     return '<a class="akxs-card"' + href + '>' +
       pins +
-      '<span class="akxs-icorow">' + flash + '<span class="akxs-ico">' + ICONS[key] + '</span></span>' +
+      '<span class="akxs-icorow">' + (flash || '<span></span>') + '<span class="akxs-ico">' + ICONS[key] + '</span><span></span></span>' +
       '<span class="akxs-nm ' + c.nameStyle + '" style="color:' + c.nameColour + '">' + c.name + '</span>' +
       '<span class="akxs-note">' + c.note + '</span>' +
       '<span class="akxs-cta" style="background:' + c.button + ';color:' + (c.buttonInk || '#fff') + '">' +
@@ -215,11 +217,12 @@
       .filter(function (s) { return CHANNELS[s]; });
     if (!order.length) order = DEFAULT_ORDER.slice();
 
+    var maxw = mount.getAttribute('data-maxwidth');
     var headingAttr = mount.getAttribute('data-heading');
     var heading = headingAttr === null ? DEFAULT_HEADING : headingAttr;
 
     var cols = Math.min(order.length, 4);
-    var html = '<div class="akxs-wrap">';
+    var html = '<div class="akxs-wrap"' + (maxw ? ' style="max-width:' + parseInt(maxw,10) + 'px"' : '') + '>';
     if (heading) html += '<h2 class="akxs-h">' + heading + '</h2>';
     html += '<div class="akxs-grid" style="--akxs-cols:' + cols + '">';
     order.forEach(function (k) { html += cardHTML(k); });
