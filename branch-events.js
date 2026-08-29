@@ -68,28 +68,27 @@
   + '.akxb *{box-sizing:border-box;}'
   + '.akxb .bx-h{text-align:center;font-family:'+SERIF+';font-weight:600;font-size:1.8rem;color:'+C.blue+';margin:0 0 20px;}'
 
-  /* ---- 1. where & when ---- */
-  + '.akxb .ww{display:flex;flex-direction:column;gap:14px;}'
-  + '.akxb .ww-card{display:flex;align-items:stretch;background:#fff;border:1px solid '+C.aquaBd+';border-radius:16px;overflow:hidden;}'
-  + '.akxb .ww-day{flex:0 0 208px;background:'+C.aquaBg+';padding:22px 20px;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:3px;}'
-  + '.akxb .ww-dname{font-family:'+SERIF+';font-weight:600;font-size:1.62rem;line-height:1.1;color:'+C.aqua+';}'
-  + '.akxb .ww-time{font:700 1.5rem/1.15 '+FONT+';color:var(--ink);letter-spacing:-.01em;}'
-  + '.akxb .ww-dur{font:600 .78rem/1.4 '+FONT+';letter-spacing:.06em;text-transform:uppercase;color:var(--mut);}'
-  + '.akxb .ww-body{flex:1;padding:22px 24px;display:flex;flex-direction:column;justify-content:center;gap:7px;min-width:0;}'
-  + '.akxb .ww-venue{font:600 1.12rem/1.35 '+FONT+';color:'+C.blue+';}'
-  + '.akxb .ww-addr{font-size:.98rem;line-height:1.5;color:var(--mut);}'
-  + '.akxb .ww-note{font-size:.92rem;color:var(--mut);}'
-  + '.akxb .ww-acts{display:flex;gap:9px;flex-wrap:wrap;margin-top:4px;}'
-  + '.akxb .ww-a{display:inline-block;font:600 .9rem '+FONT+';padding:9px 15px;border-radius:999px;text-decoration:none;background:'+C.aquaBg+';color:'+C.aqua+';border:1px solid '+C.aquaBd+';}'
-  + '.akxb .ww-a.solid{background:'+C.coral+';color:#fff;border-color:'+C.coral+';}'
-  + '.akxb .ww-soon{background:#fff;border:1px solid '+C.skyBd+';border-radius:16px;padding:24px 26px;font-size:1.04rem;line-height:1.6;}'
-  + '.akxb .ww-soon b{color:'+C.blue+';}'
+  /* ---- 1. where & when: ONE invitation card ---- */
+  + '.akxb .inv{background:#fff;border:1px solid '+C.aquaBd+';border-radius:20px;padding:38px 40px;text-align:center;box-shadow:0 2px 14px rgba(42,102,166,.05);}'
+  + '.akxb .inv-eye{font:600 .74rem/1 '+FONT+';letter-spacing:.16em;text-transform:uppercase;color:'+C.coral+';margin-bottom:14px;}'
+  + '.akxb .inv-t{font-family:'+SERIF+';font-weight:600;font-size:1.72rem;line-height:1.2;color:'+C.blue+';margin:0 0 6px;}'
+  + '.akxb .inv-venue{font:600 1.06rem/1.5 '+FONT+';color:'+C.blue+';margin-bottom:2px;}'
+  + '.akxb .inv-addr{font-size:1rem;line-height:1.55;color:var(--mut);}'
+  + '.akxb .inv-rule{width:54px;height:2px;background:'+C.aquaBd+';border-radius:2px;margin:22px auto;}'
+  + '.akxb .inv-slots{display:flex;flex-direction:column;gap:10px;margin-bottom:6px;}'
+  + '.akxb .inv-slot{font-family:'+SERIF+';font-weight:600;font-size:1.4rem;line-height:1.25;color:'+C.blue+';}'
+  + '.akxb .inv-slot em{font-style:normal;color:'+C.aqua+';}'
+  + '.akxb .inv-dur{font:600 .8rem/1.5 '+FONT+';letter-spacing:.05em;text-transform:uppercase;color:var(--mut);}'
+  + '.akxb .inv-note{font-size:.95rem;line-height:1.55;color:var(--mut);margin-top:16px;}'
+  + '.akxb .inv-acts{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:22px;}'
+  + '.akxb .inv-a{display:inline-block;font:600 .93rem '+FONT+';padding:11px 20px;border-radius:999px;text-decoration:none;background:'+C.aquaBg+';color:'+C.blue+';border:1px solid '+C.aquaBd+';}'
+  + '.akxb .inv-a.solid{background:'+C.coral+';color:#fff;border-color:'+C.coral+';}'
+  + '.akxb .inv-soon{font-size:1.05rem;line-height:1.65;color:var(--ink);}'
 
-  /* ---- 2. branch pills ---- */
-  + '.akxb .bp{margin-top:20px;text-align:center;}'
-  + '.akxb .bp-lbl{font:600 .74rem/1 '+FONT+';letter-spacing:.13em;text-transform:uppercase;color:var(--mut);margin-bottom:11px;}'
+  /* ---- 2. pills (no sub-header) ---- */
+  + '.akxb .bp{margin-top:22px;}'
   + '.akxb .bp-row{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;}'
-  + '.akxb .bp-row a{font:600 .92rem '+FONT+';text-decoration:none;padding:9px 17px;border-radius:999px;background:'+C.skyBg+';color:#3E7FA8;border:1px solid '+C.skyBd+';transition:background .15s;}'
+  + '.akxb .bp-row a{font:600 .9rem '+FONT+';text-decoration:none;padding:9px 17px;border-radius:999px;background:'+C.skyBg+';color:#3E7FA8;border:1px solid '+C.skyBd+';transition:background .15s;}'
   + '.akxb .bp-row a:hover{background:#DCEDF8;}'
 
   /* ---- 3. events list ---- */
@@ -121,14 +120,12 @@
   + '.akxb .bx-msg{text-align:center;color:#8f8a81;padding:20px;}'
 
   + '@media(max-width:640px){'
-  +   '.akxb .ww-card{flex-direction:column;}'
-  +   '.akxb .ww-day{flex:none;flex-direction:row;align-items:baseline;justify-content:flex-start;gap:10px;padding:14px 18px;text-align:left;}'
-  +   '.akxb .ww-dname{font-size:1.28rem;} .akxb .ww-time{font-size:1.18rem;}'
-  +   '.akxb .ww-body{padding:16px 18px;}'
+  +   '.akxb .inv{padding:26px 20px;border-radius:16px;}'
+  +   '.akxb .inv-t{font-size:1.34rem;} .akxb .inv-slot{font-size:1.16rem;}'
   +   '.akxb .bx-card{flex-direction:column;gap:12px;padding:16px;}'
   +   '.akxb .bx-when{display:flex;gap:9px;align-items:baseline;border-right:0;border-bottom:1px solid #F3EFE8;padding:0 0 10px;flex:none;text-align:left;width:100%;}'
   +   '.akxb .bx-h{font-size:1.4rem;}'
-  +   '.akxb .bx-btn,.akxb .ww-a{flex:1;text-align:center;}'
+  +   '.akxb .bx-btn,.akxb .inv-a{flex:1;text-align:center;}'
   + '}';
 
   /* ---------- helpers ---------- */
@@ -181,38 +178,39 @@
 
   /* ---------- 1. WHERE & WHEN + pills ---------- */
   function drawWhen(root, name, town, slots, venue){
-    var html='<style>'+STYLE+'</style>';
-    html+='<h2 class="bx-h">Where &amp; when we meet in '+esc(name)+'</h2>';
+    var html='<style>'+STYLE+'</style><div class="inv">';
+    html+='<div class="inv-eye">Everybody welcome</div>';
+    html+='<h2 class="inv-t">Meditation classes in '+esc(name)+'</h2>';
+
     if(slots.length){
-      html+='<div class="ww">';
+      if(venue&&venue.name) html+='<div class="inv-venue">'+esc(venue.name)+'</div>';
+      if(venue&&venue.address) html+='<div class="inv-addr">'+esc(venue.address)+'</div>';
+      html+='<div class="inv-rule"></div><div class="inv-slots">';
       slots.forEach(function(s){
-        var acts='';
-        if(venue && venue.address) acts+='<a class="ww-a" href="'+esc(maps(venue.address))+'" target="_blank" rel="noopener">Get directions</a>';
-        if(s.book) acts='<a class="ww-a solid" href="'+esc(s.book)+'" target="_blank" rel="noopener">Book your Spot &rarr;</a>'+acts;
-        html+='<div class="ww-card">'
-            + '<div class="ww-day"><div class="ww-dname">'+esc(s.day)+'</div>'
-            +   '<div class="ww-time">'+esc(s.time)+'</div>'
-            +   (s.duration?'<div class="ww-dur">'+esc(s.duration)+'</div>':'')
-            + '</div>'
-            + '<div class="ww-body">'
-            +   '<div class="ww-venue">'+esc(venue&&venue.name?venue.name:name)+'</div>'
-            +   (venue&&venue.address?'<div class="ww-addr">'+esc(venue.address)+'</div>':'')
-            +   (venue&&venue.access?'<div class="ww-note">'+esc(venue.access)+'</div>':'')
-            +   (acts?'<div class="ww-acts">'+acts+'</div>':'')
-            + '</div></div>';
+        html+='<div><div class="inv-slot">'+esc(s.day)+' <em>at '+esc(s.time)+'</em></div>'
+            + (s.duration?'<div class="inv-dur">'+esc(s.duration)+'</div>':'')+'</div>';
       });
       html+='</div>';
+      if(venue&&venue.access) html+='<div class="inv-note">'+esc(venue.access)+'</div>';
+      var acts='';
+      var booking=null; slots.forEach(function(s){ if(!booking&&s.book) booking=s.book; });
+      if(booking) acts+='<a class="inv-a solid" href="'+esc(booking)+'" target="_blank" rel="noopener">Book your Spot &rarr;</a>';
+      if(venue&&venue.address) acts+='<a class="inv-a" href="'+esc(maps(venue.address))+'" target="_blank" rel="noopener">Get directions</a>';
+      if(acts) html+='<div class="inv-acts">'+acts+'</div>';
     } else {
-      html+='<div class="ww-soon"><b>We&rsquo;re confirming a venue and dates for '+esc(name)+'.</b> '
-          + 'In the meantime you&rsquo;re very welcome at any of our other classes &mdash; and there are ways to start at home, below.</div>';
+      html+='<div class="inv-rule"></div>'
+          + '<p class="inv-soon">We&rsquo;re confirming a venue and dates in '+esc(name)+' now.<br>'
+          + 'In the meantime you&rsquo;re very welcome at any of our other classes, and there are ways to start at home below.</p>';
     }
-    /* branch pills */
-    var others=BRANCHES.filter(function(b){ return b.slug!==town; });
-    if(others.length){
-      html+='<div class="bp"><div class="bp-lbl">We also meet in</div><div class="bp-row">'
-          + others.map(function(b){ return '<a href="/'+b.slug+'">'+esc(b.name)+'</a>'; }).join('')
-          + '</div></div>';
-    }
+    html+='</div>';
+
+    /* pills — Cheltenham first (to What\u2019s On), then the other branches */
+    var pills=[{href:'/whats-on', label:'Events in Cheltenham'}];
+    BRANCHES.forEach(function(b){ if(b.slug!==town) pills.push({href:'/'+b.slug, label:'Events in '+b.name}); });
+    html+='<div class="bp"><div class="bp-row">'
+       + pills.map(function(p){ return '<a href="'+p.href+'">'+esc(p.label)+'</a>'; }).join('')
+       + '</div></div>';
+
     root.className='akxb';
     root.innerHTML=html;
   }
