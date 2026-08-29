@@ -39,6 +39,8 @@
   /* ------------------------------------------------------------------ */
   var TITLE    = 'Drop-in classes in {town}';    // {town} = the data-name on the stub
   var BANNER   = 'Everybody welcome';
+  var EVENTS_TITLE = 'Talks &amp; short courses';
+  var COURSES  = 2;                              // the current/next course + the one after it
   var WHATSAPP = '07788 945212';                 // from /contact-us
   var SHEET    = '1YArubV8QgCvPUIIvHOHWhCN2fYLRz0DDPSRSHD_tSmY';
   var BASE     = 'https://kadampacheltenham.github.io/akx-widgets/';
@@ -59,7 +61,9 @@
     { key: 'card',        widget: null },
     { key: 'lotus',       widget: 'lotus-benefits.js', mount: 'akx-lotus' },
     { key: 'testimony',   widget: 'testimony-quotes.js' },
-    { key: 'events',      widget: null },                       // to be built
+    /* Talks & short courses — the SAME widget /weekly-classes uses, filtered to this town
+       and capped at two cards: the current/next course, then the one after it. */
+    { key: 'events',      widget: ['event-graphics.js', 'wc-talks-courses.js'], mount: 'akx-programme' },
     { key: 'starthome',   widget: 'start-at-home.js',  mount: 'akx-starthome' },
     { key: 'social',      widget: 'social-cards.js',   mount: 'akx-social' },
     { key: 'calendar',    widget: 'calendar.js',       mount: 'akx-cal' }
@@ -73,6 +77,7 @@
     '.akxp-sec{padding:46px 0}',
     '.akxp-sec:first-child{padding-top:0}',
     '.akxp-sec:empty{display:none;padding:0}',
+    '.akxp-sec.akx-empty{display:none;padding:0}',   /* set by a widget that has nothing to show */
     /* card */
     '.akxb-card{background:#fff;border:1px solid rgba(226,136,106,.38);border-radius:18px;',
     'overflow:hidden;max-width:800px;margin:0 auto;',
@@ -260,15 +265,27 @@
   /* ------------------------------------------------------------------ */
   var BASE_OVERRIDE = null;   // set from data-base on the mount (used for local previews)
 
-  function loadScript(file) {
+  function loadScript(file, onload) {
     var id = 'akx-w-' + file.replace(/\W+/g,'-');
-    if (document.getElementById(id)) return;
+    if (document.getElementById(id)) { if (onload) onload(); return; }
     var s = document.createElement('script');
     s.id = id; s.src = (BASE_OVERRIDE || BASE) + file + V; s.defer = true;
+    s.onload = function () { if (onload) onload(); };
     s.onerror = function () {
       if (window.console) console.warn('[akx-branch] ' + file + ' not published yet — its section stays empty.');
+      if (onload) onload();          // a missing helper must not block the widget behind it
     };
     document.body.appendChild(s);
+  }
+
+  /* an array loads in order — event-graphics.js must define AKX_GFX before wc-talks-courses.js */
+  function loadWidget(w) {
+    if (!w) return;
+    if (typeof w === 'string') return loadScript(w);
+    (function next(i) {
+      if (i >= w.length) return;
+      loadScript(w[i], function () { next(i + 1); });
+    })(0);
   }
 
   /* ------------------------------------------------------------------ */
@@ -298,9 +315,12 @@
       if (s.key === 'card') {
         html += '<div class="akxp-sec">' + card.html + '</div>';
       } else if (s.key === 'events') {
-        html += '<div class="akxp-sec">' +
-                (showSlot ? '<div class="akxp-slot">Classes &amp; events in ' + esc(name) +
-                            ' — section not built yet</div>' : '') + '</div>';
+        html += '<div class="akxp-sec"><div id="' + s.mount + '"' +
+                ' data-location="' + esc(town) + '"' +
+                ' data-limit="' + COURSES + '"' +
+                ' data-labels="branch"' +
+                ' data-heading="' + EVENTS_TITLE + '"' +
+                ' data-lead="" data-quotes="0"></div></div>';
       } else if (s.key === 'testimony') {
         html += '<div class="akxp-sec"><div class="akx-tq" data-type="testimony" data-page="' +
                 esc(quotePage) + '"></div></div>';
@@ -316,7 +336,7 @@
     mount.innerHTML = html;
     mount.setAttribute('data-akx-done', '1');
 
-    order.forEach(function (s) { if (s.widget) loadScript(s.widget); });
+    order.forEach(function (s) { loadWidget(s.widget); });
   }
 
   function init() {
