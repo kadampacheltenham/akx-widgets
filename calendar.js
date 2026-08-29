@@ -3,12 +3,19 @@
        <div id="calendar" style="scroll-margin-top:130px;"></div>
        <div id="akx-cal" data-cal="weekly"></div>
        <script src="https://kadampacheltenham.github.io/akx-widgets/calendar.js" defer></script>
-   data-cal picks the preset (see PRESETS below): "whatson" | "weekly".
-   Each preset sets its own title, default view, and which feeds show. */
+   data-cal picks the preset (see PRESETS below): "whatson" | "weekly" | "courses"
+   | "prayers" | "volunteer" | "branch".
+   Each preset sets its own title, default view, and which feeds show.
+
+   29 Aug 2026 — added: the "branch" preset (Classes in Gloucestershire), plus
+   past days dimmed and the next day with an event lightly highlighted, in both
+   Month and Upcoming views. A day counts as past once every event on it
+   finished more than SETTLE_HOURS ago. */
 (function(){
   var API_KEY = 'AIzaSyAVm0epUASAL2aNbAN_aBmpDDPxoPJVOwA';
   var TZ = 'Europe/London';
-  // ---- master feed list (all five calendars) ----
+  var SETTLE_HOURS = 6;   // today stays "current" until 6h after its last event ends
+  // ---- master feed list (all six calendars) ----
   var FEEDS = {
     weekly:   { name:'Weekly classes (Cheltenham)', color:'#2E7C7C', id:'c_9e95a300a2d0f8775b28d30ebfe5eb816d8dc678d4dffbebbc09cd59d9208ffd@group.calendar.google.com' },
     branch:   { name:'Branch classes',              color:'#4FA35A', id:'c_6b6fc5b8541682cc520a71d1bc5683dc16d14d2e907ef4da85a1e7479a73c798@group.calendar.google.com' },
@@ -29,7 +36,11 @@
     prayers:  { title:'Upcoming Prayers & Pujas', mode:'list',
                 feeds:[ {k:'weekly',on:false}, {k:'branch',on:false}, {k:'weekend',on:false}, {k:'prayers'}, {k:'volunteer',on:false}, {k:'announce'} ] },
     volunteer:{ title:'Upcoming Volunteering Events', mode:'list',
-                feeds:[ {k:'weekly',on:false}, {k:'branch',on:false}, {k:'weekend',on:false}, {k:'prayers',on:false}, {k:'volunteer'}, {k:'announce'} ] }
+                feeds:[ {k:'weekly',on:false}, {k:'branch',on:false}, {k:'weekend',on:false}, {k:'prayers',on:false}, {k:'volunteer'}, {k:'announce'} ] },
+    /* branch pages — Cirencester, Stroud, Gloucester, Tewkesbury, Evesham.
+       Branch classes and Cheltenham on; Courses & retreats available but off. */
+    branch:   { title:'Classes in Gloucestershire', mode:'list',
+                feeds:[ {k:'branch'}, {k:'weekly'}, {k:'weekend',on:false}, {k:'prayers',on:false}, {k:'volunteer',on:false}, {k:'announce'} ] }
   };
 
   var root = document.getElementById('akx-cal');
@@ -38,7 +49,7 @@
   var P = PRESETS[(root.getAttribute('data-cal')||'weekly').trim()] || PRESETS.weekly;  /* this file = Weekly Classes page; default to the weekly preset (weekly+branch+announce) */
   var CALS = P.feeds.map(function(f){ var base=FEEDS[f.k]; return Object.assign({key:f.k, on:f.on}, base); })
                     .filter(function(c){ return c && /@/.test(c.id); });
-  var TITLE = P.title;
+  var TITLE = root.getAttribute('data-title') || P.title;
 
   var enabled = {}; CALS.forEach(function(c){ enabled[c.key]= c.pinned ? true : (c.on!==false); });
   var view = new Date(); view.setDate(1);
@@ -49,7 +60,7 @@
   var loading = false;
 
   var CSS = ''
-  + '#akx-cal{--coral:#E2886A;--ink:#1D1D1F;--muted:#6B6B6E;--line:#ECE9E2;color:var(--ink);max-width:1000px;margin:0 auto;}'  /* lotus/content width */
+  + '#akx-cal{--coral:#E2886A;--ink:#1D1D1F;--muted:#6B6B6E;--line:#ECE9E2;--teal:#1F7C74;--tealbg:#EDF8F6;--tealbd:#B9E3DD;color:var(--ink);max-width:1000px;margin:0 auto;}'  /* lotus/content width */
   + '#akx-cal *{box-sizing:border-box;}'
   + '#akx-cal .cal-title{margin:0 auto 34px;text-align:center;font-family:\'Inter\',sans-serif;font-size:clamp(1.5rem,4.5vw,1.9rem);font-weight:600;color:#2A66A6;}'  /* blue heading &mdash; Title Case, size matches Week at a Glance / Programme */
   + '#akx-cal .card{background:#fff;border-radius:16px;box-shadow:0 6px 30px rgba(0,0,0,.07);padding:22px 22px 26px;}'
@@ -80,12 +91,22 @@
   + '#akx-cal .cell{min-height:104px;min-width:0;overflow:hidden;border:1px solid var(--line);border-radius:10px;padding:6px 6px 8px;background:#fff;display:flex;flex-direction:column;gap:4px;}'
   + '#akx-cal .cell.other{background:#faf8f4;color:#bcb8b0;}'
   + '#akx-cal .cell.closed{background:#F3F0EA;}'
+  /* --- past days: quietly out of the way, still readable --- */
+  + '#akx-cal .cell.past{background:#FAF9F6;}'
+  + '#akx-cal .cell.past .num{color:#B4B0A8;}'
+  + '#akx-cal .cell.past .ev{opacity:.42;filter:saturate(.55);}'
+  /* --- the next day with something on it --- */
+  + '#akx-cal .cell.nextday{background:var(--tealbg);border-color:var(--tealbd);}'
+  + '#akx-cal .cell.nextday .num{color:var(--teal);font-weight:700;}'
   + '#akx-cal .cell .num{font-size:.8rem;color:var(--muted);padding:1px 3px;}'
   + '#akx-cal .cell.today .num{background:var(--coral);color:#fff;border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-weight:600;}'
   + '#akx-cal .ev{font-size:.74rem;line-height:1.2;color:#fff;border-radius:6px;padding:3px 6px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}'
   + '#akx-cal .ev .t{opacity:.85;}'
   + '#akx-cal .more{font-size:.72rem;color:var(--muted);cursor:pointer;padding:1px 4px;}'
   + '#akx-cal .list .dg{border-top:1px solid var(--line);padding:14px 2px;}#akx-cal .list .dg:first-child{border-top:0;}'
+  + '#akx-cal .list .dg.past{opacity:.45;}'
+  + '#akx-cal .list .dg.nextday{background:var(--tealbg);border-radius:12px;padding-left:14px;padding-right:14px;}'
+  + '#akx-cal .list .dg.nextday .dl{color:var(--teal);font-weight:700;}'
   + '#akx-cal .dl{font-size:.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;}'
   + '#akx-cal .li{display:flex;align-items:flex-start;gap:12px;padding:8px 0;cursor:pointer;}'
   + '#akx-cal .li .dot{width:11px;height:11px;border-radius:50%;margin-top:6px;flex:none;}'
@@ -139,12 +160,13 @@
   function base(item, cal){
     var allDay=!!(item.start&&item.start.date);
     var startStr=item.start?(item.start.dateTime||item.start.date):null;
+    var endStr=item.end?(item.end.dateTime||item.end.date):null;      // needed for the 6-hour settle rule
     var rawDesc=item.description||'';
     var book=findBooking(rawDesc)||findBooking(item.location);
     var desc=stripHtml(rawDesc);
     if(book) desc=desc.replace(book,'').replace(/\bbook(ing)?\s*(here|now)?\s*:?\s*$/i,'').replace(/\s{2,}/g,' ').trim();
     return {id:item.id, calKey:cal.key, color:cal.color, calName:cal.name, pinned:!!cal.pinned,
-            title:item.summary||'(untitled)', start:startStr, allDay:allDay,
+            title:item.summary||'(untitled)', start:startStr, end:endStr, allDay:allDay,
             loc:item.location||'', desc:desc, book:book,
             endDate:(allDay&&item.end&&item.end.date)?item.end.date:null};
   }
@@ -168,7 +190,7 @@
       +'&timeMin='+encodeURIComponent(tMin)+'&timeMax='+encodeURIComponent(tMax);
   }
   function fetchMonth(cal, y, m){
-    if(!cal.id || /PUT_/.test(cal.id)) return Promise.resolve();   // feed not configured yet (e.g. Volunteering) — skip, keep its pill visible
+    if(!cal.id || /PUT_/.test(cal.id)) return Promise.resolve();   // feed not configured yet — skip, keep its pill visible
     var k=cal.id+'|'+y+'-'+m; if(fetched[k]) return Promise.resolve(); fetched[k]=true;
     var tMin=new Date(y,m,1).toISOString(), tMax=new Date(y,m+1,1).toISOString();
     return fetch(apiUrl(cal,tMin,tMax)).then(function(r){return r.json();}).then(function(j){
@@ -186,6 +208,33 @@
               .sort(function(a,b){ if(a.allDay!==b.allDay) return a.allDay?-1:1; return (a.start||'').localeCompare(b.start||''); });
   }
 
+  /* ---------------------------------------------------------------
+     Past / next-up. A day is past when it is before today, or when it
+     IS today and every event on it finished more than SETTLE_HOURS ago.
+     A day with nothing on it is never "settled" — today stays today.
+     --------------------------------------------------------------- */
+  function isPast(ymd, evs){
+    var todayYmd=ymdLocal(new Date());
+    if(ymd < todayYmd) return true;
+    if(ymd !== todayYmd) return false;
+    if(!evs || !evs.length) return false;
+    var cutoff=Date.now() - SETTLE_HOURS*3600*1000;
+    return evs.every(function(e){
+      if(e.allDay) return false;                       // an all-day thing today hasn't "finished"
+      var endMs = e.end ? new Date(e.end).getTime()
+                        : (e.start ? new Date(e.start).getTime() + 90*60*1000 : 0);  // no end time → assume 90 mins
+      return endMs && endMs < cutoff;
+    });
+  }
+  /* the earliest day, from today onwards, that still has something on it */
+  function nextUpYmd(){
+    var todayYmd=ymdLocal(new Date()), days={};
+    ALL.forEach(function(e){ if(enabled[e.calKey] && e.ymd >= todayYmd) days[e.ymd]=true; });
+    var keys=Object.keys(days).sort();
+    for(var i=0;i<keys.length;i++){ if(!isPast(keys[i], eventsOn(keys[i]))) return keys[i]; }
+    return null;
+  }
+
   // ---- closure / announcement banner (always visible, month-independent) ----
   function rangeStr(startStr, endDate, allDay){
     if(allDay){
@@ -199,7 +248,7 @@
   function loadBanner(){
     var pins=CALS.filter(function(c){return c.pinned;}); if(!pins.length){return;}
     var now=new Date(), t0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-    var tMin=new Date(t0.getFullYear(),t0.getMonth(),t0.getDate()-1).toISOString(), tMax=new Date(t0.getFullYear(),t0.getMonth(),t0.getDate()+21).toISOString();   // fetch near-term; the per-type display window below decides what actually shows
+    var tMin=new Date(t0.getFullYear(),t0.getMonth(),t0.getDate()-1).toISOString(), tMax=new Date(t0.getFullYear(),t0.getMonth(),t0.getDate()+21).toISOString();
     Promise.all(pins.map(function(c){
       return fetch(apiUrl(c,tMin,tMax)).then(function(r){return r.json();})
         .then(function(j){return {cal:c,items:(j.items||[])};}).catch(function(){return {cal:c,items:[]};});
@@ -211,9 +260,9 @@
         var endDate=(allDay&&it.end&&it.end.date)?it.end.date:null;
         var title=it.summary||'Notice';
         var closure=/clos(e|ed|ure)|shut|cancel/i.test(title);
-        if(!closure) return;                                    // BANNER is ONLY for "centre closed" notices; every other announcement just shows in the list (so programme gaps are explained)
+        if(!closure) return;                                    // BANNER is ONLY for "centre closed" notices
         var startD = allDay ? parseYmd(startStr) : new Date(startStr);
-        var lastDay;                                            // last ACTUAL day of the closure
+        var lastDay;
         if(allDay && endDate){ lastDay=parseYmd(endDate); lastDay.setDate(lastDay.getDate()-1); }
         else if(allDay){ lastDay=new Date(startD); }
         else { lastDay = endDate ? new Date(endDate) : new Date(startStr); }
@@ -226,7 +275,7 @@
       }); });
       anns.sort(function(a,b){return a._s-b._s;});
       var box=document.getElementById('akx-banner'); box.innerHTML='';
-      anns.slice(0,1).forEach(function(a){                      // one at a time — the next/current notice only
+      anns.slice(0,1).forEach(function(a){
         var closure=/clos(e|ed|ure)|shut|cancel/i.test(a.title);
         var ink=closure?'#8A2A26':'#B7791F';
         var el=document.createElement('div'); el.className='ann '+(closure?'closure':'notice');
@@ -253,7 +302,7 @@
   function renderFilters(){
     var f=document.getElementById('akx-filters'); f.innerHTML='';
     var toggleable=CALS.filter(function(c){return !c.pinned;});
-    if(toggleable.length<2 && CALS.length<2){ return; }   // nothing meaningful to show
+    if(toggleable.length<2 && CALS.length<2){ return; }
     CALS.forEach(function(c){
       var on=enabled[c.key], pin=!!c.pinned;
       var el=document.createElement('div'); el.className='pill '+(on?'on':'off')+(pin?'':' tog');
@@ -270,12 +319,14 @@
     var html='<div class="gridwrap"><div class="wh">'
       +['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(function(d){return '<div>'+d+'</div>';}).join('')+'</div><div class="grid">';
     var first=new Date(y,m,1), start=(first.getDay()+6)%7, gs=new Date(y,m,1-start);
-    var todayYmd=ymdLocal(new Date());
+    var todayYmd=ymdLocal(new Date()), nextYmd=nextUpYmd();
     for(var i=0;i<42;i++){
       var d=new Date(gs); d.setDate(gs.getDate()+i);
       var ymd=ymdLocal(d), other=d.getMonth()!==m, evs=eventsOn(ymd);
       var closed=evs.some(function(e){return e.pinned;});
-      html+='<div class="cell'+(other?' other':'')+(closed?' closed':'')+(ymd===todayYmd?' today':'')+'"><div class="num">'+d.getDate()+'</div>';
+      var past=isPast(ymd,evs), isNext=(ymd===nextYmd);
+      html+='<div class="cell'+(other?' other':'')+(closed?' closed':'')+(past?' past':'')
+           +(isNext?' nextday':'')+(ymd===todayYmd?' today':'')+'"><div class="num">'+d.getDate()+'</div>';
       evs.slice(0,3).forEach(function(e,idx){
         html+='<div class="ev" data-ymd="'+ymd+'" data-i="'+idx+'" style="background:'+e.color+(e.pinned?';color:#4a4740':'')+'">'
           +(e.allDay?'':'<span class="t">'+fmtTime(e.start,false)+'</span> ')+esc(e.title)+'</div>';
@@ -287,19 +338,23 @@
   }
   function drawList(){
     var y=view.getFullYear(), m=view.getMonth(), days=new Date(y,m+1,0).getDate(), html='<div class="list">', any=false, shown={};
+    var nextYmd=nextUpYmd();
     for(var dd=1;dd<=days;dd++){
       var d=new Date(y,m,dd), ymd=y+'-'+pad(m+1)+'-'+pad(dd), evs=eventsOn(ymd), rows='';
       evs.forEach(function(e,idx){
         var multi = e.allDay && e.endDate && (parseYmd(e.endDate)-parseYmd(e.start) > 86400000);
         if(multi){ if(shown[e.id]) return; shown[e.id]=true; }
         var tm = multi ? '' : fmtTime(e.start,e.allDay);
-        var sub = multi ? rangeStr(e.start,e.endDate,true) : '';  /* address hidden in list view to save space (mobile); branch town lives in the event title. Pop-up still shows it. */
+        var sub = multi ? rangeStr(e.start,e.endDate,true) : '';  /* address hidden in list view to save space (mobile) */
         rows+='<div class="li" data-ymd="'+ymd+'" data-i="'+idx+'"><span class="dot" style="background:'+e.color+'"></span>'
           +'<span class="tm">'+tm+'</span>'
           +'<span><span class="ti">'+esc(e.title)+'</span>'+(sub?'<br><span class="lo">'+sub+'</span>':'')+(e.book?'<br><span class="lo">Booking recommended</span>':'')+'</span></div>';
       });
       if(!rows) continue; any=true;
-      html+='<div class="dg"><div class="dl">'+new Intl.DateTimeFormat('en-GB',{timeZone:TZ,weekday:'long',day:'numeric',month:'long'}).format(d)+'</div>'+rows+'</div>';
+      var past=isPast(ymd,evs), isNext=(ymd===nextYmd);
+      html+='<div class="dg'+(past?' past':'')+(isNext?' nextday':'')+'"><div class="dl">'
+        +new Intl.DateTimeFormat('en-GB',{timeZone:TZ,weekday:'long',day:'numeric',month:'long'}).format(d)
+        +(isNext?' &middot; next':'')+'</div>'+rows+'</div>';
     }
     if(!any) html+='<div class="msg">No upcoming events this month.</div>';
     return html+'</div>';
