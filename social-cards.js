@@ -36,7 +36,7 @@
       cta: 'Follow',
       ctaShort: 'Follow',                      // used on mobile
       url: 'https://whatsapp.com/channel/0029VbDgH5y0VycLdfp0MV35',
-      badge: '',
+      badge: 'Recommended',
       flash: 'New',                            // coral corner marker
       button: '#25D366',                       // exactly the icon green (Gen, 29 Aug)
       buttonInk: '#07301F',                    // dark ink — white on #25D366 is unreadable
