@@ -126,11 +126,21 @@
     mount.innerHTML = html + '</div>';
     mount.setAttribute('data-akx-done', '1');
 
-    /* tap to flip on touch; Enter/Space for keyboards */
+    /* First hover (desktop) or first tap (mobile) reveals the card. Once it is
+       showing, a click anywhere on it follows the card's first link. */
+    mount.addEventListener('mouseenter', function (e) {
+      var card = e.target && e.target.closest ? e.target.closest('.sc') : null;
+      if (card) card.dataset.revealed = '1';
+    }, true);
+
     mount.addEventListener('click', function (e) {
       var card = e.target.closest('.sc');
       if (!card || e.target.closest('a')) return;
-      card.classList.toggle('open');
+      var revealed = card.classList.contains('open') || card.dataset.revealed === '1';
+      var link = card.querySelector('.cap a');
+      if (revealed && link) { window.open(link.href, '_blank', 'noopener'); return; }
+      card.classList.add('open');
+      card.dataset.revealed = '1';
     });
     mount.addEventListener('keydown', function (e) {
       if (e.key !== 'Enter' && e.key !== ' ') return;
