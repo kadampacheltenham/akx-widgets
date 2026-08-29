@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Branch page prototype — Akanishta</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Fraunces:opsz,wght@9..144,600&display=swap" rel="stylesheet">
+<title>Branch page prototype v2 — Akanishta</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600&display=swap" rel="stylesheet">
 <style>
  body{margin:0;background:#FEFEFA;font-family:Inter,system-ui,sans-serif;color:#2B2A28}
  .nav{background:#fff;border-bottom:1px solid #E7E1D6;padding:16px 30px;display:flex;justify-content:space-between;align-items:center}
@@ -16,59 +16,177 @@
  .placeholder b{display:block;color:#2A66A6;font-family:Fraunces,Georgia,serif;font-size:20px;margin-bottom:4px}
  .switch{position:fixed;right:14px;bottom:14px;background:#2A66A6;color:#fff;border:0;border-radius:999px;padding:12px 18px;font:600 14px Inter,sans-serif;cursor:pointer;z-index:99;box-shadow:0 6px 20px rgba(0,0,0,.2)}
  .note{max-width:1000px;margin:0 auto;font-size:13.5px;color:#8a857c;text-align:center;padding-top:8px}
+ .sh{text-align:center;font-family:Fraunces,Georgia,serif;font-weight:600;font-size:1.75rem;color:#2A66A6;margin:0 0 22px}
+
+ /* ---- Stay in touch (real block, ready to lift) ---- */
+ .st{max-width:900px;margin:0 auto;display:flex;gap:24px;flex-wrap:wrap}
+ .st-card{flex:1 1 380px;background:#fff;border:1px solid #E7E1D6;border-radius:18px;padding:28px 30px;text-align:center}
+ .st-ic{width:52px;height:52px;margin:0 auto 14px;border-radius:14px;display:flex;align-items:center;justify-content:center}
+ .st-wa{background:#E9F7EE}
+ .st-nw{background:#EAF4FB}
+ .st-t{font-family:Fraunces,Georgia,serif;font-weight:600;font-size:1.2rem;color:#2A66A6;margin:0 0 8px}
+ .st-p{font-size:.98rem;line-height:1.6;color:#5E5A54;margin:0 0 16px}
+ .st-btn{display:inline-block;background:#25D366;color:#fff;font:600 .95rem Inter,sans-serif;padding:11px 22px;border-radius:999px;text-decoration:none}
+ .st-note{font-size:.88rem;color:#8a857c;margin-top:10px}
 </style></head>
 <body>
 
 <div class="nav"><b>Everybody Welcome</b><div><span>What's On</span><span>Programme</span><span>About</span><span>Contact Us</span></div></div>
 <div class="hero" id="hero" style="background-image:url('images/cirencester-hero.jpg')"></div>
 
+<!-- 1. title + intro (native, untouched) -->
 <div class="sec">
   <h1 id="ttl">Meditate in Cirencester</h1>
-  <p class="lede" id="lede">A friendly weekly meditation class in the middle of Cirencester. No experience needed and nothing to join — you can simply turn up.</p>
+  <p class="lede" id="lede">A friendly weekly meditation class in the middle of town. No experience needed and nothing to join — you can simply turn up.</p>
 </div>
 
+<!-- 2. invitation card + town pills (branch-events.js) -->
 <div class="sec">
   <div id="akx-branch-when" data-town="cirencester" data-name="Cirencester"></div>
 </div>
 
+<!-- 3. three lotus benefits -->
 <div class="sec"><div class="placeholder"><b>Why meditate — the three lotus benefits</b>existing homepage block (to be hosted as a widget)</div></div>
 
-<!-- THE NEW WIDGET -->
+<!-- 4. classes & short courses — THE REAL /weekly-classes WIDGET -->
 <div class="sec">
-  <div id="akx-branch" data-town="cirencester" data-name="Cirencester" data-calendar="akx-cal" data-staytouch="akx-staytouch"></div>
+  <h2 class="sh">Classes and short courses</h2>
+  <div id="akx-programme"></div>
 </div>
 
+<!-- 5. courses & retreats — THE REAL /courses-retreats WIDGET -->
+<div class="sec">
+  <h2 class="sh">Days and retreats</h2>
+  <div id="akx-events"></div>
+</div>
+
+<!-- 6. featured events -->
 <div class="sec" id="featured-sec"><div class="placeholder"><b>Featured events</b>existing What's On featured-events widget</div></div>
 
+<!-- 7. start from home -->
 <div class="sec" id="starthome-sec"><div class="placeholder"><b>Start from home</b>existing Start Here cards block</div></div>
 
-<div class="sec" id="stay-sec"><div class="placeholder" id="akx-staytouch"><b>Stay in touch</b>WhatsApp channel + eNews sign-up (to build)</div></div>
+<!-- 8. STAY IN TOUCH — real -->
+<div class="sec" id="stay-sec">
+  <div id="akx-staytouch">
+    <h2 class="sh">Stay in touch</h2>
+    <div class="st">
+      <div class="st-card">
+        <div class="st-ic st-wa">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="#25D366" aria-hidden="true"><path d="M17.47 14.38c-.3-.15-1.75-.86-2.02-.96-.27-.1-.47-.15-.67.15-.2.3-.77.96-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.47-1.75-1.64-2.05-.17-.3-.02-.46.13-.6.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.6-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.22 3.08c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.09 1.75-.72 2-1.41.25-.69.25-1.28.17-1.41-.07-.13-.27-.2-.57-.35z"/><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.46 1.32 4.96L2 22l5.25-1.38a9.86 9.86 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2zm0 18.02h-.01a8.2 8.2 0 0 1-4.18-1.15l-.3-.18-3.11.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.23 8.24-8.23 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 0 1 2.41 5.82c0 4.54-3.7 8.23-8.24 8.23z"/></svg>
+        </div>
+        <h3 class="st-t">WhatsApp channel</h3>
+        <a class="st-btn" href="https://whatsapp.com/channel/0029VbDgH5y0VycLdfp0MV35" target="_blank" rel="noopener">Follow our channel</a>
+        <p class="st-note">Follow us on our new WhatsApp channel — Follow then tap 🔔 to get notifications</p>
+      </div>
+      <div class="st-card">
+        <div class="st-ic st-nw">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#5FB3DC" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="m3 6.5 9 6.5 9-6.5"/></svg>
+        </div>
+        <h3 class="st-t">Our eNews</h3>
+        <p class="st-p">Classes, courses and news from the centre — a few times a term, never more.</p>
+        <script async data-uid="9f9556739d" src="https://akanishta-kbc.kit.com/9f9556739d/index.js"></script>
+      </div>
+    </div>
+  </div>
+</div>
 
+<!-- 9. calendar -->
 <div class="sec"><div class="placeholder" id="akx-cal"><b>Gloucestershire events calendar</b>separate embed — branch classes + announcements on by default, toggles for Cheltenham classes and weekend events</div></div>
 
-<p class="note">Prototype — not the live site. The two placeholders above and below the widget are existing blocks, shown as outlines.</p>
+<p class="note">Prototype — not the live site. Sections 4 and 5 are the REAL /weekly-classes and /courses-retreats widgets, filtered to this town by a prototype shim (the proper fix is a location option inside each widget).</p>
 
 <button class="switch" id="sw">Show empty-state (Stroud)</button>
 
 <script src="branch-events.js" defer></script>
+<script src="event-graphics.js" defer></script>
+<script src="wc-talks-courses.js" defer></script>
+<script src="cr-events.js" defer></script>
+
 <script>
+/* ---------------------------------------------------------------
+   PROTOTYPE SHIM — filters the two real widgets down to one town.
+   Not for production: the real fix is a data-location option inside
+   wc-talks-courses.js and cr-events.js.
+   --------------------------------------------------------------- */
+(function(){
+  function town(){ return (document.getElementById('akx-branch-when').getAttribute('data-town')||'').toLowerCase(); }
+
+  function filterClasses(){
+    var root=document.getElementById('akx-programme'); if(!root) return;
+    var cards=root.querySelectorAll('.cc'); if(!cards.length) return false;
+    var t=town(), any=false;
+    cards.forEach(function(card){
+      var pills=[].slice.call(card.querySelectorAll('.tab-btn'));
+      var mine=pills.filter(function(p){ return p.textContent.toLowerCase().indexOf(t)>-1; });
+      if(pills.length){
+        if(!mine.length){ card.style.display='none'; return; }
+        mine[0].click();
+        pills.forEach(function(p){ if(p!==mine[0]) p.style.display='none'; });
+        var chip=card.querySelector('.pk-chip'); if(chip) chip.style.display='none';
+        var pk=card.querySelector('.picker'); if(pk) pk.style.borderTop='0';
+      } else {
+        var txt=card.textContent.toLowerCase();
+        if(txt.indexOf(t)===-1){ card.style.display='none'; return; }
+      }
+      any=true;
+    });
+    if(!any) root.innerHTML='<p style="text-align:center;color:#8a857c">No classes or short courses listed here yet.</p>';
+    return true;
+  }
+
+  function filterEvents(){
+    var root=document.getElementById('akx-events'); if(!root) return;
+    var cards=root.querySelectorAll('.card'); if(!cards.length) return false;
+    var t=town(), any=false;
+    cards.forEach(function(card){
+      if(card.textContent.toLowerCase().indexOf(t)===-1){ card.style.display='none'; }
+      else any=true;
+    });
+    if(!any) root.innerHTML='<p style="text-align:center;color:#8a857c">No days or retreats listed here yet.</p>';
+    return true;
+  }
+
+  var tries=0;
+  var iv=setInterval(function(){
+    tries++;
+    var a=filterClasses(), b=filterEvents();
+    if((a&&b) || tries>40) clearInterval(iv);
+  }, 400);
+})();
+
+/* town switcher */
 document.getElementById('sw').addEventListener('click', function(){
-  var r=document.getElementById('akx-branch');
-  var toStroud = r.getAttribute('data-town')!=='stroud';
-  r.setAttribute('data-town', toStroud?'stroud':'cirencester');
-  var w=document.getElementById('akx-branch-when'); w.setAttribute('data-town', toStroud?'stroud':'cirencester'); w.setAttribute('data-name', toStroud?'Stroud':'Cirencester'); w.removeAttribute('data-done'); w.innerHTML='';
-  r.setAttribute('data-name', toStroud?'Stroud':'Cirencester');
+  var w=document.getElementById('akx-branch-when');
+  var toStroud = w.getAttribute('data-town')!=='stroud';
+  w.setAttribute('data-town', toStroud?'stroud':'cirencester');
+  w.setAttribute('data-name', toStroud?'Stroud':'Cirencester');
   document.getElementById('ttl').textContent = toStroud?'Meditate in Stroud':'Meditate in Cirencester';
   document.getElementById('lede').textContent = toStroud
     ? 'Meditation classes are coming to Stroud — we are confirming a venue and dates now.'
-    : 'A friendly weekly meditation class in the middle of Cirencester. No experience needed and nothing to join — you can simply turn up.';
+    : 'A friendly weekly meditation class in the middle of town. No experience needed and nothing to join — you can simply turn up.';
   document.getElementById('hero').style.backgroundImage = toStroud?"url('images/stroud-hero.jpg')":"url('images/cirencester-hero.jpg')";
-  this.textContent = toStroud?'Show Cirencester (with events)':'Show empty-state (Stroud)';
-  /* put the sections back in standard order, then re-run the widget */
-  var wrap=document.body;
-  wrap.insertBefore(document.getElementById('stay-sec'), document.querySelector('.sec:nth-of-type(6)'));
-  location.hash=''; r.removeAttribute('data-done'); r.innerHTML='';
-  var s=document.createElement('script'); s.src='branch-events.js?r='+Date.now(); document.body.appendChild(s);
+  this.textContent = toStroud?'Show Cirencester (with classes)':'Show empty-state (Stroud)';
+  location.href = location.pathname + '?town=' + (toStroud?'stroud':'cirencester');
 });
+
+/* honour ?town= on load */
+(function(){
+  var m=(location.search.match(/town=([a-z]+)/i)||[])[1];
+  if(!m) return;
+  var w=document.getElementById('akx-branch-when');
+  w.setAttribute('data-town', m.toLowerCase());
+  w.setAttribute('data-name', m.charAt(0).toUpperCase()+m.slice(1).toLowerCase());
+  if(m.toLowerCase()==='stroud'){
+    document.getElementById('ttl').textContent='Meditate in Stroud';
+    document.getElementById('lede').textContent='Meditation classes are coming to Stroud — we are confirming a venue and dates now.';
+    document.getElementById('hero').style.backgroundImage="url('images/stroud-hero.jpg')";
+    document.getElementById('sw').textContent='Show Cirencester (with classes)';
+    /* empty state: Stay in touch moves up under the invitation card */
+    var stay=document.getElementById('stay-sec');
+    var after=document.getElementById('akx-branch-when').closest('.sec');
+    after.parentNode.insertBefore(stay, after.nextSibling);
+  }
+})();
 </script>
 </body></html>
