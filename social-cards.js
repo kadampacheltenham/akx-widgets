@@ -20,6 +20,9 @@
 
    Multiple mounts on one page are fine — use class="akx-social" instead of id.
 
+   eNEWS: the eNews card opens a pop-up carrying the Kit form, so nobody
+   leaves the page. Its url is kept only as a no-JS fallback.
+
    CACHE NOTE: GitHub Pages caches this file. After committing a change, load
    the page with ?v=n and hard-reload, or you will review a stale version.
    =========================================================================== */
@@ -51,7 +54,12 @@
       note: 'Updates from time to time with news &amp; events.',
       cta: 'Get eNews',
       ctaShort: 'Get eNews',
-      url: '#ENEWS-URL-NEEDED',                // <<< Kit sign-up page URL
+      url: 'https://akanishta-kbc.kit.com/9f9556739d',  // fallback if JS is off
+      modal: {                                 // opens a pop-up instead of leaving the page
+        kitUid: '9f9556739d',                  // Kit form embed
+        title: 'Get eNews',
+        blurb: 'Updates from time to time with news &amp; events.'
+      },
       badge: 'Popular',
       button: '#2A66A6',
       nameColour: '#2A66A6'
@@ -63,7 +71,7 @@
       note: 'News, updates and occasional posts, stories &amp; reels.',
       cta: 'Follow',
       ctaShort: 'Follow',
-      url: '#FACEBOOK-URL-NEEDED',             // <<< page URL
+      url: 'https://www.facebook.com/meditationincheltenham.org.uk/',
       badge: '',
       button: '#1877F2',
       nameColour: '#1877F2'
@@ -75,7 +83,7 @@
       note: 'Posts, stories and reels from time to time.',
       cta: 'Follow',
       ctaShort: 'Follow',
-      url: '#INSTAGRAM-URL-NEEDED',            // <<< profile URL
+      url: 'https://www.instagram.com/meditate_akbc/',
       badge: '',
       button: 'linear-gradient(45deg,#F58529,#DD2A7B 55%,#8134AF)',
       nameColour: '#262626'
@@ -170,6 +178,19 @@
     '.akxs-pin{font-size:9px;padding:3px 8px;letter-spacing:.05em}',
     '.akxs-flash{font-size:9.5px;letter-spacing:.06em}',
     '.akxs-full{display:none}.akxs-short{display:inline}}',
+    '.akxs-ov{position:fixed;inset:0;z-index:9999;background:rgba(30,38,46,.55);',
+    'display:flex;align-items:center;justify-content:center;padding:20px}',
+    '.akxs-modal{background:#FEFEFA;border-radius:18px;max-width:520px;width:100%;',
+    'max-height:88vh;overflow:auto;padding:34px 30px 26px;position:relative;',
+    'box-shadow:0 18px 50px rgba(0,0,0,.22)}',
+    '.akxs-x{position:absolute;top:12px;right:14px;border:0;background:none;cursor:pointer;',
+    'font-size:26px;line-height:1;color:#8A929B;padding:6px 10px;border-radius:8px}',
+    '.akxs-x:hover{color:#2A66A6;background:#EFEFEA}',
+    '.akxs-mt{font-family:Fraunces,Georgia,serif;font-size:24px;color:#2A66A6;margin:0 0 6px;text-align:center}',
+    '.akxs-mb{font-size:14px;color:#5C6672;margin:0 0 18px;text-align:center}',
+    '.akxs-mform{min-height:120px}',
+    '.akxs-mform .formkit-form{margin:0 auto!important;box-shadow:none!important;border:0!important}',
+    '@media (max-width:520px){.akxs-modal{padding:30px 18px 20px}.akxs-mt{font-size:20px}}',
     '@media (prefers-reduced-motion:reduce){.akxs-card{transition:none}.akxs-card:hover{transform:none}}'
   ].join('');
 
@@ -209,6 +230,64 @@
     '</a>';
   }
 
+  /* ---------------------------------------------------------------------
+     Pop-up — used by the eNews card so people never leave the page.
+     The Kit embed writes its form in beside the script tag, so the script
+     is appended into the modal body on first open and then reused.
+     --------------------------------------------------------------------- */
+  var overlay = null, lastFocus = null;
+
+  function closeModal() {
+    if (!overlay) return;
+    overlay.style.display = 'none';
+    document.body.style.overflow = '';
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+
+  function openModal(cfg, trigger) {
+    lastFocus = trigger || null;
+
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.className = 'akxs-ov';
+      overlay.setAttribute('role', 'dialog');
+      overlay.setAttribute('aria-modal', 'true');
+      overlay.innerHTML =
+        '<div class="akxs-modal">' +
+          '<button class="akxs-x" aria-label="Close">&times;</button>' +
+          '<h2 class="akxs-mt"></h2>' +
+          '<p class="akxs-mb"></p>' +
+          '<div class="akxs-mform"></div>' +
+        '</div>';
+      document.body.appendChild(overlay);
+
+      overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) closeModal();
+      });
+      overlay.querySelector('.akxs-x').addEventListener('click', closeModal);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeModal();
+      });
+    }
+
+    overlay.querySelector('.akxs-mt').innerHTML = cfg.title || '';
+    overlay.querySelector('.akxs-mb').innerHTML = cfg.blurb || '';
+
+    var host = overlay.querySelector('.akxs-mform');
+    if (cfg.kitUid && !host.getAttribute('data-loaded')) {
+      var k = document.createElement('script');
+      k.async = true;
+      k.setAttribute('data-uid', cfg.kitUid);
+      k.src = 'https://akanishta-kbc.kit.com/' + cfg.kitUid + '/index.js';
+      host.appendChild(k);
+      host.setAttribute('data-loaded', '1');
+    }
+
+    overlay.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    overlay.querySelector('.akxs-x').focus();
+  }
+
   function render(mount) {
     if (mount.getAttribute('data-akx-done') === '1') return;
 
@@ -230,6 +309,18 @@
 
     mount.innerHTML = html;
     mount.setAttribute('data-akx-done', '1');
+
+    // cards flagged modal open a pop-up instead of navigating away
+    order.forEach(function (k, i) {
+      var cfg = CHANNELS[k];
+      if (!cfg || !cfg.modal) return;
+      var el = mount.querySelectorAll('.akxs-card')[i];
+      if (!el) return;
+      el.addEventListener('click', function (e) {
+        e.preventDefault();
+        openModal(cfg.modal, el);
+      });
+    });
   }
 
   function init() {
