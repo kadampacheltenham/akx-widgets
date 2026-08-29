@@ -31,8 +31,8 @@
    Any widget that isn't on the server yet simply leaves its section empty —
    nothing breaks, and the section appears the moment that file is published.
 
-   EMPTY STATE: when the town has no classes in the sheet, Start from home and
-   Stay in touch move up directly under the card, ahead of the empty events slot.
+   EMPTY STATE: a town with nothing in the sheet yet runs in a different order —
+   card, lotuses, start from home, testimonial, socials, calendar. See EMPTY_ORDER.
 
    CACHE: stubs carry no version query — a stub just pulls the widget. GitHub
    Pages caches for ~10 minutes, so after a commit give it that long (or
@@ -75,6 +75,12 @@
     { key: 'social',      widget: 'social-cards.js',   mount: 'akx-social' },
     { key: 'calendar',    widget: 'calendar.js',       mount: 'akx-cal' }
   ];
+
+  /* Order used when the town has nothing in the sheet yet (Gen, 29 Aug):
+     card → lotuses → start from home → testimonial → socials → calendar.
+     'events' rides along and collapses to nothing; it is here only so a town that
+     somehow has a course but no weekly class still shows it. */
+  var EMPTY_ORDER = ['card', 'lotus', 'starthome', 'testimony', 'events', 'social', 'calendar'];
 
   /* ------------------------------------------------------------------ */
   /* STYLES — the card and pills; each widget brings its own             */
@@ -309,15 +315,12 @@
 
     var card = cardHTML(town, name, title, data);
 
-    /* empty state: bring Start from home and Stay in touch up under the card */
+    /* empty state — a town with nothing in the sheet yet gets EMPTY_ORDER instead */
     var order = SECTIONS.slice();
     if (!card.hasClasses) {
-      order = [];
-      SECTIONS.forEach(function (s) { if (s.key === 'card') order.push(s); });
-      SECTIONS.forEach(function (s) { if (s.key === 'starthome' || s.key === 'social') order.push(s); });
-      SECTIONS.forEach(function (s) {
-        if (['card','starthome','social'].indexOf(s.key) === -1) order.push(s);
-      });
+      order = EMPTY_ORDER.map(function (k) {
+        return SECTIONS.filter(function (s) { return s.key === k; })[0];
+      }).filter(Boolean);
     }
 
     var html = '<div class="akxp">';
