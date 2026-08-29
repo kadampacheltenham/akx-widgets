@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Branch page prototype — Akanishta</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Fraunces:opsz,wght@9..144,600&display=swap" rel="stylesheet">
+<style>
+ body{margin:0;background:#FEFEFA;font-family:Inter,system-ui,sans-serif;color:#2B2A28}
+ .nav{background:#fff;border-bottom:1px solid #E7E1D6;padding:16px 30px;display:flex;justify-content:space-between;align-items:center}
+ .nav b{color:#2A66A6;font-size:19px}
+ .nav span{font-size:13px;color:#3d3d3d;margin-left:16px}
+ .hero{height:clamp(300px,44vw,520px);background-size:cover;background-position:center 55%}
+ .sec{padding:46px 24px}
+ h1{font-family:Fraunces,Georgia,serif;color:#2A66A6;font-size:clamp(28px,4vw,42px);max-width:1000px;margin:0 auto 14px}
+ .lede{max-width:1000px;margin:0 auto;font-size:18px;line-height:1.6;color:#3a3833}
+ .placeholder{max-width:1000px;margin:0 auto;border:1px dashed #D6CFC2;border-radius:12px;padding:26px;text-align:center;color:#8a857c;background:#FCFAF6}
+ .placeholder b{display:block;color:#2A66A6;font-family:Fraunces,Georgia,serif;font-size:20px;margin-bottom:4px}
+ .switch{position:fixed;right:14px;bottom:14px;background:#2A66A6;color:#fff;border:0;border-radius:999px;padding:12px 18px;font:600 14px Inter,sans-serif;cursor:pointer;z-index:99;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+ .note{max-width:1000px;margin:0 auto;font-size:13.5px;color:#8a857c;text-align:center;padding-top:8px}
+</style></head>
+<body>
+
+<div class="nav"><b>Everybody Welcome</b><div><span>What's On</span><span>Programme</span><span>About</span><span>Contact Us</span></div></div>
+<div class="hero" id="hero" style="background-image:url('images/cirencester-hero.jpg')"></div>
+
+<div class="sec">
+  <h1 id="ttl">Meditate in Cirencester</h1>
+  <p class="lede" id="lede">A friendly weekly meditation class in the middle of Cirencester. No experience needed and nothing to join — you can simply turn up.</p>
+</div>
+
+<div class="sec"><div class="placeholder"><b>Why meditate — the three lotus benefits</b>existing homepage block (to be hosted as a widget)</div></div>
+
+<!-- THE NEW WIDGET -->
+<div class="sec">
+  <div id="akx-branch" data-town="cirencester" data-name="Cirencester" data-calendar="akx-cal" data-staytouch="akx-staytouch"></div>
+</div>
+
+<div class="sec" id="featured-sec"><div class="placeholder"><b>Featured events</b>existing What's On featured-events widget</div></div>
+
+<div class="sec" id="starthome-sec"><div class="placeholder"><b>Start from home</b>existing Start Here cards block</div></div>
+
+<div class="sec" id="stay-sec"><div class="placeholder" id="akx-staytouch"><b>Stay in touch</b>WhatsApp channel + eNews sign-up (to build)</div></div>
+
+<div class="sec"><div class="placeholder" id="akx-cal"><b>Gloucestershire events calendar</b>separate embed — branch classes + announcements on by default, toggles for Cheltenham classes and weekend events</div></div>
+
+<p class="note">Prototype — not the live site. The two placeholders above and below the widget are existing blocks, shown as outlines.</p>
+
+<button class="switch" id="sw">Show empty-state (Stroud)</button>
+
+<script src="branch-events.js" defer></script>
+<script>
+document.getElementById('sw').addEventListener('click', function(){
+  var r=document.getElementById('akx-branch');
+  var toStroud = r.getAttribute('data-town')!=='stroud';
+  r.setAttribute('data-town', toStroud?'stroud':'cirencester');
+  r.setAttribute('data-name', toStroud?'Stroud':'Cirencester');
+  document.getElementById('ttl').textContent = toStroud?'Meditate in Stroud':'Meditate in Cirencester';
+  document.getElementById('lede').textContent = toStroud
+    ? 'Meditation classes are coming to Stroud — we are confirming a venue and dates now.'
+    : 'A friendly weekly meditation class in the middle of Cirencester. No experience needed and nothing to join — you can simply turn up.';
+  document.getElementById('hero').style.backgroundImage = toStroud?"url('images/stroud-hero.jpg')":"url('images/cirencester-hero.jpg')";
+  this.textContent = toStroud?'Show Cirencester (with events)':'Show empty-state (Stroud)';
+  /* put the sections back in standard order, then re-run the widget */
+  var wrap=document.body;
+  wrap.insertBefore(document.getElementById('stay-sec'), document.querySelector('.sec:nth-of-type(6)'));
+  location.hash=''; r.removeAttribute('data-done'); r.innerHTML='';
+  var s=document.createElement('script'); s.src='branch-events.js?r='+Date.now(); document.body.appendChild(s);
+});
+</script>
+</body></html>
