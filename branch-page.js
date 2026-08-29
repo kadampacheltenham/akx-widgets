@@ -75,7 +75,7 @@
     '.akxp-sec:empty{display:none;padding:0}',
     /* card */
     '.akxb-card{background:#fff;border:1px solid rgba(226,136,106,.38);border-radius:18px;',
-    'overflow:hidden;max-width:860px;margin:0 auto;',
+    'overflow:hidden;max-width:800px;margin:0 auto;',
     'box-shadow:0 3px 16px rgba(226,136,106,.13),0 1px 3px rgba(226,136,106,.08)}',
     '.akxb-banner{background:#E2886A;color:#fff;text-align:center;font-size:11.5px;font-weight:700;',
     'letter-spacing:.16em;text-transform:uppercase;padding:10px 16px;border-radius:14px;',
