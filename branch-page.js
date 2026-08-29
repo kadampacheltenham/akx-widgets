@@ -1,12 +1,15 @@
 /* ===========================================================================
    akx branch-page.js — the whole branch page, from one stub
-   Akanishta Kadampa Buddhist Centre · v1.0 · 29 Aug 2026
+   Akanishta Kadampa Buddhist Centre · v2.0 · 29 Aug 2026
 
    ONE STUB PER BRANCH PAGE. Everything below the page title and intro is
    built here. Two lines change per town:
 
      <div id="akx-branch" data-town="cirencester" data-name="Cirencester"></div>
-     <script src="https://kadampacheltenham.github.io/akx-widgets/branch-page.js?v=1" defer></script>
+     <script src="https://kadampacheltenham.github.io/akx-widgets/branch-page.js?v=2" defer></script>
+
+   The card title is built from data-name: "Drop-in classes in Cirencester".
+   Override the whole line with data-title if a town ever needs different words.
 
    WHAT IT DOES
    Draws the Drop-in classes card and the town pills itself, then lays out the
@@ -34,21 +37,21 @@
   /* ------------------------------------------------------------------ */
   /* CONFIG                                                             */
   /* ------------------------------------------------------------------ */
-  var TITLE    = 'Drop-in classes';
+  var TITLE    = 'Drop-in classes in {town}';    // {town} = the data-name on the stub
   var BANNER   = 'Everybody welcome';
   var WHATSAPP = '07788 945212';                 // from /contact-us
   var SHEET    = '1YArubV8QgCvPUIIvHOHWhCN2fYLRz0DDPSRSHD_tSmY';
   var BASE     = 'https://kadampacheltenham.github.io/akx-widgets/';
-  var V        = '?v=1';                         // bump with this file
+  var V        = '?v=2';                         // bump with this file
 
   var PILLS = [
     { label: 'Classes in Cheltenham', href: '/whats-on',   key: 'cheltenham' },
-    { label: 'Away day retreats',     href: '/away-days',  key: 'awaydays'   },
     { label: 'Cirencester',           href: '/cirencester',key: 'cirencester'},
     { label: 'Evesham',               href: '/evesham',    key: 'evesham'    },
     { label: 'Gloucester',            href: '/gloucester', key: 'gloucester' },
     { label: 'Stroud',                href: '/stroud',     key: 'stroud'     },
-    { label: 'Tewkesbury',            href: '/tewkesbury', key: 'tewkesbury' }
+    { label: 'Tewkesbury',            href: '/tewkesbury', key: 'tewkesbury' },
+    { label: 'Away day retreats',     href: '/away-days',  key: 'awaydays', sand: true }
   ];
 
   /* section order. `widget` = the file to load into it; null = drawn here. */
@@ -72,7 +75,7 @@
     '.akxp-sec:empty{display:none;padding:0}',
     /* card */
     '.akxb-card{background:#fff;border:1px solid rgba(226,136,106,.38);border-radius:18px;',
-    'overflow:hidden;max-width:1000px;margin:0 auto;',
+    'overflow:hidden;max-width:860px;margin:0 auto;',
     'box-shadow:0 3px 16px rgba(226,136,106,.13),0 1px 3px rgba(226,136,106,.08)}',
     '.akxb-banner{background:#E2886A;color:#fff;text-align:center;font-size:11.5px;font-weight:700;',
     'letter-spacing:.16em;text-transform:uppercase;padding:10px 16px;border-radius:14px;',
@@ -104,6 +107,8 @@
     '.akxb-pill{background:#EAF7F4;border:1px solid #C9E6E0;color:#2E8078;font-size:.83rem;',
     'font-weight:600;padding:8px 16px;border-radius:999px;text-decoration:none}',
     '.akxb-pill:hover{background:#E4F5F2;color:#1F7C74}',
+    '.akxb-pill.sand{background:#F6EFE4;border-color:#E7DAC4;color:#8A6B3A}',
+    '.akxb-pill.sand:hover{background:#F1E7D7;color:#7A5D2E}',
     /* the events slot, visible only while it is unbuilt and only on the prototype */
     '.akxp-slot{max-width:1000px;margin:0 auto;border:1px dashed #D8D3C6;border-radius:12px;',
     'padding:30px 20px;text-align:center;color:#A8A296;font-size:.9rem;letter-spacing:.04em}',
@@ -243,7 +248,8 @@
 
     html += '<div class="akxb-pills">' +
       PILLS.filter(function (p) { return p.key !== town; })
-           .map(function (p) { return '<a class="akxb-pill" href="' + p.href + '">' + esc(p.label) + '</a>'; })
+           .map(function (p) { return '<a class="akxb-pill' + (p.sand ? ' sand' : '') +
+                                      '" href="' + p.href + '">' + esc(p.label) + '</a>'; })
            .join('') + '</div>';
 
     return { html: html, hasClasses: !!slots.length };
@@ -269,7 +275,7 @@
   function build(mount, data) {
     var town  = (mount.getAttribute('data-town') || '').toLowerCase();
     var name  = mount.getAttribute('data-name') || town;
-    var title = mount.getAttribute('data-title') || TITLE;
+    var title = (mount.getAttribute('data-title') || TITLE).replace('{town}', name);
     var showSlot  = mount.getAttribute('data-show-slot') === '1';   // prototype only
     var quotePage = mount.getAttribute('data-quote-page') || 'classes';  // testimony-quotes.js
     if (mount.getAttribute('data-base')) BASE_OVERRIDE = mount.getAttribute('data-base');
