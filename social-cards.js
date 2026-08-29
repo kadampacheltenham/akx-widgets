@@ -68,7 +68,7 @@
     facebook: {
       name: 'facebook',
       nameStyle: 'fb',
-      note: 'News, updates and occasional posts, stories &amp; reels.',
+      note: 'News, updates, posts, stories &amp; reels.',
       cta: 'Follow',
       ctaShort: 'Follow',
       url: 'https://www.facebook.com/meditationincheltenham.org.uk/',
@@ -139,11 +139,11 @@
      Styles — injected once, all selectors namespaced .akxs-
      --------------------------------------------------------------------- */
   var CSS = [
-    '.akxs-wrap{width:100%;margin:0 auto;font-family:inherit}',
+    '.akxs-wrap{width:100%;max-width:1000px;margin:0 auto;font-family:inherit}',
     '.akxs-h{font-family:Fraunces,Georgia,serif;font-size:1.75rem;color:#2A66A6;text-align:center;margin:0 0 1.5rem}',
     '.akxs-grid{display:grid;grid-template-columns:repeat(var(--akxs-cols,4),1fr);gap:16px;align-items:stretch}',
     '.akxs-card{position:relative;display:flex;flex-direction:column;text-align:center;',
-    'background:#fff;border:1px solid #E6E6DF;border-radius:16px;padding:30px 18px 22px;',
+    'background:#fff;border:1px solid #E6E6DF;border-radius:16px;padding:26px 16px 20px;',
     'text-decoration:none;color:inherit;transition:box-shadow .18s ease,transform .18s ease}',
     '.akxs-card:hover{box-shadow:0 6px 18px rgba(42,102,166,.10);transform:translateY(-2px)}',
     '.akxs-card:focus-visible{outline:2px solid #2A66A6;outline-offset:3px}',
