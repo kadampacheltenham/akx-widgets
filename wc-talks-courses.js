@@ -12,10 +12,31 @@
                   <script src="https://kadampacheltenham.github.io/akx-widgets/wc-talks-courses.js" defer></script>
    (event-graphics.js must load first so window.AKX_GFX exists; a local fallback keeps
     the colours right even if it doesn't. Mount id stays #akx-programme — internal only.)
+
+   [29 Aug 2026 — v1.1] Optional mount attributes, so branch pages reuse this widget rather
+   than a second one being built. With none set, /weekly-classes behaves exactly as before:
+     data-location   keep only class rows for that Location ID (e.g. "cirencester")
+     data-limit      max cards, and no "Show more" — branch pages use 2
+     data-labels     "branch" → Current classes | Next (6 days or less) | Upcoming
+     data-heading    replace the H2 (data-heading="" removes it)
+     data-lead       replace the intro paragraph (data-lead="" removes it)
+     data-quotes     "0" = don't inject the rotating testimonial between cards
+   With data-limit set, cards are ordered by start date — so the current/next course is
+   first and the one after it second.
 */
 (function(){
   var SHEET_ID = '1YArubV8QgCvPUIIvHOHWhCN2fYLRz0DDPSRSHD_tSmY';
   var MOUNT_ID = 'akx-programme';
+  /* ---- mount options (all optional; with none set this widget behaves exactly as before) ----
+     data-location="cirencester"  keep only class rows for that Location ID, and drop any
+                                  talk/course left with no class rows in that town
+     data-limit="2"               show at most N cards, no "Show more"
+     data-labels="branch"         Current classes | Next | Upcoming  (see bannerLabel)
+     data-heading="..."           replace the H2   (data-heading="" removes it)
+     data-lead="..."              replace the intro paragraph  (data-lead="" removes it)
+     data-quotes="0"              don't inject the rotating testimonial between cards
+     Branch pages set location + limit + labels; /weekly-classes sets none of them.       */
+  var OPT = { location:'', limit:0, labels:'', heading:null, lead:null, quotes:true };
   var TAB_ITEMS = 'Talks & series';
   var TAB_CLASSES = 'Class details';        // renamed 24 Aug 2026; old name kept as fallback
   var TAB_CLASSES_OLD = 'Class times';      // gviz silently serves the FIRST tab for a bad name, so we validate the header
@@ -282,20 +303,28 @@
     return 'Drop in to join';
   }
   // ---- left-header label by position: 1st = countdown / Current series; 2nd&ndash;3rd = Booking open|Upcoming; 4th+ = Upcoming ----
+  //      Branch pages (data-labels="branch") use Gen's simpler set instead:
+  //      already started -> "Current classes" | 6 days or less -> "Next" | 7+ days -> "Upcoming".
   function bannerLabel(idx, classes, showFrom){
     var hasBooking = classes.some(function(cl){return cl.booking_url;});
     if(idx===0){
       var dates=allClassDates(classes, showFrom);
       if(!dates.length) return 'Upcoming';
       var now=new Date(); now.setHours(0,0,0,0);
-      if(dates[0] < now) return 'Current series';         // already started
+      if(dates[0] < now) return OPT.labels==='branch' ? 'Current classes' : 'Current series';
       var days=Math.round((dates[0]-now)/86400000);
+      if(OPT.labels==='branch') return days<=6 ? 'Next' : 'Upcoming';
       if(days===0) return 'Today';
       if(days===1) return '1 day';
       return days+' days';
     }
     if(idx===1 || idx===2) return hasBooking ? 'Booking open' : 'Upcoming';
     return 'Upcoming';
+  }
+  // first class date of a run &mdash; used to order branch cards (current first, then the next)
+  function firstDateOf(it, classes){
+    var d=allClassDates(classes, parseFullDate(it.show_from));
+    return d.length ? d[0] : new Date(8640000000000000);
   }
   // summary shown in the collapsed mobile bar (HTML) &mdash; talks list each date stacked; courses a 'from' date
   function summaryDates(isTalk, classes, showFrom){
@@ -400,7 +429,9 @@
     var body='';
     if(classes.length===0){
       body='<div class="tbc">Date &amp; venue to be confirmed &mdash; see the calendar below for the latest.</div>';
-    } else if(isTalk && classes.length===1){
+    } else if(classes.length===1){
+      /* one time & place only — no point offering "Choose a class" with a single option.
+         (Was talks-only; branch pages filter to one town, so courses land here too.) */
       body='<div class="single"><div class="detail">'+pane(classes[0],0,true)+'</div></div>';
     } else {
       var pkClass = 'picker inline';
@@ -505,30 +536,72 @@
     colourTitles(root);
   }
   function csvUrl(sheet){return 'https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:csv&headers=1&sheet='+encodeURIComponent(sheet);}
+  var DEFAULT_HEAD = 'Talks &amp; Short Courses';
+  var DEFAULT_LEAD = 'Here\'s the upcoming programme of talks, short courses &amp; special events. All events are drop-in &mdash; except special events. If you choose to book online you\'ll have access to discounts such as student pricing, bring a friend for half price, early bird pricing and 20% discount for booking a series, where these are available.';
   function render(mount, items, classes){
+    /* branch pages: keep only the class rows for this town, then only the talks/courses
+       that still have somewhere to happen here */
+    if(OPT.location){
+      var want=OPT.location.toLowerCase();
+      classes = classes.filter(function(cl){ return String(cl.location||'').trim().toLowerCase()===want; });
+    }
     var byId={}; classes.forEach(function(cl){ if(cl.id){ (byId[cl.id]=byId[cl.id]||[]).push(cl); } });
     var today=new Date(); today.setHours(0,0,0,0);
     var live = items.filter(function(it){ return isVisible(it, byId[it.id]||[], today); });
-    var html='<h2 class="pg-h">Talks &amp; Short Courses</h2>'
-           +'<div class="pg-lead"><p>Here\'s the upcoming programme of talks, short courses &amp; special events. All events are drop-in &mdash; except special events. If you choose to book online you\'ll have access to discounts such as student pricing, bring a friend for half price, early bird pricing and 20% discount for booking a series, where these are available.</p></div>';
-    if(!live.length){ html+='<div class="pg-msg">Nothing scheduled just now &mdash; please check back soon.</div>'; }
+    if(OPT.location) live = live.filter(function(it){ return (byId[it.id]||[]).length; });
+
+    /* branch pages ask for "the current / next course and the one after it", so order by
+       start date rather than sheet order, then take the first N */
+    if(OPT.limit){
+      live = live.slice().sort(function(a,b){
+        return firstDateOf(a, byId[a.id]||[]) - firstDateOf(b, byId[b.id]||[]);
+      }).slice(0, OPT.limit);
+    }
+
+    var head = OPT.heading===null ? DEFAULT_HEAD : OPT.heading;
+    var lead = OPT.lead===null ? DEFAULT_LEAD : OPT.lead;
+    var html = (head ? '<h2 class="pg-h">'+head+'</h2>' : '')
+             + (lead ? '<div class="pg-lead"><p>'+lead+'</p></div>' : '');
+    if(!live.length){
+      /* branch pages: draw nothing at all and let the host section collapse, rather than
+         leaving a heading over an apology */
+      if(OPT.limit){
+        mount.innerHTML='';
+        if(mount.parentNode && mount.parentNode.classList) mount.parentNode.classList.add('akx-empty');
+        return;
+      }
+      html += '<div class="pg-msg">Nothing scheduled just now &mdash; please check back soon.</div>';
+    }
     else {
       var cardsHtml = live.map(function(it,idx){ return card(it, byId[it.id]||[], idx); });
-      var TQ = '<div style="max-width:1000px;margin:24px auto;"><div class="akx-tq" data-type="testimony" data-page="classes"></div></div>';
-      var head3 = cardsHtml.slice(0,3);
-      html += head3[0] + TQ + head3.slice(1).join('');   // show 3 cards, rotating testimonial after the first
-      if(cardsHtml.length>3){
-        html += '<div class="pg-more" id="pgMore">'+cardsHtml.slice(3).map(function(c){return '<div class="pg-item">'+c+'</div>';}).join('')+'</div>'
-              + '<button type="button" class="pg-showall" id="pgShowAll">Show more &darr;</button>';
+      var TQ = OPT.quotes ? '<div style="max-width:1000px;margin:24px auto;"><div class="akx-tq" data-type="testimony" data-page="classes"></div></div>' : '';
+      if(OPT.limit){
+        html += cardsHtml.join('');                        // branch: just the cards, no testimonial, no Show more
+      } else {
+        var head3 = cardsHtml.slice(0,3);
+        html += head3[0] + TQ + head3.slice(1).join('');   // show 3 cards, rotating testimonial after the first
+        if(cardsHtml.length>3){
+          html += '<div class="pg-more" id="pgMore">'+cardsHtml.slice(3).map(function(c){return '<div class="pg-item">'+c+'</div>';}).join('')+'</div>'
+                + '<button type="button" class="pg-showall" id="pgShowAll">Show more &darr;</button>';
+        }
       }
     }
     mount.innerHTML=html;
     wire(mount);
   }
   function init(){
-    var mount=document.getElementById(MOUNT_ID); if(!mount) return;
+    var mount=document.getElementById(MOUNT_ID) || document.querySelector('.'+MOUNT_ID);
+    if(!mount) return;
     if(mount.getAttribute('data-akx-done')==='1') return;
     mount.setAttribute('data-akx-done','1');
+    mount.id = MOUNT_ID;                       // the stylesheet is scoped to the id
+    var A=function(n){ return mount.getAttribute(n); };
+    OPT.location = (A('data-location')||'').trim();
+    OPT.limit    = parseInt(A('data-limit'),10) || 0;
+    OPT.labels   = (A('data-labels')||'').trim();
+    OPT.heading  = A('data-heading')===null ? null : A('data-heading');
+    OPT.lead     = A('data-lead')===null    ? null : A('data-lead');
+    OPT.quotes   = A('data-quotes')!=='0';
     if(!document.getElementById('akx-programme-style')){var st=document.createElement('style');st.id='akx-programme-style';st.textContent=STYLE;document.head.appendChild(st);}
     if(window.AKX_GFX&&AKX_GFX.injectCSS){AKX_GFX.injectCSS();}   // motif symbols for the type tiles
     mount.innerHTML='<div class="pg-msg">Loading&hellip;</div>';
