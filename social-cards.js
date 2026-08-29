@@ -30,13 +30,14 @@
   var CHANNELS = {
 
     whatsapp: {
-      name: 'WhatsApp',
+      name: 'WhatsApp Channel',
       nameStyle: 'sans',                       // platform wordmark style
       note: 'Follow and tap 🔔 for notifications.',
-      cta: 'Follow the channel',
+      cta: 'Follow',
       ctaShort: 'Follow',                      // used on mobile
       url: 'https://whatsapp.com/channel/0029VbDgH5y0VycLdfp0MV35',
-      badge: 'Recommended',
+      badge: '',
+      flash: 'New',                            // coral corner marker
       button: '#25D366',                       // exactly the icon green (Gen, 29 Aug)
       buttonInk: '#07301F',                    // dark ink — white on #25D366 is unreadable
       nameColour: '#111B21'
@@ -137,11 +138,15 @@
     '.akxs-card:hover{box-shadow:0 6px 18px rgba(42,102,166,.10);transform:translateY(-2px)}',
     '.akxs-card:focus-visible{outline:2px solid #2A66A6;outline-offset:3px}',
     /* pinned label straddles the top edge so it can never touch the icon */
-    '.akxs-pin{position:absolute;top:-11px;left:50%;transform:translateX(-50%);white-space:nowrap;',
-    'font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;',
-    'padding:4px 13px;border-radius:999px;background:#fff}',
-    '.akxs-pin-rec{color:#3B7C44;border:1px solid rgba(78,158,88,.45)}',
-    '.akxs-pin-pop{color:#8A6B3A;border:1px solid rgba(232,183,90,.60)}',
+    '.akxs-pins{position:absolute;top:-11px;left:50%;transform:translateX(-50%);',
+    'display:flex;gap:6px;align-items:center}',
+    '.akxs-pin{white-space:nowrap;font-size:10.5px;font-weight:700;',
+    'letter-spacing:.07em;text-transform:uppercase;padding:4px 12px;border-radius:999px;background:#fff}',
+    '.akxs-pin{color:#8A6B3A;border:1px solid rgba(232,183,90,.60)}',
+    '.akxs-icorow{position:relative;display:flex;justify-content:center;align-items:center}',
+    '.akxs-flash{position:absolute;left:2px;top:50%;transform:translateY(-50%);',
+    'font-family:Inter,Helvetica,Arial,sans-serif;font-size:11.5px;font-weight:700;',
+    'letter-spacing:.10em;text-transform:uppercase;color:#4E9E58}',
     '.akxs-ico{width:66px;height:66px;margin:6px auto 16px}',
     '.akxs-ico svg{width:100%;height:100%;display:block}',
     '.akxs-nm{margin-bottom:9px;line-height:1}',
@@ -149,7 +154,8 @@
     '.akxs-nm.fb{font-family:Inter,Helvetica,Arial,sans-serif;font-weight:800;font-size:20px;letter-spacing:-.045em}',
     '.akxs-nm.serif{font-family:Fraunces,Georgia,serif;font-weight:600;font-size:20px}',
     '.akxs-nm.script{font-family:"Grand Hotel",cursive;font-size:26px;line-height:.9}',
-    '.akxs-note{font-size:13px;color:#5C6672;line-height:1.4;min-height:36px;margin-bottom:16px;padding:0 4px}',
+    '.akxs-note{font-size:13px;color:#5C6672;line-height:1.4;min-height:36px;margin-bottom:16px;',
+    'padding:0 2px;text-wrap:balance;text-wrap:pretty}',
     '.akxs-note:empty{min-height:0;margin-bottom:0}',
     '.akxs-cta{margin-top:auto;display:block;border-radius:999px;padding:11px 10px;',
     'font-family:Inter,Helvetica,Arial,sans-serif;font-weight:700;font-size:14px;color:#fff}',
@@ -157,9 +163,10 @@
     '@media (max-width:900px){.akxs-grid{grid-template-columns:repeat(min(var(--akxs-cols,2),2),1fr);gap:14px}',
     '.akxs-card{padding:26px 12px 18px}.akxs-ico{width:54px;height:54px;margin-bottom:13px}',
     '.akxs-nm.sans,.akxs-nm.fb,.akxs-nm.serif{font-size:17px}.akxs-nm.script{font-size:22px}',
-    '.akxs-note{font-size:12px;min-height:34px;margin-bottom:13px}',
+    '.akxs-note{font-size:11.2px;line-height:1.35;min-height:32px;margin-bottom:12px;padding:0}',
     '.akxs-cta{font-size:13px;padding:10px 8px}',
-    '.akxs-pin{font-size:9.5px;padding:3px 10px}',
+    '.akxs-pin{font-size:9px;padding:3px 8px;letter-spacing:.05em}',
+    '.akxs-flash{font-size:9.5px;left:0;letter-spacing:.07em}',
     '.akxs-full{display:none}.akxs-short{display:inline}}',
     '@media (prefers-reduced-motion:reduce){.akxs-card{transition:none}.akxs-card:hover{transform:none}}'
   ].join('');
@@ -179,11 +186,8 @@
     var c = CHANNELS[key];
     if (!c) return '';
 
-    var pin = '';
-    if (c.badge) {
-      var cls = /recommend/i.test(c.badge) ? 'akxs-pin-rec' : 'akxs-pin-pop';
-      pin = '<span class="akxs-pin ' + cls + '">' + c.badge + '</span>';
-    }
+    var pins = c.badge ? '<span class="akxs-pins"><span class="akxs-pin">' + c.badge + '</span></span>' : '';
+    var flash = c.flash ? '<span class="akxs-flash">' + c.flash + '</span>' : '';
 
     var ready = c.url && c.url.charAt(0) !== '#';
     var href = ready ? ' href="' + c.url + '" target="_blank" rel="noopener"' : '';
@@ -192,8 +196,8 @@
     }
 
     return '<a class="akxs-card"' + href + '>' +
-      pin +
-      '<span class="akxs-ico">' + ICONS[key] + '</span>' +
+      pins +
+      '<span class="akxs-icorow">' + flash + '<span class="akxs-ico">' + ICONS[key] + '</span></span>' +
       '<span class="akxs-nm ' + c.nameStyle + '" style="color:' + c.nameColour + '">' + c.name + '</span>' +
       '<span class="akxs-note">' + c.note + '</span>' +
       '<span class="akxs-cta" style="background:' + c.button + ';color:' + (c.buttonInk || '#fff') + '">' +
