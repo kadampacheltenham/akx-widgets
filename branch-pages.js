@@ -19,7 +19,7 @@
      1  Drop-in classes card + town pills      (here)
      2  Lotus benefits                          lotus-benefits.js
      3  Testimony                               testimony-quotes.js
-     4  Talks & short courses in <town>         wc-talks-courses.js  (+ event-graphics.js)
+     4  Programme of classes                    wc-talks-courses.js  (+ event-graphics.js)
      5  Start from home                         start-at-home.js
      6  Stay in touch                           social-cards.js
      7  Calendar                                calendar.js  (data-cal="branch")
@@ -46,7 +46,8 @@
   /* ------------------------------------------------------------------ */
   var TITLE    = 'Drop-in classes in {town}';    // {town} = the data-name on the stub
   var BANNER   = 'Everybody welcome';
-  var EVENTS_TITLE = 'Talks &amp; short courses';
+  var EVENTS_TITLE = 'Programme of classes';
+  var SEE_BELOW    = 'See below for programme of classes';
   var COURSES  = 2;                              // the current/next course + the one after it
   var WHATSAPP = '07788 945212';                 // from /contact-us
   var SHEET    = '1YArubV8QgCvPUIIvHOHWhCN2fYLRz0DDPSRSHD_tSmY';
@@ -104,6 +105,11 @@
     '.akxb-val{flex:1;min-width:0;font-size:1rem;line-height:1.55;color:#2E3640}',
     '.akxb-venue{font-weight:700}',
     '.akxb-sub{color:#7A8189;font-size:.88em}',
+    /* "See below…" — hidden until the programme section reports it has cards */
+    '.akxb-seebelow{display:none;margin-top:3px}',
+    '.akxb-seebelow.on{display:block}',
+    '.akxb-seebelow a{color:#2A66A6;font-size:.86rem;text-decoration:underline}',
+    '#akx-programme{scroll-margin-top:90px}',
     '.akxb-dirs{color:#0B7A3B;font-weight:600;font-size:.86em;text-decoration:underline;white-space:nowrap}',
     '.akxb-link{color:#2A66A6;text-decoration:underline;font-size:1rem;font-weight:400;letter-spacing:0}',
     '.akxb-next{flex:none;width:140px;background:#F6EFE4;border:1px solid #E7DAC4;border-radius:12px;',
@@ -222,7 +228,9 @@
       var teacher = val(s,'teacher'), day = val(s,'day'), time = val(s,'time'),
           duration = val(s,'duration'), nxt = nextDate(parseDates(val(s,'dates')));
       var when = esc(day) + (day && time ? ', ' : '') + esc(time) +
-                 (duration ? ' <span class="akxb-sub">(' + esc(duration) + ')</span>' : '');
+                 (duration ? ' <span class="akxb-sub">(' + esc(duration) + ')</span>' : '') +
+                 /* revealed only once the programme section below has something in it */
+                 '<span class="akxb-seebelow"><a href="#akx-programme">' + esc(SEE_BELOW) + '</a></span>';
       html += '<div class="akxb-sec akxb-secflex"><div class="akxb-main">' +
                 row('Teacher', teacher ? 'with ' + esc(teacher) : '') +
                 row('When', when) + '</div>';
@@ -339,6 +347,22 @@
     mount.setAttribute('data-akx-done', '1');
 
     order.forEach(function (s) { loadWidget(s.widget); });
+    watchProgramme(mount);
+  }
+
+  /* The "See below…" link is only honest once the programme section has cards in it.
+     That section fills in later (own widget, own sheet read), so watch for it. */
+  function watchProgramme(root) {
+    var sec  = root.querySelector('#akx-programme');
+    var link = root.querySelector('.akxb-seebelow');
+    if (!sec || !link) return;
+    var check = function () { link.classList.toggle('on', !!sec.querySelector('.cc')); };
+    check();
+    if (window.MutationObserver) {
+      new MutationObserver(check).observe(sec, { childList: true, subtree: true });
+    } else {
+      setTimeout(check, 1500);
+    }
   }
 
   function init() {
