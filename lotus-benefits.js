@@ -12,7 +12,8 @@
    OPTIONS on the mount:
      data-heading="Why meditate"   optional heading above the row; omit for none
 
-   Content taken verbatim from the live homepage block, 29 Aug 2026.
+   Content AND type taken from the live homepage block, 29 Aug 2026:
+   Inter 600 / 17.6px / #1D1D1F for the line, Inter 400 / 15.2px / #5A5A5A beneath.
    CACHE: GitHub Pages caches this file. Load with ?v=n and bump after a commit.
    =========================================================================== */
 (function () {
@@ -30,9 +31,10 @@
     '.benefits-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;',
     'max-width:1000px;margin:0 auto;text-align:center;font-family:inherit}',
     '.benefits-grid .bn img{width:105px;height:auto;display:block;margin:0 auto 12px}',
-    '.benefits-grid .bn h3{font-family:Fraunces,Georgia,serif;font-weight:600;font-size:1.15rem;',
-    'color:#1D1D1F;margin:0 0 6px;line-height:1.25}',
-    '.benefits-grid .bn p{margin:0;font-size:.95rem;line-height:1.5;color:#5B5B5B}',
+    '.benefits-grid .bn h3{font-family:Inter,-apple-system,"Segoe UI",Roboto,sans-serif;font-weight:600;',
+    'font-size:17.6px;color:#1D1D1F;margin:0 0 6px;line-height:1.3}',
+    '.benefits-grid .bn p{margin:0;font-family:Inter,-apple-system,"Segoe UI",Roboto,sans-serif;',
+    'font-size:15.2px;line-height:1.5;color:#5A5A5A}',
     '.akx-lotus-h{font-family:Fraunces,Georgia,serif;font-size:1.6rem;color:#2A66A6;',
     'text-align:center;margin:0 0 26px}',
     '@media(max-width:680px){.benefits-grid{grid-template-columns:1fr;gap:26px}',
