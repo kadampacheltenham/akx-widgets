@@ -15,9 +15,8 @@
    Content and images taken verbatim from the live /start-here block, 29 Aug 2026.
    Cards flip on tap/hover to show the graphic and the action buttons.
 
-   NOTE — two links were EMPTY on the live block (the "Watch now" and
-   "Listen now" buttons did nothing). Living Clarity is set below from the
-   block's own header comment; the podcast URL still needs supplying.
+   NOTE — two links were EMPTY on the live /start-here block ("Watch now" and
+   "Listen now" did nothing). All three are set here.
 
    CACHE: GitHub Pages caches this file. Load with ?v=n and bump after a commit.
    =========================================================================== */
@@ -35,8 +34,7 @@
       teaser: 'A 100% free app to help you begin to meditate — calm, compassion and clarity in daily life.',
       gfx: IMG + 'mb-med-app.png',
       links: [
-        { label: 'App Store ↗',   href: 'https://apps.apple.com/app/apple-store/id6751805356' },
-        { label: 'Google Play ↗', href: 'https://play.google.com/store/apps/details?id=org.kadampa.modernbuddhism' }
+        { label: 'Get the app ↗', href: 'https://kadampa.org/app#download' }
       ]
     },
     {
@@ -45,7 +43,7 @@
       teaser: 'Everyday wisdom for everyday life — real conversations, anytime.',
       gfx: IMG + 'images/mb-podcast.png',
       links: [
-        { label: 'Watch now ↗', href: '' }        // <<< NEEDS THE YOUTUBE URL
+        { label: 'Watch now ↗', href: 'https://www.youtube.com/@modernbuddhismpodcast' }
       ]
     },
     {
