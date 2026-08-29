@@ -82,25 +82,27 @@
     '.akxb-sec{padding:16px 0}',
     '.akxb-sec + .akxb-sec{border-top:1px solid #EDE9DF}',
     '.akxb-secflex{display:flex;gap:24px;align-items:center}',
-    '.akxb-main{flex:1;min-width:0}',
+    '.akxb-main{flex:0 0 52%}',
+    '.akxb-main{min-width:0}',
     '.akxb-line{display:flex;gap:16px;align-items:baseline;padding:3px 0}',
     '.akxb-lbl{flex:none;width:92px;font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;',
     'font-weight:700;color:#8A8578}',
     '.akxb-val{flex:1;min-width:0;font-size:1rem;line-height:1.55;color:#2E3640}',
+    '.akxb-venue{font-weight:700}',
     '.akxb-sub{color:#7A8189;font-size:.88em}',
     '.akxb-dirs{color:#0B7A3B;font-weight:600;font-size:.86em;text-decoration:underline;white-space:nowrap}',
     '.akxb-link{color:#2A66A6;text-decoration:underline;font-size:1rem;font-weight:400;letter-spacing:0}',
     '.akxb-next{flex:none;width:140px;background:#F6EFE4;border:1px solid #E7DAC4;border-radius:12px;',
-    'padding:11px 8px;text-align:center}',
+    'padding:11px 8px;text-align:center;margin-left:auto}',
     '.akxb-next .k{font-size:9.6px;letter-spacing:.11em;text-transform:uppercase;font-weight:700;color:#1F7C74}',
     '.akxb-next .d{font-family:Fraunces,Georgia,serif;font-size:1.15rem;color:#1F7C74;margin:3px 0 1px;line-height:1.15}',
     '.akxb-next .t{font-size:.85rem;color:#1F7C74}',
     '.akxb-soon{text-align:center;color:#5C6672;font-size:1rem;padding:6px 0 2px}',
     /* pills */
     '.akxb-pills{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin-top:20px}',
-    '.akxb-pill{background:#E4F5F2;border:1px solid #B9E3DD;color:#1F7C74;font-size:.85rem;',
-    'font-weight:600;padding:8px 17px;border-radius:999px;text-decoration:none}',
-    '.akxb-pill:hover{background:#D6EFEA}',
+    '.akxb-pill{background:#F2FAF8;border:1px solid #DCEEEA;color:#4A8B84;font-size:.8rem;',
+    'font-weight:500;padding:7px 15px;border-radius:999px;text-decoration:none}',
+    '.akxb-pill:hover{background:#E4F5F2;color:#1F7C74}',
     /* the events slot, visible only while it is unbuilt and only on the prototype */
     '.akxp-slot{max-width:1000px;margin:0 auto;border:1px dashed #D8D3C6;border-radius:12px;',
     'padding:30px 20px;text-align:center;color:#A8A296;font-size:.9rem;letter-spacing:.04em}',
@@ -110,12 +112,14 @@
     '.akxb-banner{width:78%;margin:18px auto 0;font-size:10px;letter-spacing:.12em;padding:9px 10px}',
     '.akxb-ttl{font-size:1.35rem;margin:15px 0 2px}',
     '.akxb-secflex{display:block}',
-    '.akxb-next{width:132px;margin:12px 0 0 auto}',
+    '.akxb-main{flex:1 1 100%}',
+    '.akxb-next{width:100%;margin:12px 0 0;display:flex;align-items:baseline;justify-content:center;gap:10px;padding:9px 10px}',
+    '.akxb-next .d{margin:0}',
     '.akxb-line{gap:9px;align-items:flex-start}',
     '.akxb-lbl{width:64px;font-size:9px;letter-spacing:.05em;padding-top:3px}',
     '.akxb-val{font-size:.9rem;word-break:break-word}',
     '.akxb-dirs{white-space:normal}',
-    '.akxb-pill{font-size:.8rem;padding:7px 13px}}'
+    '.akxb-pill{font-size:.76rem;padding:6px 12px}}'
   ].join('');
 
   function injectCSS() {
@@ -213,7 +217,9 @@
       var web = val(loc,'Branch website'), email = val(loc,'Branch email');
 
       var sec =
-        row('Venue', venue ? esc(venue) + ' &nbsp;<a class="akxb-dirs" href="' + mapsHref(venue) +
+        row('Venue', venue ? '<strong class="akxb-venue">' + esc(display || venue) + '</strong>' +
+              (display ? ', ' + esc(val(loc,'address')) : '') +
+              ' &nbsp;<a class="akxb-dirs" href="' + mapsHref(venue) +
               '" target="_blank" rel="noopener">Get directions</a>' : '') +
         row('Information', val(loc,'access_note') ? '<span class="akxb-sub">' + esc(val(loc,'access_note')) + '</span>' : '') +
         row('WhatsApp', WHATSAPP ? '<a class="akxb-link" href="https://wa.me/44' +
