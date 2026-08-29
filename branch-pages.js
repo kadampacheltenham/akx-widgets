@@ -1,12 +1,13 @@
 /* ===========================================================================
-   akx branch-page.js — the whole branch page, from one stub
+   akx branch-pages.js — the whole branch page, from one stub
    Akanishta Kadampa Buddhist Centre · v2.0 · 29 Aug 2026
+   (was branch-page.js — renamed 29 Aug so it reads as "the branch pages widget")
 
    ONE STUB PER BRANCH PAGE. Everything below the page title and intro is
-   built here. Two lines change per town:
+   built here. Two lines change per town — the town id and its display name:
 
      <div id="akx-branch" data-town="cirencester" data-name="Cirencester"></div>
-     <script src="https://kadampacheltenham.github.io/akx-widgets/branch-page.js?v=2" defer></script>
+     <script src="https://kadampacheltenham.github.io/akx-widgets/branch-pages.js" defer></script>
 
    The card title is built from data-name: "Drop-in classes in Cirencester".
    Override the whole line with data-title if a town ever needs different words.
@@ -17,11 +18,15 @@
 
      1  Drop-in classes card + town pills      (here)
      2  Lotus benefits                          lotus-benefits.js
-     3  Testimony                               testimony-quotes.js (existing)
-     4  Classes & events in <town>              NOT BUILT — empty slot for now
-     5  Start from home                         start-at-home.js  (not built yet)
+     3  Testimony                               testimony-quotes.js
+     4  Talks & short courses in <town>         wc-talks-courses.js  (+ event-graphics.js)
+     5  Start from home                         start-at-home.js
      6  Stay in touch                           social-cards.js
      7  Calendar                                calendar.js  (data-cal="branch")
+
+   Section 4 is the SAME widget /weekly-classes uses, told which town it is on
+   and capped at two cards. It needs the optional filter added to
+   wc-talks-courses.js — without it that section would show every town.
 
    Any widget that isn't on the server yet simply leaves its section empty —
    nothing breaks, and the section appears the moment that file is published.
@@ -29,7 +34,9 @@
    EMPTY STATE: when the town has no classes in the sheet, Start from home and
    Stay in touch move up directly under the card, ahead of the empty events slot.
 
-   CACHE: GitHub Pages caches this file. Load with ?v=n and bump after a commit.
+   CACHE: stubs carry no version query — a stub just pulls the widget. GitHub
+   Pages caches for ~10 minutes, so after a commit give it that long (or
+   hard-reload) before deciding a change didn't land.
    =========================================================================== */
 (function () {
   'use strict';
@@ -44,7 +51,6 @@
   var WHATSAPP = '07788 945212';                 // from /contact-us
   var SHEET    = '1YArubV8QgCvPUIIvHOHWhCN2fYLRz0DDPSRSHD_tSmY';
   var BASE     = 'https://kadampacheltenham.github.io/akx-widgets/';
-  var V        = '?v=2';                         // bump with this file
 
   var PILLS = [
     { label: 'Classes in Cheltenham', href: '/whats-on',   key: 'cheltenham' },
@@ -114,9 +120,6 @@
     '.akxb-pill:hover{background:#E4F5F2;color:#1F7C74}',
     '.akxb-pill.sand{background:#F6EFE4;border-color:#E7DAC4;color:#8A6B3A}',
     '.akxb-pill.sand:hover{background:#F1E7D7;color:#7A5D2E}',
-    /* the events slot, visible only while it is unbuilt and only on the prototype */
-    '.akxp-slot{max-width:1000px;margin:0 auto;border:1px dashed #D8D3C6;border-radius:12px;',
-    'padding:30px 20px;text-align:center;color:#A8A296;font-size:.9rem;letter-spacing:.04em}',
     '@media (max-width:700px){',
     '.akxp-sec{padding:34px 0}',
     '.akxb-pad{padding:0 18px 18px}',
@@ -269,7 +272,7 @@
     var id = 'akx-w-' + file.replace(/\W+/g,'-');
     if (document.getElementById(id)) { if (onload) onload(); return; }
     var s = document.createElement('script');
-    s.id = id; s.src = (BASE_OVERRIDE || BASE) + file + V; s.defer = true;
+    s.id = id; s.src = (BASE_OVERRIDE || BASE) + file; s.defer = true;
     s.onload = function () { if (onload) onload(); };
     s.onerror = function () {
       if (window.console) console.warn('[akx-branch] ' + file + ' not published yet — its section stays empty.');
@@ -293,7 +296,6 @@
     var town  = (mount.getAttribute('data-town') || '').toLowerCase();
     var name  = mount.getAttribute('data-name') || town;
     var title = (mount.getAttribute('data-title') || TITLE).replace('{town}', name);
-    var showSlot  = mount.getAttribute('data-show-slot') === '1';   // prototype only
     var quotePage = mount.getAttribute('data-quote-page') || 'classes';  // testimony-quotes.js
     if (mount.getAttribute('data-base')) BASE_OVERRIDE = mount.getAttribute('data-base');
 
