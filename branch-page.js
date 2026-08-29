@@ -71,8 +71,9 @@
     '.akxp-sec:first-child{padding-top:0}',
     '.akxp-sec:empty{display:none;padding:0}',
     /* card */
-    '.akxb-card{background:#fff;border:1px solid #E9E4D8;border-radius:18px;overflow:hidden;',
-    'max-width:1000px;margin:0 auto;box-shadow:0 2px 10px rgba(120,105,80,.05)}',
+    '.akxb-card{background:#fff;border:1px solid rgba(226,136,106,.38);border-radius:18px;',
+    'overflow:hidden;max-width:1000px;margin:0 auto;',
+    'box-shadow:0 3px 16px rgba(226,136,106,.13),0 1px 3px rgba(226,136,106,.08)}',
     '.akxb-banner{background:#E2886A;color:#fff;text-align:center;font-size:11.5px;font-weight:700;',
     'letter-spacing:.16em;text-transform:uppercase;padding:10px 16px;border-radius:14px;',
     'width:62%;margin:22px auto 0}',
@@ -82,8 +83,7 @@
     '.akxb-sec{padding:16px 0}',
     '.akxb-sec + .akxb-sec{border-top:1px solid #EDE9DF}',
     '.akxb-secflex{display:flex;gap:24px;align-items:center}',
-    '.akxb-main{flex:0 0 52%}',
-    '.akxb-main{min-width:0}',
+    '.akxb-main{flex:0 0 52%;min-width:0}',
     '.akxb-line{display:flex;gap:16px;align-items:baseline;padding:3px 0}',
     '.akxb-lbl{flex:none;width:92px;font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;',
     'font-weight:700;color:#8A8578}',
@@ -93,15 +93,16 @@
     '.akxb-dirs{color:#0B7A3B;font-weight:600;font-size:.86em;text-decoration:underline;white-space:nowrap}',
     '.akxb-link{color:#2A66A6;text-decoration:underline;font-size:1rem;font-weight:400;letter-spacing:0}',
     '.akxb-next{flex:none;width:140px;background:#F6EFE4;border:1px solid #E7DAC4;border-radius:12px;',
-    'padding:11px 8px;text-align:center;margin-left:auto}',
+    'padding:11px 10px;text-align:center}',
     '.akxb-next .k{font-size:9.6px;letter-spacing:.11em;text-transform:uppercase;font-weight:700;color:#1F7C74}',
-    '.akxb-next .d{font-family:Fraunces,Georgia,serif;font-size:1.15rem;color:#1F7C74;margin:3px 0 1px;line-height:1.15}',
-    '.akxb-next .t{font-size:.85rem;color:#1F7C74}',
+    '.akxb-next .d{font-family:Fraunces,Georgia,serif;font-weight:600;font-size:1.25rem;color:#1F7C74;',
+    'margin:3px 0 2px;line-height:1.15}',
+    '.akxb-next .t{font-size:.88rem;color:#5C6672}',
     '.akxb-soon{text-align:center;color:#5C6672;font-size:1rem;padding:6px 0 2px}',
     /* pills */
     '.akxb-pills{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin-top:20px}',
-    '.akxb-pill{background:#F2FAF8;border:1px solid #DCEEEA;color:#4A8B84;font-size:.8rem;',
-    'font-weight:500;padding:7px 15px;border-radius:999px;text-decoration:none}',
+    '.akxb-pill{background:#EAF7F4;border:1px solid #C9E6E0;color:#2E8078;font-size:.83rem;',
+    'font-weight:600;padding:8px 16px;border-radius:999px;text-decoration:none}',
     '.akxb-pill:hover{background:#E4F5F2;color:#1F7C74}',
     /* the events slot, visible only while it is unbuilt and only on the prototype */
     '.akxp-slot{max-width:1000px;margin:0 auto;border:1px dashed #D8D3C6;border-radius:12px;',
@@ -175,6 +176,13 @@
   function mapsHref(a) { return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(a); }
   function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+  /* bold everything up to the first comma — the venue name, not the address */
+  function boldFirstPart(str) {
+    var i = str.indexOf(',');
+    if (i === -1) return '<strong class="akxb-venue">' + esc(str) + '</strong>';
+    return '<strong class="akxb-venue">' + esc(str.slice(0, i)) + '</strong>' + esc(str.slice(i));
+  }
+
   function row(label, html) {
     if (!html) return '';
     return '<div class="akxb-line"><div class="akxb-lbl">' + esc(label) + '</div>' +
@@ -217,8 +225,7 @@
       var web = val(loc,'Branch website'), email = val(loc,'Branch email');
 
       var sec =
-        row('Venue', venue ? '<strong class="akxb-venue">' + esc(display || venue) + '</strong>' +
-              (display ? ', ' + esc(val(loc,'address')) : '') +
+        row('Venue', venue ? boldFirstPart(venue) +
               ' &nbsp;<a class="akxb-dirs" href="' + mapsHref(venue) +
               '" target="_blank" rel="noopener">Get directions</a>' : '') +
         row('Information', val(loc,'access_note') ? '<span class="akxb-sub">' + esc(val(loc,'access_note')) + '</span>' : '') +
