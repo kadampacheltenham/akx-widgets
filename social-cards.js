@@ -147,14 +147,18 @@
     'background:#fff;border:1px solid #E6E6DF;border-radius:16px;padding:26px 16px 20px;',
     'text-decoration:none;color:inherit;transition:box-shadow .18s ease,transform .18s ease}',
     '.akxs-card:hover{box-shadow:0 6px 18px rgba(42,102,166,.10);transform:translateY(-2px)}',
-    /* the two cards we most want followed carry the drop-in card's warm coral treatment.
-       WhatsApp is the recommended one, so its line, glow and blush are a step stronger. */
+    /* the two cards we most want followed carry the drop-in card's warm coral treatment:
+       a thin coral line, and the blush BEHIND the card only — the card itself stays white,
+       exactly as the drop-in card does. WhatsApp is the recommended one, so its line and
+       glow are a step stronger. */
     '.akxs-enews{border-color:rgba(226,136,106,.38);',
     'box-shadow:0 3px 16px rgba(226,136,106,.13),0 1px 3px rgba(226,136,106,.08)}',
     '.akxs-enews:hover{box-shadow:0 7px 22px rgba(226,136,106,.20),0 1px 3px rgba(226,136,106,.10)}',
-    '.akxs-whatsapp{border-color:rgba(226,136,106,.55);background:#FFFBF8;',
-    'box-shadow:0 4px 22px rgba(226,136,106,.20),0 1px 4px rgba(226,136,106,.11)}',
-    '.akxs-whatsapp:hover{box-shadow:0 8px 28px rgba(226,136,106,.28),0 1px 4px rgba(226,136,106,.13)}',
+    '.akxs-whatsapp{border-color:rgba(226,136,106,.55);',
+    'box-shadow:0 5px 26px rgba(226,136,106,.26),0 0 14px rgba(226,136,106,.10),',
+    '0 1px 4px rgba(226,136,106,.13)}',
+    '.akxs-whatsapp:hover{box-shadow:0 9px 32px rgba(226,136,106,.32),0 0 16px rgba(226,136,106,.12),',
+    '0 1px 4px rgba(226,136,106,.15)}',
     '.akxs-whatsapp .akxs-pin{border-color:rgba(226,136,106,.70)}',
     '.akxs-card:focus-visible{outline:2px solid #2A66A6;outline-offset:3px}',
     /* pinned label straddles the top edge so it can never touch the icon */
