@@ -73,7 +73,10 @@
     D('.teaser') + '{font-size:12.5px;line-height:1.5;color:#5B5B5B;margin:0;max-width:34ch}',
     D('.tap') + '{margin-top:5px;font-size:11.5px;font-weight:600;color:var(--coral)}',
     D('.back') + '{position:absolute;inset:0;transform:translateY(100%);transition:transform .5s cubic-bezier(.4,0,.2,1)}',
-    D('.gfx') + '{position:absolute;inset:0;background-size:cover;background-position:center}',
+    /* NOT .gfx — wc-talks-courses.js defines a global .gfx at 190x190 and its width
+   beat our inset:0, shrinking the graphic to a square. Own name, no collision. */
+    D('.shgfx') + '{position:absolute;inset:0;width:100%;height:100%;',
+    'background-size:cover;background-position:center}',
     D('.cap') + '{position:absolute;left:0;right:0;bottom:0;padding:26px 14px 12px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;background:linear-gradient(to top,rgba(15,22,32,.6),rgba(15,22,32,0))}',
     D('.cap a') + '{font-size:12px;font-weight:700;background:rgba(255,255,255,.94);color:#1D1D1F;border-radius:999px;padding:8px 13px;text-decoration:none;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.18)}',
     D('.cap a:hover') + '{background:#fff}',
@@ -117,7 +120,7 @@
             '<p class="teaser">' + esc(c.teaser) + '</p>' +
             '<span class="tap">Tap to preview →</span>' +
           '</div>' +
-          '<div class="back"><div class="gfx" style="background-image:url(' + c.gfx + ')"></div>' +
+          '<div class="back"><div class="shgfx" style="background-image:url(' + c.gfx + ')"></div>' +
             (caps ? '<div class="cap">' + caps + '</div>' : '') +
           '</div>' +
         '</div>';
@@ -126,21 +129,21 @@
     mount.innerHTML = html + '</div>';
     mount.setAttribute('data-akx-done', '1');
 
-    /* First hover (desktop) or first tap (mobile) reveals the card. Once it is
-       showing, a click anywhere on it follows the card's first link. */
-    mount.addEventListener('mouseenter', function (e) {
-      var card = e.target && e.target.closest ? e.target.closest('.sc') : null;
-      if (card) card.dataset.revealed = '1';
-    }, true);
+    /* Desktop (a real pointer): hovering already shows the back, so a click follows the
+       link. Touch: the FIRST tap reveals, a second tap follows the link.
+       The old version set a "revealed" flag on mouseenter — but a tap fires mouseenter
+       too, so on a phone the first tap jumped straight to the link. Ask the card whether
+       its back is actually showing instead of remembering that it might be. */
+    var canHover = !!(window.matchMedia && window.matchMedia('(hover:hover)').matches);
 
     mount.addEventListener('click', function (e) {
-      var card = e.target.closest('.sc');
+      var card = e.target.closest ? e.target.closest('.sc') : null;
       if (!card || e.target.closest('a')) return;
-      var revealed = card.classList.contains('open') || card.dataset.revealed === '1';
+      var showing = card.classList.contains('open') ||
+                    (canHover && card.matches && card.matches(':hover'));
       var link = card.querySelector('.cap a');
-      if (revealed && link) { window.open(link.href, '_blank', 'noopener'); return; }
+      if (showing && link) { window.open(link.href, '_blank', 'noopener'); return; }
       card.classList.add('open');
-      card.dataset.revealed = '1';
     });
     mount.addEventListener('keydown', function (e) {
       if (e.key !== 'Enter' && e.key !== ' ') return;
