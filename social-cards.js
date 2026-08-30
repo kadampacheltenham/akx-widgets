@@ -45,7 +45,8 @@
       flash: 'New',                            // coral corner marker
       button: '#25D366',                       // exactly the icon green (Gen, 29 Aug)
       buttonInk: '#07301F',                    // dark ink — white on #25D366 is unreadable
-      nameColour: '#111B21'
+      nameColour: '#1D1D1F',                   // site charcoal, not black — the name should not
+      nameSize: '14px'                         // out-shout the other three (Gen, 29 Aug)
     },
 
     enews: {
@@ -146,6 +147,15 @@
     'background:#fff;border:1px solid #E6E6DF;border-radius:16px;padding:26px 16px 20px;',
     'text-decoration:none;color:inherit;transition:box-shadow .18s ease,transform .18s ease}',
     '.akxs-card:hover{box-shadow:0 6px 18px rgba(42,102,166,.10);transform:translateY(-2px)}',
+    /* the two cards we most want followed carry the drop-in card's warm coral treatment.
+       WhatsApp is the recommended one, so its line, glow and blush are a step stronger. */
+    '.akxs-enews{border-color:rgba(226,136,106,.38);',
+    'box-shadow:0 3px 16px rgba(226,136,106,.13),0 1px 3px rgba(226,136,106,.08)}',
+    '.akxs-enews:hover{box-shadow:0 7px 22px rgba(226,136,106,.20),0 1px 3px rgba(226,136,106,.10)}',
+    '.akxs-whatsapp{border-color:rgba(226,136,106,.55);background:#FFFBF8;',
+    'box-shadow:0 4px 22px rgba(226,136,106,.20),0 1px 4px rgba(226,136,106,.11)}',
+    '.akxs-whatsapp:hover{box-shadow:0 8px 28px rgba(226,136,106,.28),0 1px 4px rgba(226,136,106,.13)}',
+    '.akxs-whatsapp .akxs-pin{border-color:rgba(226,136,106,.70)}',
     '.akxs-card:focus-visible{outline:2px solid #2A66A6;outline-offset:3px}',
     /* pinned label straddles the top edge so it can never touch the icon */
     '.akxs-pins{position:absolute;top:-11px;left:50%;transform:translateX(-50%);',
@@ -219,10 +229,11 @@
       console.warn('[akx-social] no URL set for "' + key + '" — card rendered without a link.');
     }
 
-    return '<a class="akxs-card"' + href + '>' +
+    return '<a class="akxs-card akxs-' + key + '"' + href + '>' +
       pins +
       '<span class="akxs-icorow">' + (flash || '<span></span>') + '<span class="akxs-ico">' + ICONS[key] + '</span><span></span></span>' +
-      '<span class="akxs-nm ' + c.nameStyle + '" style="color:' + c.nameColour + '">' + c.name + '</span>' +
+      '<span class="akxs-nm ' + c.nameStyle + '" style="color:' + c.nameColour +
+        (c.nameSize ? ';font-size:' + c.nameSize : '') + '">' + c.name + '</span>' +
       '<span class="akxs-note">' + c.note + '</span>' +
       '<span class="akxs-cta" style="background:' + c.button + ';color:' + (c.buttonInk || '#fff') + '">' +
         '<span class="akxs-full">' + c.cta + '</span>' +
