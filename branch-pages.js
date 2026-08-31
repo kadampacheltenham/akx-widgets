@@ -45,6 +45,11 @@
   /* CONFIG                                                             */
   /* ------------------------------------------------------------------ */
   var TITLE    = 'Drop-in classes in {town}';    // {town} = the data-name on the stub
+  /* a town with no classes in the sheet yet gets this title and this copy instead */
+  var TITLE_EMPTY  = 'Upcoming events in {town} & nearby';
+  var SOON     = 'We’re working to find a suitable venue. Please let us know if you have any suggestions or ideas.';
+  var SOON_2   = 'See below for other local events & ways to get started from home.';
+  var NEARBY_LABEL = 'Classes & events nearby';
   var BANNER   = 'Everybody welcome';
   var EVENTS_TITLE = 'Programme of classes';
   var SEE_BELOW    = 'See below for programme of classes';
@@ -124,9 +129,17 @@
     '.akxb-next .d{font-family:Fraunces,Georgia,serif;font-weight:600;font-size:1.25rem;color:#1F7C74;',
     'margin:3px 0 2px;line-height:1.15}',
     '.akxb-next .t{font-size:.88rem;color:#5C6672}',
-    '.akxb-soon{text-align:center;color:#5C6672;font-size:1rem;padding:6px 0 2px}',
+    '.akxb-soon{text-align:center;color:#5C6672;font-size:1rem;padding:6px 0 2px;max-width:52ch;margin:0 auto}',
+    '.akxb-soon p{margin:0}',
+    '.akxb-soon .akxb-soon2{margin-top:8px;color:#7A8189;font-size:.94rem}',
+    /* pills inside the card, on a town with nothing on yet */
+    '.akxb-nearby{text-align:center}',
+    '.akxb-nearby-h{font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;font-weight:700;',
+    'color:#8A8578;margin-bottom:11px}',
     /* pills */
     '.akxb-pills{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin-top:20px}',
+    '.akxb-pills.in{margin-top:0;gap:10px}',
+    '.akxb-pills.in .akxb-pill{font-size:.9rem;padding:10px 20px}',
     '.akxb-pill{background:#EAF7F4;border:1px solid #C9E6E0;color:#2E8078;font-size:.83rem;',
     'font-weight:600;padding:8px 16px;border-radius:999px;text-decoration:none}',
     '.akxb-pill:hover{background:#E4F5F2;color:#1F7C74}',
@@ -222,13 +235,18 @@
       return val(r,'Location ID').toLowerCase() === town; })[0];
     var slots = data.classes.filter(function (r) {
       return val(r,'Location ID').toLowerCase() === town; });
+    var empty = !slots.length;
+
+    /* A town with nothing on yet is not offering drop-in classes, so it does not get
+       that title. It points at what IS happening — here and in the towns around it. */
+    if (empty) title = TITLE_EMPTY.replace('{town}', name);
 
     var html = '<div class="akxb-card"><div class="akxb-banner">' + esc(BANNER) + '</div>' +
                '<div class="akxb-ttl">' + esc(title) + '</div><div class="akxb-pad">';
 
-    if (!slots.length) {
-      html += '<div class="akxb-sec akxb-soon">We’re confirming a venue and dates in ' +
-              esc(name) + ' now.</div>';
+    if (empty) {
+      html += '<div class="akxb-sec akxb-soon"><p>' + esc(SOON) + '</p>' +
+              '<p class="akxb-soon2">' + esc(SOON_2) + '</p></div>';
     } else {
       var s = slots[0];
       var teacher = val(s,'teacher'), day = val(s,'day'), time = val(s,'time'),
@@ -245,36 +263,48 @@
       html += '</div>';
     }
 
-    if (loc) {
-      var display = val(loc,'display_name');
-      if (display.toLowerCase() === name.toLowerCase()) display = '';
-      var venue = [display, val(loc,'address')].filter(Boolean).join(', ');
-      var web = val(loc,'Branch website'), email = val(loc,'Branch email');
+    /* Venue and the branch's own website/email need a Locations row. WhatsApp does NOT —
+       a town we're asking for venue suggestions must always show a way to reach us. */
+    var display = loc ? val(loc,'display_name') : '';
+    if (display.toLowerCase() === name.toLowerCase()) display = '';
+    var venue = loc ? [display, val(loc,'address')].filter(Boolean).join(', ') : '';
+    var web   = loc ? val(loc,'Branch website') : '';
+    var email = loc ? val(loc,'Branch email')   : '';
 
-      var sec =
-        row('Venue', venue ? boldFirstPart(venue) +
-              ' &nbsp;<a class="akxb-dirs" href="' + mapsHref(venue) +
-              '" target="_blank" rel="noopener">Get directions</a>' : '') +
-        row('Information', val(loc,'access_note') ? '<span class="akxb-sub">' + esc(val(loc,'access_note')) + '</span>' : '') +
-        row('WhatsApp', WHATSAPP ? '<a class="akxb-link" href="https://wa.me/44' +
-              WHATSAPP.replace(/\D/g,'').replace(/^0/,'') + '" target="_blank" rel="noopener">' +
-              esc(WHATSAPP) + '</a>' : '') +
-        row('Website', web ? '<a class="akxb-link" href="' +
-              (/^https?:/i.test(web) ? esc(web) : 'https://' + esc(web)) +
-              '" target="_blank" rel="noopener">' + esc(web.replace(/^https?:\/\//i,'')) + '</a>' : '') +
-        row('Email', email ? '<a class="akxb-link" href="mailto:' + esc(email) + '">' + esc(email) + '</a>' : '');
-      if (sec) html += '<div class="akxb-sec">' + sec + '</div>';
+    var sec =
+      row('Venue', venue ? boldFirstPart(venue) +
+            ' &nbsp;<a class="akxb-dirs" href="' + mapsHref(venue) +
+            '" target="_blank" rel="noopener">Get directions</a>' : '') +
+      row('Information', loc && val(loc,'access_note') ? '<span class="akxb-sub">' + esc(val(loc,'access_note')) + '</span>' : '') +
+      row('WhatsApp', WHATSAPP ? '<a class="akxb-link" href="https://wa.me/44' +
+            WHATSAPP.replace(/\D/g,'').replace(/^0/,'') + '" target="_blank" rel="noopener">' +
+            esc(WHATSAPP) + '</a>' : '') +
+      row('Website', web ? '<a class="akxb-link" href="' +
+            (/^https?:/i.test(web) ? esc(web) : 'https://' + esc(web)) +
+            '" target="_blank" rel="noopener">' + esc(web.replace(/^https?:\/\//i,'')) + '</a>' : '') +
+      row('Email', email ? '<a class="akxb-link" href="mailto:' + esc(email) + '">' + esc(email) + '</a>' : '');
+    if (sec) html += '<div class="akxb-sec">' + sec + '</div>';
+
+    /* The town pills answer "where, then?" — so on a town with nothing on they belong
+       INSIDE the card, carrying a label and a little more weight. Everywhere else they
+       stay below it, quiet, as a footer of sister pages. */
+    var pills = PILLS.filter(function (p) { return p.key !== town; })
+      .map(function (p) { return '<a class="akxb-pill' + (p.sand ? ' sand' : '') +
+                                 '" href="' + p.href + '">' + esc(p.label) + '</a>'; })
+      .join('');
+
+    if (empty) {
+      html += '<div class="akxb-sec akxb-nearby">' +
+                '<div class="akxb-nearby-h">' + esc(NEARBY_LABEL) + '</div>' +
+                '<div class="akxb-pills in">' + pills + '</div>' +
+              '</div>';
     }
 
     html += '</div></div>';
 
-    html += '<div class="akxb-pills">' +
-      PILLS.filter(function (p) { return p.key !== town; })
-           .map(function (p) { return '<a class="akxb-pill' + (p.sand ? ' sand' : '') +
-                                      '" href="' + p.href + '">' + esc(p.label) + '</a>'; })
-           .join('') + '</div>';
+    if (!empty) html += '<div class="akxb-pills">' + pills + '</div>';
 
-    return { html: html, hasClasses: !!slots.length };
+    return { html: html, hasClasses: !empty };
   }
 
   /* ------------------------------------------------------------------ */
