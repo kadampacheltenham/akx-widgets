@@ -48,7 +48,7 @@
   /* a town with no classes in the sheet yet gets this title and this copy instead */
   var TITLE_EMPTY  = 'Upcoming events in {town} & nearby';
   var NOTICE_H = 'Coming to {town}';
-  var SOON     = 'We’re working to find a suitable venue. Please let us know if you have any suggestions or ideas.';
+  var SOON     = 'We’re working to find a suitable venue. Please let us know if you have any suggestions, ideas or would be interested to help with classes.';
   var SOON_2   = 'See below for other local events & ways to get started from home.';
   var NEARBY_LABEL = 'Classes & events nearby';
   var BANNER   = 'Everybody welcome';
