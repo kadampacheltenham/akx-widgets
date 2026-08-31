@@ -282,7 +282,7 @@
             (/^https?:/i.test(web) ? esc(web) : 'https://' + esc(web)) +
             '" target="_blank" rel="noopener">' + esc(web.replace(/^https?:\/\//i,'')) + '</a>' : '') +
       row('Email', email ? '<a class="akxb-link" href="mailto:' + esc(email) + '">' + esc(email) + '</a>' : '');
-    if (sec) html += '<div class="akxb-sec">' + sec + '</div>';
+    var contact = sec ? '<div class="akxb-sec">' + sec + '</div>' : '';
 
     /* The town pills answer "where, then?" — so on a town with nothing on they belong
        INSIDE the card, carrying a label and a little more weight. Everywhere else they
@@ -293,10 +293,13 @@
       .join('');
 
     if (empty) {
+      /* nearby first, then how to reach us — the pills are the answer, the contact is the ask */
       html += '<div class="akxb-sec akxb-nearby">' +
                 '<div class="akxb-nearby-h">' + esc(NEARBY_LABEL) + '</div>' +
                 '<div class="akxb-pills in">' + pills + '</div>' +
-              '</div>';
+              '</div>' + contact;
+    } else {
+      html += contact;
     }
 
     html += '</div></div>';
