@@ -129,9 +129,8 @@
     '.akxb-next .d{font-family:Fraunces,Georgia,serif;font-weight:600;font-size:1.25rem;color:#1F7C74;',
     'margin:3px 0 2px;line-height:1.15}',
     '.akxb-next .t{font-size:.88rem;color:#5C6672}',
-    '.akxb-soon{text-align:center;color:#5C6672;font-size:1rem;padding:6px 0 2px;max-width:52ch;margin:0 auto}',
-    '.akxb-soon p{margin:0}',
-    '.akxb-soon .akxb-soon2{margin-top:8px;color:#7A8189;font-size:.94rem}',
+    '.akxb-soon{text-align:center;color:#5C6672;font-size:1rem;padding:6px 0 2px;max-width:56ch;margin:0 auto}',
+    '.akxb-soon p{margin:0;line-height:1.6;text-wrap:pretty}',
     /* pills inside the card, on a town with nothing on yet */
     '.akxb-nearby{text-align:center}',
     '.akxb-nearby-h{font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;font-weight:700;',
@@ -245,8 +244,8 @@
                '<div class="akxb-ttl">' + esc(title) + '</div><div class="akxb-pad">';
 
     if (empty) {
-      html += '<div class="akxb-sec akxb-soon"><p>' + esc(SOON) + '</p>' +
-              '<p class="akxb-soon2">' + esc(SOON_2) + '</p></div>';
+      /* one flowing paragraph — two sentences, not two blocks */
+      html += '<div class="akxb-sec akxb-soon"><p>' + esc(SOON) + ' ' + esc(SOON_2) + '</p></div>';
     } else {
       var s = slots[0];
       var teacher = val(s,'teacher'), day = val(s,'day'), time = val(s,'time'),
