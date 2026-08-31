@@ -49,7 +49,10 @@
   var TITLE_EMPTY  = 'Upcoming events in {town} & nearby';
   var NOTICE_H = 'Coming to {town}';
   var SOON     = 'We’re working to find a suitable venue. Please let us know if you have any suggestions, ideas or would be interested to help with classes.';
-  var SOON_2   = 'See below for other local events & ways to get started from home.';
+  /* The <b> tags mark the three destinations further down the page. This one line is
+     written as HTML so those can carry a little weight — keep the tags if you edit it. */
+  var SOON_2   = 'See below for other <b>local events</b>, <b>ways to stay in touch</b> ' +
+                 '&amp; <b>ways to get started from home</b>.';
   var NEARBY_LABEL = 'Classes & events nearby';
   var BANNER   = 'Everybody welcome';
   var EVENTS_TITLE = 'Programme of classes';
@@ -137,8 +140,12 @@
     'padding:16px 20px;margin:0 26px;color:#5C6672;font-size:1rem;line-height:1.6}',
     '.akxb-notice strong{display:block;font-family:Fraunces,Georgia,serif;font-weight:600;',
     'font-size:1.15rem;color:#8A6B3A;margin-bottom:5px}',
-    '.akxb-after{text-align:center;color:#7A8189;font-size:.95rem;line-height:1.55;',
-    'margin:16px auto 0;max-width:50ch}',
+    /* the signpost line — teal so it stands apart from the gold notice above and the blue
+       title; the three destinations carry weight but no colour jump, so it never shouts */
+    '.akxb-after{text-align:center;color:#26786F;font-size:1.06rem;font-weight:400;',
+    'line-height:1.55;margin:18px auto 0;max-width:52ch}',
+    '.akxb-after b{font-weight:600}',
+    '.akxb-after .arw{display:block;margin-top:4px;font-size:1.05rem;opacity:.55}',
     /* pills inside the card, on a town with nothing on yet */
     '.akxb-nearby{text-align:center}',
     '.akxb-nearby-h{font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;font-weight:700;',
@@ -165,7 +172,9 @@
     '.akxb-lbl{width:64px;font-size:9px;letter-spacing:.05em;padding-top:3px}',
     '.akxb-val{font-size:.9rem;word-break:break-word}',
     '.akxb-dirs{white-space:normal}',
-    '.akxb-pill{font-size:.76rem;padding:6px 12px}}'
+    '.akxb-pill{font-size:.76rem;padding:6px 12px}',
+    /* narrow screens: same weight relationship, just smaller — so it reads, never shouts */
+    '.akxb-after{font-size:.98rem}}'
   ].join('');
 
   function injectCSS() {
@@ -255,7 +264,7 @@
       html += '<div class="akxb-sec">' +
                 '<div class="akxb-notice"><strong>' + esc(NOTICE_H.replace('{town}', name)) + '</strong>' +
                   esc(SOON) + '</div>' +
-                '<p class="akxb-after">' + esc(SOON_2) + '</p>' +
+                '<p class="akxb-after">' + SOON_2 + '<span class="arw">&#8595;</span></p>' +
               '</div>';
     } else {
       var s = slots[0];
