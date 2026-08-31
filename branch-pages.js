@@ -104,7 +104,7 @@
     /* a strip fused to the top edge of the card, not a pill floating inside it */
     '.akxb-banner{background:#E2886A;color:#fff;text-align:center;font-size:11.5px;font-weight:700;',
     'letter-spacing:.16em;text-transform:uppercase;padding:11px 16px;',
-    'width:100%;margin:0;border-radius:0}',
+    'width:100%;margin:0;border-radius:0;box-sizing:border-box}',
     '.akxb-ttl{font-family:Fraunces,Georgia,serif;font-weight:400;font-size:1.7rem;color:#2A66A6;',
     'text-align:center;margin:16px 0 2px;line-height:1.2}',
     '.akxb-pad{padding:0 30px 22px}',
