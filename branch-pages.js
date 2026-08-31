@@ -47,6 +47,7 @@
   var TITLE    = 'Drop-in classes in {town}';    // {town} = the data-name on the stub
   /* a town with no classes in the sheet yet gets this title and this copy instead */
   var TITLE_EMPTY  = 'Upcoming events in {town} & nearby';
+  var NOTICE_H = 'Coming to {town}';
   var SOON     = 'We’re working to find a suitable venue. Please let us know if you have any suggestions or ideas.';
   var SOON_2   = 'See below for other local events & ways to get started from home.';
   var NEARBY_LABEL = 'Classes & events nearby';
@@ -100,9 +101,10 @@
     '.akxb-card{background:#fff;border:1px solid rgba(226,136,106,.38);border-radius:18px;',
     'overflow:hidden;max-width:800px;margin:0 auto;',
     'box-shadow:0 3px 16px rgba(226,136,106,.13),0 1px 3px rgba(226,136,106,.08)}',
+    /* a strip fused to the top edge of the card, not a pill floating inside it */
     '.akxb-banner{background:#E2886A;color:#fff;text-align:center;font-size:11.5px;font-weight:700;',
-    'letter-spacing:.16em;text-transform:uppercase;padding:10px 16px;border-radius:14px;',
-    'width:62%;margin:22px auto 0}',
+    'letter-spacing:.16em;text-transform:uppercase;padding:11px 16px;',
+    'width:100%;margin:0;border-radius:0}',
     '.akxb-ttl{font-family:Fraunces,Georgia,serif;font-weight:400;font-size:1.7rem;color:#2A66A6;',
     'text-align:center;margin:16px 0 2px;line-height:1.2}',
     '.akxb-pad{padding:0 30px 22px}',
@@ -129,8 +131,14 @@
     '.akxb-next .d{font-family:Fraunces,Georgia,serif;font-weight:600;font-size:1.25rem;color:#1F7C74;',
     'margin:3px 0 2px;line-height:1.15}',
     '.akxb-next .t{font-size:.88rem;color:#5C6672}',
-    '.akxb-soon{text-align:center;color:#5C6672;font-size:1rem;padding:6px 0 2px;max-width:56ch;margin:0 auto}',
-    '.akxb-soon p{margin:0;line-height:1.6;text-wrap:pretty}',
+    /* the notice: gold rule and tint, inset both sides so it reads as a marked block.
+       Gold, not coral — the card border and the welcome strip already carry the coral. */
+    '.akxb-notice{border-left:3px solid #C79A3E;background:#FBF4E4;border-radius:0 12px 12px 0;',
+    'padding:16px 20px;margin:0 26px;color:#5C6672;font-size:1rem;line-height:1.6}',
+    '.akxb-notice strong{display:block;font-family:Fraunces,Georgia,serif;font-weight:600;',
+    'font-size:1.15rem;color:#8A6B3A;margin-bottom:5px}',
+    '.akxb-after{text-align:center;color:#7A8189;font-size:.95rem;line-height:1.55;',
+    'margin:16px auto 0;max-width:50ch}',
     /* pills inside the card, on a town with nothing on yet */
     '.akxb-nearby{text-align:center}',
     '.akxb-nearby-h{font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;font-weight:700;',
@@ -147,7 +155,7 @@
     '@media (max-width:700px){',
     '.akxp-sec{padding:34px 0}',
     '.akxb-pad{padding:0 18px 18px}',
-    '.akxb-banner{width:78%;margin:18px auto 0;font-size:10px;letter-spacing:.12em;padding:9px 10px}',
+    '.akxb-banner{width:100%;margin:0;font-size:10px;letter-spacing:.12em;padding:10px 10px}',
     '.akxb-ttl{font-size:1.35rem;margin:15px 0 2px}',
     '.akxb-secflex{display:block}',
     '.akxb-main{flex:1 1 100%}',
@@ -244,8 +252,11 @@
                '<div class="akxb-ttl">' + esc(title) + '</div><div class="akxb-pad">';
 
     if (empty) {
-      /* one flowing paragraph — two sentences, not two blocks */
-      html += '<div class="akxb-sec akxb-soon"><p>' + esc(SOON) + ' ' + esc(SOON_2) + '</p></div>';
+      html += '<div class="akxb-sec">' +
+                '<div class="akxb-notice"><strong>' + esc(NOTICE_H.replace('{town}', name)) + '</strong>' +
+                  esc(SOON) + '</div>' +
+                '<p class="akxb-after">' + esc(SOON_2) + '</p>' +
+              '</div>';
     } else {
       var s = slots[0];
       var teacher = val(s,'teacher'), day = val(s,'day'), time = val(s,'time'),
