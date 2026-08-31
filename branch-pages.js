@@ -278,10 +278,10 @@
       row('WhatsApp', WHATSAPP ? '<a class="akxb-link" href="https://wa.me/44' +
             WHATSAPP.replace(/\D/g,'').replace(/^0/,'') + '" target="_blank" rel="noopener">' +
             esc(WHATSAPP) + '</a>' : '') +
-      row('Website', web ? '<a class="akxb-link" href="' +
+      row('Email', email ? '<a class="akxb-link" href="mailto:' + esc(email) + '">' + esc(email) + '</a>' : '') +
+      row('Web', web ? '<a class="akxb-link" href="' +
             (/^https?:/i.test(web) ? esc(web) : 'https://' + esc(web)) +
-            '" target="_blank" rel="noopener">' + esc(web.replace(/^https?:\/\//i,'')) + '</a>' : '') +
-      row('Email', email ? '<a class="akxb-link" href="mailto:' + esc(email) + '">' + esc(email) + '</a>' : '');
+            '" target="_blank" rel="noopener">' + esc(web.replace(/^https?:\/\//i,'')) + '</a>' : '');
     var contact = sec ? '<div class="akxb-sec">' + sec + '</div>' : '';
 
     /* The town pills answer "where, then?" — so on a town with nothing on they belong
