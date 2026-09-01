@@ -390,7 +390,10 @@
         html += '<div class="akxp-sec"><div class="akx-tq" data-type="testimony" data-page="' +
                 esc(quotePage) + '"></div></div>';
       } else if (s.key === 'calendar') {
-        html += '<div class="akxp-sec"><div id="' + s.mount + '" data-cal="branch"></div></div>';
+        /* a town with nothing of its own also shows the Cheltenham classes by default,
+           so the calendar isn't near-empty on the pages that most need something in it */
+        html += '<div class="akxp-sec"><div id="' + s.mount + '" data-cal="branch"' +
+                (card.hasClasses ? '' : ' data-on="weekly"') + '></div></div>';
       } else {
         html += '<div class="akxp-sec"><div id="' + s.mount + '"' +
                 (s.key === 'testimonial' ? ' data-town="' + esc(town) + '"' : '') + '></div></div>';
