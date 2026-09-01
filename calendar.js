@@ -4,6 +4,7 @@
        <div id="akx-cal" data-cal="weekly"></div>
        <script src="https://kadampacheltenham.github.io/akx-widgets/calendar.js" defer></script>
    data-cal picks the preset (see PRESETS below): "whatson" | "weekly" | "courses"
+   data-on="weekly" forces extra feeds on over the preset (comma-separated keys)
    | "prayers" | "volunteer" | "branch".
    Each preset sets its own title, default view, and which feeds show.
 
@@ -51,7 +52,11 @@
                     .filter(function(c){ return c && /@/.test(c.id); });
   var TITLE = root.getAttribute('data-title') || P.title;
 
-  var enabled = {}; CALS.forEach(function(c){ enabled[c.key]= c.pinned ? true : (c.on!==false); });
+  /* data-on="weekly,weekend" forces those feeds ON over the preset, without needing a new
+     preset. Branch pages use it: a town with nothing of its own also shows Cheltenham. */
+  var FORCE_ON = (root.getAttribute('data-on')||'').split(',').map(function(s){return s.trim();}).filter(Boolean);
+  var enabled = {}; CALS.forEach(function(c){
+    enabled[c.key] = c.pinned ? true : (FORCE_ON.indexOf(c.key) > -1 ? true : c.on !== false); });
   var view = new Date(); view.setDate(1);
   var mode = P.mode || 'list';
   var ALL = [];            // flat, expanded, deduped events
