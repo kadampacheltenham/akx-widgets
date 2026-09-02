@@ -251,7 +251,13 @@
       return val(r,'Location ID').toLowerCase() === town; })[0];
     var slots = data.classes.filter(function (r) {
       return val(r,'Location ID').toLowerCase() === town; });
-    var empty = !slots.length;
+
+    /* The Locations status column decides whether a town's activity is published.
+       Anything other than Live = the page goes quiet: waiting card, no classes, no
+       courses, no venue. Contact details ALWAYS show regardless of status —
+       "please let us know" needs somewhere to land (Gen, 2 Sep). */
+    var locLive = !!(loc && /live/i.test(val(loc,'status')));
+    var empty = !slots.length || (loc && !locLive);
 
     /* A town with nothing on yet is not offering drop-in classes, so it does not get
        that title. It points at what IS happening — here and in the towns around it. */
@@ -282,11 +288,11 @@
       html += '</div>';
     }
 
-    /* Venue and the branch's own website/email need a Locations row. WhatsApp does NOT —
-       a town we're asking for venue suggestions must always show a way to reach us. */
+    /* The venue is activity, so it needs a LIVE row. Contacts come from the row whatever
+       its status, and WhatsApp needs no row at all. */
     var display = loc ? val(loc,'display_name') : '';
     if (display.toLowerCase() === name.toLowerCase()) display = '';
-    var venue = loc ? [display, val(loc,'address')].filter(Boolean).join(', ') : '';
+    var venue = (loc && locLive) ? [display, val(loc,'address')].filter(Boolean).join(', ') : '';
     var web   = loc ? val(loc,'Branch website') : '';
     var email = loc ? val(loc,'Branch email')   : '';
 
@@ -294,7 +300,7 @@
       row('Venue', venue ? boldFirstPart(venue) +
             ' &nbsp;<a class="akxb-dirs" href="' + mapsHref(venue) +
             '" target="_blank" rel="noopener">Get directions</a>' : '') +
-      row('Information', loc && val(loc,'access_note') ? '<span class="akxb-sub">' + esc(val(loc,'access_note')) + '</span>' : '') +
+      row('Information', loc && locLive && val(loc,'access_note') ? '<span class="akxb-sub">' + esc(val(loc,'access_note')) + '</span>' : '') +
       row('WhatsApp', WHATSAPP ? '<a class="akxb-link" href="https://wa.me/44' +
             WHATSAPP.replace(/\D/g,'').replace(/^0/,'') + '" target="_blank" rel="noopener">' +
             esc(WHATSAPP) + '</a>' : '') +
@@ -380,12 +386,15 @@
       if (s.key === 'card') {
         html += '<div class="akxp-sec">' + card.html + '</div>';
       } else if (s.key === 'events') {
-        html += '<div class="akxp-sec"><div id="' + s.mount + '"' +
-                ' data-location="' + esc(town) + '"' +
-                ' data-limit="' + COURSES + '"' +
-                ' data-labels="branch"' +
-                ' data-heading="' + EVENTS_TITLE + '"' +
-                ' data-lead="" data-quotes="0"></div></div>';
+        /* a quiet town publishes no courses either — leave the section out entirely */
+        html += card.hasClasses
+          ? '<div class="akxp-sec"><div id="' + s.mount + '"' +
+              ' data-location="' + esc(town) + '"' +
+              ' data-limit="' + COURSES + '"' +
+              ' data-labels="branch"' +
+              ' data-heading="' + EVENTS_TITLE + '"' +
+              ' data-lead="" data-quotes="0"></div></div>'
+          : '<div class="akxp-sec"></div>';
       } else if (s.key === 'testimony') {
         html += '<div class="akxp-sec"><div class="akx-tq" data-type="testimony" data-page="' +
                 esc(quotePage) + '"></div></div>';
@@ -404,7 +413,10 @@
     mount.innerHTML = html;
     mount.setAttribute('data-akx-done', '1');
 
-    order.forEach(function (s) { loadWidget(s.widget); });
+    order.forEach(function (s) {
+      if (s.key === 'events' && !card.hasClasses) return;   // nothing mounted to fill
+      loadWidget(s.widget);
+    });
     watchProgramme(mount);
   }
 
