@@ -1,7 +1,11 @@
 /* ===========================================================================
    akx branch-pages.js — the whole branch page, from one stub
-   Akanishta Kadampa Buddhist Centre · v2.0 · 29 Aug 2026
+   Akanishta Kadampa Buddhist Centre · v2.1 · 3 Sep 2026
    (was branch-page.js — renamed 29 Aug so it reads as "the branch pages widget")
+   v2.1: "Book the series" button on the drop-in card (beside the Next class chip on
+   desktop, under it on mobile; quieter than the chip; shows only while the class row
+   has a booking_url AND today is on or before the series' second date — the booking
+   page closes at midnight after class two). Also: mobile chip text now centre-aligned.
 
    ONE STUB PER BRANCH PAGE. Everything below the page title and intro is
    built here. Two lines change per town — the town id and its display name:
@@ -113,7 +117,7 @@
     '.akxb-pad{padding:0 30px 22px}',
     '.akxb-sec{padding:16px 0}',
     '.akxb-sec + .akxb-sec{border-top:1px solid #EDE9DF}',
-    '.akxb-secflex{display:flex;gap:24px;align-items:center}',
+    '.akxb-secflex{display:flex;flex-wrap:wrap;gap:24px;align-items:center}',
     '.akxb-main{flex:0 0 52%;min-width:0}',
     '.akxb-line{display:flex;gap:16px;align-items:baseline;padding:3px 0}',
     '.akxb-lbl{flex:none;width:92px;font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;',
@@ -134,6 +138,12 @@
     '.akxb-next .d{font-family:Fraunces,Georgia,serif;font-weight:600;font-size:1.25rem;color:#1F7C74;',
     'margin:3px 0 2px;line-height:1.15}',
     '.akxb-next .t{font-size:.88rem;color:#5C6672}',
+    /* Book the series — deliberately quieter than the Next class chip (it's a drop-in
+       card): white, thin teal border, sits beside the chip on desktop */
+    '.akxb-book{flex:none;align-self:center;text-align:center;color:#1F7C74;background:#fff;',
+    'border:1px solid #C9E6E0;border-radius:999px;padding:9px 16px;font-size:.85rem;',
+    'font-weight:600;text-decoration:none;white-space:nowrap}',
+    '.akxb-book:hover{background:#EAF7F4}',
     /* the notice: gold rule and tint, inset both sides so it reads as a marked block.
        Gold, not coral — the card border and the welcome strip already carry the coral. */
     '.akxb-notice{border-left:3px solid #C79A3E;background:#FBF4E4;border-radius:0 12px 12px 0;',
@@ -166,8 +176,10 @@
     '.akxb-ttl{font-size:1.35rem;margin:15px 0 2px}',
     '.akxb-secflex{display:block}',
     '.akxb-main{flex:1 1 100%}',
-    '.akxb-next{width:100%;margin:12px 0 0;display:flex;align-items:baseline;justify-content:center;gap:10px;padding:9px 10px}',
-    '.akxb-next .d{margin:0}',
+    /* centre the chip's mixed text sizes — baseline made the small label sit oddly (Gen, 3 Sep) */
+    '.akxb-next{width:100%;box-sizing:border-box;margin:12px 0 0;display:flex;align-items:center;justify-content:center;gap:10px;padding:9px 10px}',
+    '.akxb-next .d{margin:0;line-height:1.1}',
+    '.akxb-book{display:block;width:100%;margin:8px 0 0;box-sizing:border-box}',
     '.akxb-line{gap:9px;align-items:flex-start}',
     '.akxb-lbl{width:64px;font-size:9px;letter-spacing:.05em;padding-top:3px}',
     '.akxb-val{font-size:.9rem;word-break:break-word}',
@@ -275,7 +287,7 @@
     } else {
       var s = slots[0];
       var teacher = val(s,'teacher'), day = val(s,'day'), time = val(s,'time'),
-          duration = val(s,'duration'), nxt = nextDate(parseDates(val(s,'dates')));
+          duration = val(s,'duration'), ds = parseDates(val(s,'dates')), nxt = nextDate(ds);
       var when = esc(day) + (day && time ? ', ' : '') + esc(time) +
                  (duration ? ' <span class="akxb-sub">(' + esc(duration) + ')</span>' : '') +
                  /* revealed only once the programme section below has something in it */
@@ -285,6 +297,18 @@
                 row('When', when) + '</div>';
       if (nxt) html += '<div class="akxb-next"><div class="k">Next class</div>' +
                        '<div class="d">' + fmt(nxt) + '</div><div class="t">' + esc(time) + '</div></div>';
+      /* Book the series (Gen's spec, 3 Sep): only while the booking page is still open —
+         it closes at midnight after the series' SECOND class. Beside the chip on
+         desktop, full-width under it on mobile. Never two series at once, so the
+         first class row's booking is always the right one. */
+      var booking = val(s,'booking_url');
+      if (booking && ds.length > 1) {
+        var bToday = new Date(); bToday.setHours(0,0,0,0);
+        if (bToday <= ds[1]) {
+          html += '<a class="akxb-book" href="' + esc(booking) +
+                  '" target="_blank" rel="noopener">Book the series</a>';
+        }
+      }
       html += '</div>';
     }
 
