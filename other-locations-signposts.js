@@ -1,12 +1,12 @@
 /* ===========================================================================
-   akx branches-signpost.js — the "other locations" page, from one stub
+   akx other-locations-signposts.js — the "other locations" page, from one stub
    Akanishta Kadampa Buddhist Centre · v1.0 · 3 Sep 2026
 
    ONE STUB. Gen places the hero image and the page title/intro in Squarespace;
    everything below that comes from here:
 
      <div id="akx-branches"></div>
-     <script src="https://kadampacheltenham.github.io/akx-widgets/branches-signpost.js" defer></script>
+     <script src="https://kadampacheltenham.github.io/akx-widgets/other-locations-signposts.js" defer></script>
 
    WHAT IT DOES
      1  Signpost grid — nine photo cards, one per location   (here)
