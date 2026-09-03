@@ -1,6 +1,6 @@
 /* ===========================================================================
    akx popup-events-signpost.js — the 2027 pop-up events banner
-   Akanishta Kadampa Buddhist Centre · v1.1 · 3 Sep 2026
+   Akanishta Kadampa Buddhist Centre · v1.2 · 3 Sep 2026
    (v1.1: banner no longer stretches when the host section hands it extra height —
     rows pinned to the top; stamp given breathing room after the headline)
 
@@ -39,19 +39,21 @@
   /* STYLES                                                             */
   /* ------------------------------------------------------------------ */
   var CSS = [
-    /* align-content:start + auto rows: the host section may hand the banner extra height —
-       without this the grid spreads its rows apart and holes open up (seen live, 3 Sep) */
+    /* Two independent columns (v1.2): the left side (headline → trail → help) flows on
+       its own, so the trail tucks up under the headline instead of being pushed down
+       to clear the snapshots — matching the signed-off mock. height:auto + align at
+       start also stops the host section stretching holes into the banner. */
     '.akxu-ban{max-width:1040px;margin:0 auto;background:#FEFEFA;border:1px solid #EDE9DF;',
     'border-radius:16px;box-shadow:0 2px 12px rgba(29,29,31,.08);padding:26px 36px 20px;',
-    'display:grid;grid-template-columns:1fr 400px;grid-template-rows:auto auto auto;',
-    'align-content:start;height:auto;grid-template-areas:',
-    '"head snaps" "trail cta" "help cta";gap:10px 26px;font-family:inherit;box-sizing:border-box}',
-    '.akxu-head{grid-area:head;display:flex;align-items:flex-start;gap:8px}',
+    'display:flex;align-items:stretch;gap:26px;height:auto;font-family:inherit;box-sizing:border-box}',
+    '.akxu-left{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start}',
+    '.akxu-right{flex:0 0 400px;display:flex;flex-direction:column}',
+    '.akxu-head{display:flex;align-items:flex-start;gap:8px}',
     '.akxu-h{font-family:Fraunces,Georgia,serif;font-weight:400;font-size:1.8rem;color:#2A66A6;',
     'margin:0;line-height:1.2}',
-    '.akxu-mark{flex:none;transform:rotate(-8deg);margin:-8px 0 0 14px}',
+    '.akxu-mark{flex:none;transform:rotate(-8deg);margin:-16px 0 0 14px}',
     /* snapshots — taped-up mini cards, loose and a little random */
-    '.akxu-snaps{grid-area:snaps;position:relative;height:124px}',
+    '.akxu-snaps{position:relative;height:124px;margin-top:8px}',
     '.akxu-pin{width:118px;height:88px;background:#fff;border:1px solid #E6E6DF;border-radius:6px;',
     'position:absolute;display:flex;align-items:center;justify-content:center;',
     'box-shadow:0 3px 8px rgba(29,29,31,.10)}',
@@ -62,15 +64,17 @@
     'width:44px;height:14px;background:rgba(231,218,196,.85);border-radius:2px}',
     '.akxu-pin small{position:absolute;bottom:5px;font-size:9px;letter-spacing:.06em;',
     'text-transform:uppercase;color:#8A8578;font-weight:600}',
-    '.akxu-trail{grid-area:trail;align-self:center}',
+    '.akxu-trail{margin-top:6px;width:100%;align-self:stretch}',
     '.akxu-trail svg{display:block;width:100%;height:auto}',
-    '.akxu-cta{grid-area:cta;align-self:center;justify-self:end;text-align:right;',
-    'font-size:.95rem;color:#1F7C74;font-weight:600}',
+    '.akxu-cta{margin:auto 0;text-align:right;font-size:.95rem;color:#1F7C74;font-weight:600}',
     '.akxu-cta a{color:#1F7C74;text-decoration:underline}',
-    '.akxu-help{grid-area:help;align-self:end;font-size:.88rem;color:#8A8578}',
+    '.akxu-help{margin-top:auto;padding-top:14px;font-size:.88rem;color:#8A8578}',
     '.akxu-help a{color:#2A66A6;text-decoration:underline}',
     '@media (max-width:700px){',
-    '.akxu-ban{display:block;margin:0 14px;padding:20px 18px 16px}',
+    '.akxu-ban{flex-direction:column;gap:0;margin:0 14px;padding:20px 18px 16px}',
+    /* on phones the two columns dissolve and the pieces stack in reading order */
+    '.akxu-left,.akxu-right{display:contents}',
+    '.akxu-head{order:1}.akxu-snaps{order:2}.akxu-trail{order:3}.akxu-cta{order:4}.akxu-help{order:5}',
     '.akxu-h{font-size:1.32rem}',
     '.akxu-mark svg{width:82px;height:66px}',
     '.akxu-mark{margin:-6px 0 0 0}',
@@ -79,8 +83,8 @@
     '.akxu-pin svg{width:40px;height:34px}',
     '.akxu-pin small{font-size:8px;bottom:4px}',
     '.akxu-trail{margin:6px 0 2px}',
-    '.akxu-cta{text-align:center;margin-top:8px;font-size:.9rem}',
-    '.akxu-help{text-align:center;margin-top:8px;font-size:.82rem}}'
+    '.akxu-cta{text-align:center;margin:8px 0 0;font-size:.9rem}',
+    '.akxu-help{text-align:center;margin-top:8px;padding-top:0;font-size:.82rem}}'
   ].join('');
 
   function injectCSS() {
@@ -131,14 +135,18 @@
   function build(mount) {
     mount.innerHTML =
       '<div class="akxu-ban">' +
-        '<div class="akxu-head"><h3 class="akxu-h">' + HEADLINE + '</h3>' +
-          '<span class="akxu-mark">' + MARK + '</span></div>' +
-        '<div class="akxu-snaps">' + SNAPS + '</div>' +
-        '<div class="akxu-trail">' + TRAIL + '</div>' +
-        '<div class="akxu-cta">' + CTA_PRE +
-          '<a href="' + WHATSAPP + '" target="_blank" rel="noopener">WhatsApp</a>' +
-          ' &amp; <a href="' + ENEWS + '" target="_blank" rel="noopener">eNews</a></div>' +
-        '<div class="akxu-help">' + HELP + '<a href="' + HELP_URL + '">Get in touch</a></div>' +
+        '<div class="akxu-left">' +
+          '<div class="akxu-head"><h3 class="akxu-h">' + HEADLINE + '</h3>' +
+            '<span class="akxu-mark">' + MARK + '</span></div>' +
+          '<div class="akxu-trail">' + TRAIL + '</div>' +
+          '<div class="akxu-help">' + HELP + '<a href="' + HELP_URL + '">Get in touch</a></div>' +
+        '</div>' +
+        '<div class="akxu-right">' +
+          '<div class="akxu-snaps">' + SNAPS + '</div>' +
+          '<div class="akxu-cta">' + CTA_PRE +
+            '<a href="' + WHATSAPP + '" target="_blank" rel="noopener">WhatsApp</a>' +
+            ' &amp; <a href="' + ENEWS + '" target="_blank" rel="noopener">eNews</a></div>' +
+        '</div>' +
       '</div>';
     mount.setAttribute('data-akx-done', '1');
   }
