@@ -1,6 +1,8 @@
 /* ===========================================================================
    akx branch-pages.js — the whole branch page, from one stub
-   Akanishta Kadampa Buddhist Centre · v2.1 · 3 Sep 2026
+   Akanishta Kadampa Buddhist Centre · v2.2 · 3 Sep 2026
+   v2.2: 2027 pop-up events banner (popup-events-signpost.js) added under the
+   lotuses, on active and quiet pages alike.
    (was branch-page.js — renamed 29 Aug so it reads as "the branch pages widget")
    v2.1: "Book the series" button on the drop-in card (beside the Next class chip on
    desktop, under it on mobile; quieter than the chip; shows only while the class row
@@ -22,7 +24,8 @@
 
      1  Drop-in classes card + town pills      (here)
      2  Lotus benefits                          lotus-benefits.js
-     3  Testimony                               testimony-quotes.js
+     3  Pop-up events banner (2027)             popup-events-signpost.js
+     4  Testimony                               testimony-quotes.js
      4  Programme of classes                    wc-talks-courses.js  (+ event-graphics.js)
      5  Start from home                         start-at-home.js
      6  Stay in touch                           social-cards.js
@@ -80,6 +83,8 @@
   var SECTIONS = [
     { key: 'card',        widget: null },
     { key: 'lotus',       widget: 'lotus-benefits.js', mount: 'akx-lotus' },
+    /* the 2027 pop-up events banner — under the lotuses on every branch page (Gen, 3 Sep) */
+    { key: 'popups',      widget: 'popup-events-signpost.js', mount: 'akx-popups' },
     { key: 'testimony',   widget: 'testimony-quotes.js' },
     /* Talks & short courses — the SAME widget /weekly-classes uses, filtered to this town
        and capped at two cards: the current/next course, then the one after it. */
@@ -93,7 +98,7 @@
      card → lotuses → start from home → testimonial → socials → calendar.
      'events' rides along and collapses to nothing; it is here only so a town that
      somehow has a course but no weekly class still shows it. */
-  var EMPTY_ORDER = ['card', 'lotus', 'starthome', 'testimony', 'events', 'social', 'calendar'];
+  var EMPTY_ORDER = ['card', 'lotus', 'popups', 'starthome', 'testimony', 'events', 'social', 'calendar'];
 
   /* ------------------------------------------------------------------ */
   /* STYLES — the card and pills; each widget brings its own             */
