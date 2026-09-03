@@ -1,6 +1,8 @@
 /* ===========================================================================
    akx popup-events-signpost.js — the 2027 pop-up events banner
-   Akanishta Kadampa Buddhist Centre · v1.0 · 3 Sep 2026
+   Akanishta Kadampa Buddhist Centre · v1.1 · 3 Sep 2026
+   (v1.1: banner no longer stretches when the host section hands it extra height —
+    rows pinned to the top; stamp given breathing room after the headline)
 
    ONE FILE, EVERY PAGE. The "Popping up near you…" postcard banner —
    design agreed 3 Sep 2026 (see claude/popup-banner-2027.md in the project):
@@ -37,14 +39,17 @@
   /* STYLES                                                             */
   /* ------------------------------------------------------------------ */
   var CSS = [
+    /* align-content:start + auto rows: the host section may hand the banner extra height —
+       without this the grid spreads its rows apart and holes open up (seen live, 3 Sep) */
     '.akxu-ban{max-width:1040px;margin:0 auto;background:#FEFEFA;border:1px solid #EDE9DF;',
     'border-radius:16px;box-shadow:0 2px 12px rgba(29,29,31,.08);padding:26px 36px 20px;',
-    'display:grid;grid-template-columns:1fr 400px;grid-template-areas:',
-    '"head snaps" "trail cta" "help cta";gap:6px 26px;font-family:inherit;box-sizing:border-box}',
+    'display:grid;grid-template-columns:1fr 400px;grid-template-rows:auto auto auto;',
+    'align-content:start;height:auto;grid-template-areas:',
+    '"head snaps" "trail cta" "help cta";gap:10px 26px;font-family:inherit;box-sizing:border-box}',
     '.akxu-head{grid-area:head;display:flex;align-items:flex-start;gap:8px}',
     '.akxu-h{font-family:Fraunces,Georgia,serif;font-weight:400;font-size:1.8rem;color:#2A66A6;',
     'margin:0;line-height:1.2}',
-    '.akxu-mark{flex:none;transform:rotate(-8deg);margin:-8px 0 0 -6px}',
+    '.akxu-mark{flex:none;transform:rotate(-8deg);margin:-8px 0 0 14px}',
     /* snapshots — taped-up mini cards, loose and a little random */
     '.akxu-snaps{grid-area:snaps;position:relative;height:124px}',
     '.akxu-pin{width:118px;height:88px;background:#fff;border:1px solid #E6E6DF;border-radius:6px;',
@@ -152,4 +157,3 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 })();
-
