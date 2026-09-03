@@ -1,8 +1,9 @@
 /* ===========================================================================
    akx other-locations-signposts.js — the "other locations" page, from one stub
-   Akanishta Kadampa Buddhist Centre · v1.3 · 3 Sep 2026
-   (v1.2 set Gen's section order; v1.3 gives the card grid proper mobile spacing —
-    14px side gutters and gaps, matching social-cards)
+   Akanishta Kadampa Buddhist Centre · v1.4 · 3 Sep 2026
+   (v1.2 set Gen's section order; v1.3 mobile card spacing; v1.4 NEW ORDER (Gen):
+    signposts → lotuses (added) → pop-ups banner (added) → stay in touch →
+    testimonial → calendar. Start-from-home is no longer on this page.)
 
    ONE STUB. Gen places the hero image and the page title/intro in Squarespace;
    everything below that comes from here:
@@ -10,12 +11,13 @@
      <div id="akx-branches"></div>
      <script src="https://kadampacheltenham.github.io/akx-widgets/other-locations-signposts.js" defer></script>
 
-   WHAT IT DOES (order set by Gen, 3 Sep — stay in touch above the testimonial)
+   WHAT IT DOES (order set by Gen, 3 Sep evening)
      1  Signpost grid — nine photo cards, one per location   (here)
-     2  Stay in touch                                         social-cards.js
-     3  Testimonial                                           testimony-quotes.js
-     4  Start from home                                       start-at-home.js
-     5  Calendar                                              calendar.js
+     2  Lotus benefits                                        lotus-benefits.js
+     3  Pop-up events banner                                  popup-events-signpost.js
+     4  Stay in touch                                         social-cards.js
+     5  Testimonial                                           testimony-quotes.js
+     6  Calendar                                              calendar.js
         (data-cal="branch" data-on="weekly" — branch classes, announcements
          AND the Cheltenham weekly classes on by default, as on quiet pages)
 
@@ -68,10 +70,11 @@
   /* the sections below the grid — same widgets as the branch pages, in Gen's order */
   var SECTIONS = [
     { key: 'grid',      widget: null },
-    { key: 'social',    widget: 'social-cards.js',  mount: 'akx-social' },
+    { key: 'lotus',     widget: 'lotus-benefits.js',        mount: 'akx-lotus' },
+    { key: 'popups',    widget: 'popup-events-signpost.js', mount: 'akx-popups' },
+    { key: 'social',    widget: 'social-cards.js',          mount: 'akx-social' },
     { key: 'testimony', widget: 'testimony-quotes.js' },
-    { key: 'starthome', widget: 'start-at-home.js', mount: 'akx-starthome' },
-    { key: 'calendar',  widget: 'calendar.js',      mount: 'akx-cal' }
+    { key: 'calendar',  widget: 'calendar.js',              mount: 'akx-cal' }
   ];
 
   /* ------------------------------------------------------------------ */
