@@ -1,6 +1,8 @@
 /* ===========================================================================
    akx other-locations-signposts.js — the "other locations" page, from one stub
-   Akanishta Kadampa Buddhist Centre · v1.0 · 3 Sep 2026
+   Akanishta Kadampa Buddhist Centre · v1.3 · 3 Sep 2026
+   (v1.2 set Gen's section order; v1.3 gives the card grid proper mobile spacing —
+    14px side gutters and gaps, matching social-cards)
 
    ONE STUB. Gen places the hero image and the page title/intro in Squarespace;
    everything below that comes from here:
@@ -99,7 +101,9 @@
     'justify-content:center;font-weight:600;font-size:.95rem}',
     '@media (max-width:700px){',
     '.akxg-sec{padding:34px 0}',
-    '.akxg-grid{grid-template-columns:1fr 1fr;gap:11px}',
+    /* phones: the section gives no side gutter, so the grid brings its own —
+       14px, matching social-cards (Gen, 3 Sep: cards touched the screen edge) */
+    '.akxg-grid{grid-template-columns:1fr 1fr;gap:14px;padding:0 14px}',
     '.akxg-card{height:112px}',
     '.akxg-card.span2{grid-column:1/-1;height:104px}',
     '.akxg-tx{left:11px;right:38px;bottom:9px}',
