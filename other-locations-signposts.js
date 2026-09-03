@@ -8,10 +8,10 @@
      <div id="akx-branches"></div>
      <script src="https://kadampacheltenham.github.io/akx-widgets/other-locations-signposts.js" defer></script>
 
-   WHAT IT DOES (order set by Gen, 3 Sep)
+   WHAT IT DOES (order set by Gen, 3 Sep — stay in touch above the testimonial)
      1  Signpost grid — nine photo cards, one per location   (here)
-     2  Testimonial                                           testimony-quotes.js
-     3  Stay in touch                                         social-cards.js
+     2  Stay in touch                                         social-cards.js
+     3  Testimonial                                           testimony-quotes.js
      4  Start from home                                       start-at-home.js
      5  Calendar                                              calendar.js
         (data-cal="branch" data-on="weekly" — branch classes, announcements
@@ -66,8 +66,8 @@
   /* the sections below the grid — same widgets as the branch pages, in Gen's order */
   var SECTIONS = [
     { key: 'grid',      widget: null },
-    { key: 'testimony', widget: 'testimony-quotes.js' },
     { key: 'social',    widget: 'social-cards.js',  mount: 'akx-social' },
+    { key: 'testimony', widget: 'testimony-quotes.js' },
     { key: 'starthome', widget: 'start-at-home.js', mount: 'akx-starthome' },
     { key: 'calendar',  widget: 'calendar.js',      mount: 'akx-cal' }
   ];
