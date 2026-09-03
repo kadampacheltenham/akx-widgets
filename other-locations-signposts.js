@@ -8,11 +8,12 @@
      <div id="akx-branches"></div>
      <script src="https://kadampacheltenham.github.io/akx-widgets/other-locations-signposts.js" defer></script>
 
-   WHAT IT DOES
+   WHAT IT DOES (order set by Gen, 3 Sep)
      1  Signpost grid — nine photo cards, one per location   (here)
-     2  Start from home                                       start-at-home.js
+     2  Testimonial                                           testimony-quotes.js
      3  Stay in touch                                         social-cards.js
-     4  Calendar                                              calendar.js
+     4  Start from home                                       start-at-home.js
+     5  Calendar                                              calendar.js
         (data-cal="branch" data-on="weekly" — branch classes, announcements
          AND the Cheltenham weekly classes on by default, as on quiet pages)
 
@@ -62,11 +63,12 @@
     { key: 'awaydays',    name: 'Away days',   href: '/away-days',  sub: 'Cotswold retreats', span2: true }
   ];
 
-  /* the sections below the grid — same widgets, same order as the branch pages */
+  /* the sections below the grid — same widgets as the branch pages, in Gen's order */
   var SECTIONS = [
     { key: 'grid',      widget: null },
-    { key: 'starthome', widget: 'start-at-home.js', mount: 'akx-starthome' },
+    { key: 'testimony', widget: 'testimony-quotes.js' },
     { key: 'social',    widget: 'social-cards.js',  mount: 'akx-social' },
+    { key: 'starthome', widget: 'start-at-home.js', mount: 'akx-starthome' },
     { key: 'calendar',  widget: 'calendar.js',      mount: 'akx-cal' }
   ];
 
@@ -218,10 +220,15 @@
   function build(mount, classes) {
     if (mount.getAttribute('data-base')) BASE_OVERRIDE = mount.getAttribute('data-base');
 
+    var quotePage = mount.getAttribute('data-quote-page') || 'classes';   // testimony-quotes.js
+
     var html = '<div class="akxg">';
     SECTIONS.forEach(function (s) {
       if (s.key === 'grid') {
         html += '<div class="akxg-sec">' + gridHTML(classes) + '</div>';
+      } else if (s.key === 'testimony') {
+        html += '<div class="akxg-sec"><div class="akx-tq" data-type="testimony" data-page="' +
+                esc(quotePage) + '"></div></div>';
       } else if (s.key === 'calendar') {
         html += '<div class="akxg-sec"><div id="' + s.mount +
                 '" data-cal="branch" data-on="weekly"></div></div>';
