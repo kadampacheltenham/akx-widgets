@@ -1,7 +1,8 @@
 /* ===========================================================================
    akx social-cards.js  —  "Stay in touch" channel cards
    Akanishta Kadampa Buddhist Centre
-   v1.0 · 29 Aug 2026
+   v1.3 · 3 Sep 2026 (mobile: wrapper adds its own 14px side gutter — cards no
+                      longer touch the screen edge on phones)
 
    ONE FILE, EVERY PAGE. Change a link or a line here and it updates
    everywhere the widget is embedded.
@@ -185,7 +186,10 @@
     'border-radius:999px;padding:8px 10px;',
     'font-family:Inter,Helvetica,Arial,sans-serif;font-weight:700;font-size:14px;color:#fff}',
     '.akxs-short{display:none}',
-    '@media (max-width:900px){.akxs-grid{grid-template-columns:repeat(min(var(--akxs-cols,2),2),1fr);gap:14px}',
+    /* phones: the section gives the cards no side gutter, so the widget brings its own
+       breathing room — inside its own wrapper only (Gen, 3 Sep: cards touched the edge) */
+    '@media (max-width:900px){.akxs-wrap{padding:0 14px;box-sizing:border-box}',
+    '.akxs-grid{grid-template-columns:repeat(min(var(--akxs-cols,2),2),1fr);gap:14px}',
     '.akxs-card{padding:26px 12px 18px}.akxs-ico{width:54px;height:54px;margin-bottom:13px}',
     '.akxs-nm.sans,.akxs-nm.fb,.akxs-nm.serif{font-size:17px}.akxs-nm.script{font-size:22px}',
     '.akxs-note{font-size:11.2px;line-height:1.35;min-height:32px;margin-bottom:12px;padding:0}',
