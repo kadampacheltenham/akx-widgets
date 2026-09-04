@@ -1,6 +1,7 @@
 /* Akanishta &mdash; shared calendar widget (live Google Calendar feed).
-   4 Sep 2026 — the title now sits in a sage tab band at the top of the card
-   (matches the drop-in card banner, per Gen's sketch); same font as before.
+   4 Sep 2026 — the title sits in a tab band at the top of the card (per Gen's sketch),
+   Inter as before. Tab colour: sage #A3B18A on the branch preset, tangerine #FC9602
+   on every other calendar (weekly, whatson, courses, prayers, volunteer).
    ONE file, per-page presets. Include with a stub like:
        <div id="calendar" style="scroll-margin-top:130px;"></div>
        <div id="akx-cal" data-cal="weekly"></div>
@@ -53,6 +54,7 @@
   var CALS = P.feeds.map(function(f){ var base=FEEDS[f.k]; return Object.assign({key:f.k, on:f.on}, base); })
                     .filter(function(c){ return c && /@/.test(c.id); });
   var TITLE = root.getAttribute('data-title') || P.title;
+  var TAB_BG = ((root.getAttribute('data-cal')||'weekly').trim()==='branch') ? '#A3B18A' : '#FC9602';  /* branch calendars sage, all others tangerine (Gen, 4 Sep) */
 
   /* data-on="weekly,weekend" forces those feeds ON over the preset, without needing a new
      preset. Branch pages use it: a town with nothing of its own also shows Cheltenham. */
@@ -69,7 +71,7 @@
   var CSS = ''
   + '#akx-cal{--coral:#E2886A;--ink:#1D1D1F;--muted:#6B6B6E;--line:#ECE9E2;--teal:#1F7C74;color:var(--ink);max-width:1000px;margin:0 auto;}'  /* lotus/content width */
   + '#akx-cal *{box-sizing:border-box;}'
-  + '#akx-cal .cal-tab{background:#A3B18A;color:#fff;text-align:center;font-family:\'Inter\',sans-serif;font-size:clamp(1.2rem,3.2vw,1.45rem);font-weight:600;margin:-22px -22px 18px;padding:13px 18px;border-radius:16px 16px 0 0;}'  /* blue heading &mdash; Title Case, size matches Week at a Glance / Programme */
+  + '#akx-cal .cal-tab{background:'+TAB_BG+';color:#fff;text-align:center;font-family:\'Inter\',sans-serif;font-size:clamp(1.2rem,3.2vw,1.45rem);font-weight:600;margin:-22px -22px 18px;padding:13px 18px;border-radius:16px 16px 0 0;}'  /* blue heading &mdash; Title Case, size matches Week at a Glance / Programme */
   + '#akx-cal .card{background:#fff;border-radius:16px;box-shadow:0 6px 30px rgba(0,0,0,.07);padding:22px 22px 26px;}'
   + '#akx-cal .ann{display:flex;gap:12px;align-items:center;border:1px solid;border-radius:12px;padding:16px 18px;margin-bottom:16px;font-size:1rem;line-height:1.45;}'  /* matches homepage announcement banner */
   + '#akx-cal .ann.notice{background:#FDF3E3;color:#6E5212;border-color:#F1E0C2;}'
