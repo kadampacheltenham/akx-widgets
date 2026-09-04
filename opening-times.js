@@ -1,4 +1,6 @@
 /* Akanishta — OPENING TIMES widget (file: opening-times.js; formerly when-to-visit.js, renamed 19 Aug 2026; v2: event lines = start time | title | duration). Opening hours derived from the LIVE Google Calendar.
+   v2.1 (4 Sep 2026): the open-now pill now says just "Until <time>" — naming one event was
+   wrong whenever the open window covers more than one event.
    ONE shared file; reuse on any page. Include with a stub like:
        <div id="akx-visit" data-theme="light"></div>
        <script src="https://kadampacheltenham.github.io/akx-widgets/when-to-visit.js" defer></script>
@@ -191,7 +193,7 @@
     if(r.closed){ var nx=nextOpen(today); return {open:false,big:'Closed today',sub:nx?('Open again '+whenLabel(today,nx.ymd)+', '+to12(minToHM(nx.win.oS))):''}; }
     for(var i=0;i<r.wins.length;i++){
       var w=r.wins[i];
-      if(mins>=w.oS && mins<w.oE) return {open:true,big:"We're open now",sub:'for '+w.events[0].name+' (until '+to12(minToHM(w.oE))+')'};
+      if(mins>=w.oS && mins<w.oE) return {open:true,big:"We're open now",sub:'Until '+to12(minToHM(w.oE))};  /* v2.1: no event name - the window can hold several */
       if(mins<w.oS) return {open:false,big:'Opens '+to12(minToHM(w.oS))+' today',sub:'for '+w.events[0].name};
     }
     var n2=nextOpen(today);
@@ -199,11 +201,11 @@
   }
 
   /* ---------- render ---------- */
-  function durTxt(m){ // 15 -> "15 mins", 60 -> "1 hr", 90 -> "1\u00bd hrs", 150 -> "2\u00bd hrs", 75 -> "1 hr 15"
+  function durTxt(m){ // 15 -> "15 mins", 60 -> "1 hr", 90 -> "1½ hrs", 150 -> "2½ hrs", 75 -> "1 hr 15"
     if(!(m>0)) return ''; var h=Math.floor(m/60), r=m%60;
     if(h===0) return r+' mins';
     if(r===0) return h+(h===1?' hr':' hrs');
-    if(r===30) return h+'\u00bd hrs';
+    if(r===30) return h+'½ hrs';
     return h+' hr '+r;
   }
   function evLine(e,w){ // start time first, then title, then a quiet duration  (19 Aug 2026)
