@@ -1,4 +1,6 @@
 /* Akanishta &mdash; IDS (FP & TTP) calendar widget (live Google Calendar feed).
+   4 Sep 2026 — the title now sits in a sage tab band at the top of the card
+   (matches the drop-in card banner + the shared calendar.js); same font as before.
    Shows ONLY: FP & TTP classes (from the weekly calendar), Sunday prayers, and announcements.
    No other calendars are displayed. Include with a stub like:
        <div id="akx-cal" data-cal="ids"></div>
@@ -38,7 +40,7 @@
   var CSS = ''
   + '#akx-cal{--coral:#E2886A;--ink:#1D1D1F;--muted:#6B6B6E;--line:#ECE9E2;color:var(--ink);max-width:1000px;margin:0 auto;}'  /* lotus/content width */
   + '#akx-cal *{box-sizing:border-box;}'
-  + '#akx-cal .cal-title{margin:0 auto 34px;text-align:center;font-family:\'Inter\',sans-serif;font-size:clamp(1.5rem,4.5vw,1.9rem);font-weight:600;color:#2A66A6;}'  /* blue heading &mdash; Title Case, size matches Week at a Glance / Programme */
+  + '#akx-cal .cal-tab{background:#A3B18A;color:#fff;text-align:center;font-family:\'Inter\',sans-serif;font-size:clamp(1.2rem,3.2vw,1.45rem);font-weight:600;margin:-22px -22px 18px;padding:13px 18px;border-radius:16px 16px 0 0;}'  /* blue heading &mdash; Title Case, size matches Week at a Glance / Programme */
   + '#akx-cal .card{background:#fff;border-radius:16px;box-shadow:0 6px 30px rgba(0,0,0,.07);padding:22px 22px 26px;}'
   + '#akx-cal .ann{display:flex;gap:12px;align-items:center;border:1px solid;border-radius:12px;padding:16px 18px;margin-bottom:16px;font-size:1rem;line-height:1.45;}'  /* matches homepage announcement banner */
   + '#akx-cal .ann.notice{background:#FDF3E3;color:#6E5212;border-color:#F1E0C2;}'
@@ -92,9 +94,9 @@
   + '@media(max-width:720px){#akx-cal .gridwrap{display:none;}#akx-cal .list{display:block!important;}#akx-cal .vt{display:none;}#akx-cal .mnav h2{min-width:0;font-size:1.25rem;}}';
 
   root.innerHTML = '<style>'+CSS+'</style>'
-    + (TITLE?'<h2 class="cal-title">'+esc(TITLE)+'</h2>':'')
     + '<div id="akx-banner"></div>'
     + '<div class="card">'
+    + (TITLE?'<h2 class="cal-tab">'+esc(TITLE)+'</h2>':'')
     + '  <div class="top">'
     + '    <div class="mnav"><button class="nb" data-a="prev">&#8249;</button><h2 id="akx-ml"></h2>'
     + '      <button class="nb" data-a="next">&#8250;</button><button class="tb" data-a="today">Today</button></div>'
