@@ -1,13 +1,18 @@
 /* ===========================================================================
    akx lotus-benefits.js — the three lotus benefits
-   Akanishta Kadampa Buddhist Centre · v1.0 · 29 Aug 2026
+   Akanishta Kadampa Buddhist Centre · v1.1 · 4 Sep 2026
 
    One hosted file. Edit the three benefits here and every page that carries
-   the block follows — homepage, Start Here, all six branch pages.
+   the block follows — Start Here, all six branch pages, /other-locations.
+   (The homepage has its own native golden-lotus block — not this widget.)
+
+   v1.1: lotuses now tangerine #FC9602 (matches the new header). The image is
+   lotus-tangerine.png in the Squarespace Asset Library. The old golden image
+   URL is kept below, commented out, for an easy swap back.
 
    EMBED:
      <div id="akx-lotus"></div>
-     <script src="https://kadampacheltenham.github.io/akx-widgets/lotus-benefits.js?v=1" defer></script>
+     <script src="https://kadampacheltenham.github.io/akx-widgets/lotus-benefits.js?v=2" defer></script>
 
    OPTIONS on the mount:
      data-heading="Why meditate"   optional heading above the row; omit for none
@@ -19,7 +24,8 @@
 (function () {
   'use strict';
 
-  var LOTUS = 'https://static1.squarespace.com/static/6a5a0b51083f343e9628d66e/t/6a5ba67a42763156df7f1739/1784391290902/Transparent+Golden+Lotus.png';
+  var LOTUS = 'https://images.squarespace-cdn.com/content/6a5a0b51083f343e9628d66e/d0adf38f-0c3b-4f75-9d78-e657d9eb1ea4/lotus-tangerine.png';
+  // golden original (pre-4 Sep): 'https://static1.squarespace.com/static/6a5a0b51083f343e9628d66e/t/6a5ba67a42763156df7f1739/1784391290902/Transparent+Golden+Lotus.png'
 
   var BENEFITS = [
     { title: 'Feel calmer',              sub: 'and less overwhelmed by daily life' },
