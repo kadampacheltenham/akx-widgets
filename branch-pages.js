@@ -1,6 +1,7 @@
 /* ===========================================================================
    akx branch-pages.js — the whole branch page, from one stub
-   Akanishta Kadampa Buddhist Centre · v2.2 · 3 Sep 2026
+   Akanishta Kadampa Buddhist Centre · v2.3 · 4 Sep 2026
+   v2.3: drop-in card banner strip now sage green #A3B18A (was coral #E2886A).
    v2.2: 2027 pop-up events banner (popup-events-signpost.js) added under the
    lotuses, on active and quiet pages alike.
    (was branch-page.js — renamed 29 Aug so it reads as "the branch pages widget")
@@ -114,7 +115,7 @@
     'overflow:hidden;max-width:800px;margin:0 auto;',
     'box-shadow:0 3px 16px rgba(226,136,106,.13),0 1px 3px rgba(226,136,106,.08)}',
     /* a strip fused to the top edge of the card, not a pill floating inside it */
-    '.akxb-banner{background:#E2886A;color:#fff;text-align:center;font-size:11.5px;font-weight:700;',
+    '.akxb-banner{background:#A3B18A;color:#fff;text-align:center;font-size:11.5px;font-weight:700;',
     'letter-spacing:.16em;text-transform:uppercase;padding:11px 16px;',
     'width:100%;margin:0;border-radius:0;box-sizing:border-box}',
     '.akxb-ttl{font-family:Fraunces,Georgia,serif;font-weight:400;font-size:1.7rem;color:#2A66A6;',
