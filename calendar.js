@@ -1,4 +1,5 @@
 /* Akanishta &mdash; shared calendar widget (live Google Calendar feed).
+   4 Sep 2026 (eve) — view toggle: Upcoming now listed first (still the default), active tab blue #2A66A6 — except the branch preset, which keeps warm coral.
    4 Sep 2026 — the title sits in a tab band at the top of the card (per Gen's sketch),
    Inter as before. Tab colour: sage #A3B18A on the branch preset, tangerine #FC9602
    on every other calendar (weekly, whatson, courses, prayers, volunteer).
@@ -54,7 +55,8 @@
   var CALS = P.feeds.map(function(f){ var base=FEEDS[f.k]; return Object.assign({key:f.k, on:f.on}, base); })
                     .filter(function(c){ return c && /@/.test(c.id); });
   var TITLE = root.getAttribute('data-title') || P.title;
-  var TAB_BG = ((root.getAttribute('data-cal')||'weekly').trim()==='branch') ? '#A3B18A' : '#FC9602';  /* branch calendars sage, all others tangerine (Gen, 4 Sep) */
+  var TAB_BG = ((root.getAttribute('data-cal')||'weekly').trim()==='branch') ? '#A3B18A' : '#FC9602';
+  var VT_ON  = ((root.getAttribute('data-cal')||'weekly').trim()==='branch') ? 'var(--coral)' : '#2A66A6';  /* active view-toggle: branch keeps warm coral, others blue (Gen, 4 Sep) */  /* branch calendars sage, all others tangerine (Gen, 4 Sep) */
 
   /* data-on="weekly,weekend" forces those feeds ON over the preset, without needing a new
      preset. Branch pages use it: a town with nothing of its own also shows Cheltenham. */
@@ -86,7 +88,7 @@
   + '#akx-cal .tb{border:1px solid var(--line);background:#fff;height:38px;padding:0 14px;border-radius:10px;font-size:.9rem;cursor:pointer;color:var(--ink);}'
   + '#akx-cal .vt{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;}'
   + '#akx-cal .vt button{border:0;background:#fff;padding:9px 16px;font-size:.9rem;cursor:pointer;color:var(--muted);}'
-  + '#akx-cal .vt button.on{background:var(--coral);color:#fff;}'
+  + '#akx-cal .vt button.on{background:'+VT_ON+';color:#fff;}'
   + '#akx-cal .filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px;}'
   + '#akx-cal .pill{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px 7px 12px;font-size:.86rem;user-select:none;color:var(--muted);}'
   + '#akx-cal .pill.tog{cursor:pointer;}'
@@ -140,7 +142,7 @@
     + '  <div class="top">'
     + '    <div class="mnav"><button class="nb" data-a="prev">&#8249;</button><h2 id="akx-ml"></h2>'
     + '      <button class="nb" data-a="next">&#8250;</button><button class="tb" data-a="today">Today</button></div>'
-    + '    <div class="vt"><button data-v="month">Month</button><button data-v="list" class="on">Upcoming</button></div>'
+    + '    <div class="vt"><button data-v="list" class="on">Upcoming</button><button data-v="month">Month</button></div>'
     + '  </div>'
     + '  <div class="filters" id="akx-filters"></div>'
     + '  <div id="akx-body"></div>'
