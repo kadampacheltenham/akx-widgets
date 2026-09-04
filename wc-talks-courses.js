@@ -1,4 +1,5 @@
 /* Akanishta &mdash; TALKS & SHORT COURSES widget  [23 Aug 2026: swirl motif option E — opacity .28, 187.5% scale] [23 Aug: "Book your Spot" button; drop-in price moved to the left column; "Online discounts available"]
+   [4 Sep 2026 — v1.2] "Choose a class →" is now a plain bold darker-orange (#F5761A) label, not a pill; the series special-offer chip sits UNDER the Book button.
    [24 Aug: "Get directions" now a dynamic map link per venue — replaces the /visit-us link, which was a 404]
    [24 Aug: classes tab renamed "Class details" — reads new name, falls back to "Class times"] (the programme of talks / courses / free / in-depth / special).
    (Was wc-programme.js &mdash; renamed to wc-talks-courses.js so "programme" can't be confused with the page/section.)
@@ -108,9 +109,10 @@
   .picker{padding:20px 30px 6px;border-top:1px solid #efe9df;margin-top:18px;}
   .picker.inline{display:flex;align-items:center;justify-content:flex-start;gap:14px;flex-wrap:wrap;}
   .picker.inline.center{justify-content:center;}
-  /* 'Choose a class' &mdash; solid pill, same height as the option buttons */
-  .pk-chip{display:inline-flex;align-items:center;min-height:44px;font-size:.78rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:0 20px;border-radius:999px;margin:0 0 13px;color:#fff;background:var(--dteal);border:1.5px solid transparent;}
-  .cc .pk-chip{color:#fff;background:var(--type);}
+  /* 'Choose a class' &mdash; plain bold label in darker orange, so the pills are the only
+     button-shaped things (Gen picked this over a coral button, 4 Sep 2026) */
+  .pk-chip{display:inline-flex;align-items:center;min-height:44px;font-size:1.08rem;font-weight:800;letter-spacing:0;text-transform:none;padding:0;margin:0 0 13px;color:#F5761A;background:none;border:none;}
+  .cc .pk-chip{color:#F5761A;background:none;}
   .picker.inline .pk-chip{margin:0;}
   .tabs{display:flex;gap:10px;flex-wrap:wrap;}
   .picker.inline .tabs{flex:0 1 auto;} .picker.inline.center .tabs{justify-content:center;}
@@ -364,7 +366,7 @@
         +(datesHtml?'<div class="d-dates">'+datesHtml+'</div>':'')
         +pp
       +'</div>'
-      +(offer||book?'<div class="d-price">'+offer+book+'</div>':'')
+      +(offer||book?'<div class="d-price">'+book+offer+'</div>':'')   /* offer sits under the Book button (Gen, 4 Sep) */
     +'</div>';
   }
   function discFmt(s){ return esc(s).replace(/\s*\|\s*/g,'<span class="sep">|</span>'); }
@@ -435,7 +437,7 @@
       body='<div class="single"><div class="detail">'+pane(classes[0],0,true)+'</div></div>';
     } else {
       var pkClass = 'picker inline';
-      body='<div class="'+pkClass+'"><span class="pk-chip">Choose a class</span><div class="tabs">'
+      body='<div class="'+pkClass+'"><span class="pk-chip">Choose a class &rarr;</span><div class="tabs">'
           + classes.map(function(cl,i){return pill(cl,i,i===0,isTalk);}).join('') + '</div></div>'
           + '<div class="detail">'+classes.map(function(cl,i){return pane(cl,i,i===0);}).join('')+'</div>';
     }
