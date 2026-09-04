@@ -1,4 +1,5 @@
 /* Akanishta &mdash; TALKS & SHORT COURSES widget  [23 Aug 2026: swirl motif option E — opacity .28, 187.5% scale] [23 Aug: "Book your Spot" button; drop-in price moved to the left column; "Online discounts available"]
+   [4 Sep 2026 — v1.3] Multi-option cards: the detail panel stays COLLAPSED until a class option is tapped; a quiet "Hide details ▴" under it collapses again (single-option cards stay always-visible — nothing to choose).
    [4 Sep 2026 — v1.2] "Choose a class →" is now a plain bold darker-orange (#F5761A) label, not a pill; the series special-offer chip sits UNDER the Book button.
    [24 Aug: "Get directions" now a dynamic map link per venue — replaces the /visit-us link, which was a 404]
    [24 Aug: classes tab renamed "Class details" — reads new name, falls back to "Class times"] (the programme of talks / courses / free / in-depth / special).
@@ -121,6 +122,10 @@
   .tab-btn.on{font-weight:800;}
   .cc .tab-btn.on{background:var(--tint);border-color:var(--tintbd);color:var(--tintink);}
   .detail{margin:16px 30px 8px;border:1px solid #eee7dd;border-radius:14px;overflow:hidden;}
+  .detail.pk-closed{display:none;}   /* collapsed until a class option is chosen (Gen, 4 Sep) */
+  .pk-hide{display:block;background:none;border:none;cursor:pointer;font-size:.85rem;font-weight:700;letter-spacing:.02em;color:#8a857c;padding:6px 0;margin:2px 30px 8px;}
+  .pk-hide:hover{color:#F5761A;}
+  .detail.pk-closed + .pk-hide{display:none;}
   .single .detail{margin-top:6px;}
   .pane{display:none;grid-template-columns:1fr auto;} .pane.on{display:grid;}
   .d-main{padding:18px 22px;}
@@ -159,7 +164,7 @@
     .cc-top{grid-template-columns:110px 1fr;grid-template-areas:"gfx head" "body body";column-gap:14px;row-gap:12px;padding:22px 20px 4px;} .gfx{width:110px;height:110px;} .ctitle{font-size:1.34rem;margin-bottom:9px;} .cc-head .tags{margin-bottom:0;}
     .picker{padding:16px 20px 4px;}
     .picker.inline{display:block;text-align:left;} .picker.inline .pk-chip{margin-bottom:13px;} .picker.inline .tabs{justify-content:flex-start;}
-    .detail{margin:14px 20px 4px;} .pane.on{grid-template-columns:1fr;}
+    .detail{margin:14px 20px 4px;} .pk-hide{margin:2px 20px 6px;} .pane.on{grid-template-columns:1fr;}
     .d-price{flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:space-between;width:100%;gap:10px;}
     .d-price .book{order:2;} .d-price .d-offer{order:3;flex-basis:100%;text-align:left;}
     .tbc,.foot{margin-left:20px;margin-right:20px;padding-left:18px;padding-right:18px;} .foot{padding:8px 0 22px;}
@@ -438,8 +443,9 @@
     } else {
       var pkClass = 'picker inline';
       body='<div class="'+pkClass+'"><span class="pk-chip">Choose a class &rarr;</span><div class="tabs">'
-          + classes.map(function(cl,i){return pill(cl,i,i===0,isTalk);}).join('') + '</div></div>'
-          + '<div class="detail">'+classes.map(function(cl,i){return pane(cl,i,i===0);}).join('')+'</div>';
+          + classes.map(function(cl,i){return pill(cl,i,false,isTalk);}).join('') + '</div></div>'
+          + '<div class="detail pk-closed">'+classes.map(function(cl,i){return pane(cl,i,false);}).join('')+'</div>'
+          + '<button type="button" class="pk-hide">Hide details &#9652;</button>';
     }
     var discHtml = item.discount_note ? '<div class="disc"><span class="disc-star">&#9733;</span> <b>Online discounts available</b> &mdash; <span>'+discInline(item.discount_note.replace(/^\s*discounts?\s*:\s*/i,''))+'</span></div>' : '';
     var foot = '<div class="foot">'+discHtml+shareRow(item)+'</div>';
@@ -533,6 +539,12 @@
         var i=btn.getAttribute('data-i');
         cc.querySelectorAll('.tab-btn').forEach(function(x){x.classList.toggle('on',x===btn);});
         cc.querySelectorAll('.pane').forEach(function(p){p.classList.toggle('on',p.getAttribute('data-i')===i);});
+        var dt=cc.querySelector('.detail'); if(dt) dt.classList.remove('pk-closed');
+      });});
+      cc.querySelectorAll('.pk-hide').forEach(function(b){b.addEventListener('click',function(){
+        var dt=cc.querySelector('.detail'); if(dt) dt.classList.add('pk-closed');
+        cc.querySelectorAll('.tab-btn').forEach(function(x){x.classList.remove('on');});
+        cc.querySelectorAll('.pane').forEach(function(p){p.classList.remove('on');});
       });});
     });
     colourTitles(root);
