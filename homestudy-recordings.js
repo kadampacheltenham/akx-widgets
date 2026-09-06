@@ -96,6 +96,10 @@
   ".akx-recordings .akr-pill{border:0;cursor:pointer;color:#fff;border-radius:999px;background:rgba(255,255,255,.16);padding:9px 14px;font-size:13px;font-weight:700;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:5px;}" +
   ".akx-recordings .akr-pill:hover{background:rgba(255,255,255,.28);color:#fff;}" +
   ".akx-recordings .akr-npmsg{font-size:12.5px;background:rgba(0,0,0,.18);border-radius:9px;padding:8px 12px;margin-top:12px;display:none;}" +
+  /* conditions card */
+  ".akx-recordings .akr-terms{background:#F7F5F0;border:1px solid #e9e4d8;border-radius:12px;padding:14px 18px;margin:0 0 18px;font-size:13px;line-height:1.55;color:#54524d;}" +
+  ".akx-recordings .akr-terms .who{display:block;margin-top:6px;font-style:italic;color:#8a857c;}" +
+  ".akx-recordings .akr-terms .cop{display:block;margin-top:2px;font-size:11.5px;color:#a09a8e;}" +
   /* resume chip */
   ".akx-recordings .akr-resume{display:flex;align-items:center;gap:10px;background:#FEF6E8;border:1px solid #f3dcb2;border-radius:12px;padding:10px 14px;margin:0 0 20px;font-size:13.5px;line-height:1.4;}" +
   ".akx-recordings .akr-resume b{color:#c47a02;}" +
@@ -182,6 +186,13 @@
 
     host.appendChild(el("h2","akr-hd",cfg.name));
     host.appendChild(el("p","akr-lead",cfg.sub));
+
+    /* conditions card */
+    var terms = el("div","akr-terms");
+    terms.appendChild(document.createTextNode("I understand the Homestudy recordings for "+(prog==="ttp"?"TTP":"FP")+" are provided by the centre for my personal use as an enrolled student on the programme and may not be shared."));
+    terms.appendChild(el("span","who","— Education Programme Coordinator"));
+    terms.appendChild(el("span","cop","© Akanishta Kadampa Buddhist Centre "+(new Date()).getFullYear()));
+    host.appendChild(terms);
 
     /* now-playing card */
     var np = el("div","akr-np");
