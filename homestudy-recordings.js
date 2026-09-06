@@ -27,23 +27,39 @@
     fp:  { name: "FP class recordings",  sub: "Foundation Programme · listen again between classes · for enrolled students only",       csv: CSV_FP  }
   };
 
-  /* Book codes -> full title (same table as the testimonies widget) */
+  /* Book codes -> [full title, Tharpa cover image] (titles match the testimonies widget) */
+  var TH = "https://d138wa8fwgcz2d.cloudfront.net/media/catalog/product/";
   var BOOKS = [
-    ["HTTYL","How to Transform Your Life"],["HTUM","How to Understand the Mind"],
-    ["JPGF","Joyful Path of Good Fortune"],["MOD","The Mirror of Dharma with Additions"],
-    ["NHW","The New Heart of Wisdom"],["MB","Modern Buddhism"],
-    ["TGP","Tantric Grounds and Paths"],["NGDL","The New Guide to Dakini Land"],
-    ["EOV","Essence of Vajrayana"],["OIM","The Oral Instructions of Mahamudra"],
-    ["GTM","Great Treasury of Merit"],["NESH","The New Eight Steps to Happiness"],
-    ["ITB","Introduction to Buddhism"],["SOHP","How to Solve Our Human Problems"],
-    ["MTB","Meaningful to Behold"],["GBWL","Guide to the Bodhisattva's Way of Life"],
-    ["BV","The Bodhisattva Vow"],["UC","Universal Compassion"],
-    ["NMH","The New Meditation Handbook"],["LMDJ","Living Meaningfully, Dying Joyfully"],
-    ["ON","Ocean of Nectar"],["HJ","Heart Jewel"],["CLB","Clear Light of Bliss"],["MT","Mahamudra Tantra"]
+    ["HTTYL","How to Transform Your Life",TH+"h/t/httyl_3d-_combo2019-12.jpg"],
+    ["HTUM","How to Understand the Mind",TH+"h/t/htutm_3d-paperback-front_and_ebook-phone-android-cover_combo_2020-01.jpg"],
+    ["JPGF","Joyful Path of Good Fortune",TH+"j/o/jo5e0d_1.jpg"],
+    ["MOD","The Mirror of Dharma with Additions",TH+"m/o/mod-addts_3d-ppback-front_ebk-ph-andr-cover_and-mp3-player-apple_combo_2020-01.jpg"],
+    ["NHW","The New Heart of Wisdom",TH+"n/e/new-heart-of-wisdom_3d-paperback-front_ebook_audio_combo_2024-05_web.jpg"],
+    ["MB","Modern Buddhism",TH+"m/o/modern-buddhism_3d-paperback-front_ebook_audio_combo_2021-12.jpg"],
+    ["TGP","Tantric Grounds and Paths",TH+"t/a/tantric-grounds-and-paths_3d-book_ebook-phone_and_audio-player_2021-06_web.jpg"],
+    ["NGDL","The New Guide to Dakini Land",TH+"n/e/new-guide-to-dakini-land_3d-paperback-front_ebook_audio_combo_2024-10_web.png"],
+    ["EOV","Essence of Vajrayana",TH+"e/s/essence-of-vajrayana_3d-paperback-front_ebook_audio_combo_2024-12.jpg"],
+    ["OIM","The Oral Instructions of Mahamudra",TH+"o/r/ord436_1.jpg"],
+    ["GTM","Great Treasury of Merit",TH+"g/r/great-treasury-of-merit_3d-paperback-front_ebook_audio_combo_2025-09_web.jpg"],
+    ["NESH","The New Eight Steps to Happiness",TH+"n/e/new-eight-steps-to-happiness_3d-pbk-fr_ebook-phone-_and_-mp3-combo_2019-07.jpg"],
+    ["ITB","Introduction to Buddhism",TH+"i/n/introduction-to-buddhism_3d-paperback-front_ebook_audio_combo_2024-03_web.jpg"],
+    ["SOHP","How to Solve Our Human Problems",TH+"q/g/qgxzztda.jpeg"],
+    ["MTB","Meaningful to Behold",TH+"m/e/meaningful-to-behold_3d-paperback-front_and_ebook-phone-android-cover_combo_2019-02.jpg"],
+    ["GBWL","Guide to the Bodhisattva's Way of Life",TH+"g/t/gttbway-of-life_3d-combo2019-12.jpg"],
+    ["BV","The Bodhisattva Vow",TH+"b/o/bodhisattva-vow_3d-paperback-front_and_ebook-phone-android-cover_combo_2020-12_web.jpg"],
+    ["UC","Universal Compassion",TH+"u/n/universal-compassion_3d-paperback-front_ebook_combo_2023-05_web_1.jpg"],
+    ["NMH","The New Meditation Handbook",TH+"n/m/nmh_3d-ppback-apple_combo2020-01_1.jpg"],
+    ["LMDJ","Living Meaningfully, Dying Joyfully",TH+"l/i/living-meaningfully-dying-joyfully_3d-paperback-front_ebook_audio_combo_2025-04_web.jpg"],
+    ["ON","Ocean of Nectar",TH+"o/c/ocd3d7_1.jpg"],
+    ["HJ","Heart Jewel",TH+"h/e/heart-jewel_3d-paperback-front_ebook_audio_combo_2025-03_web.jpg"],
+    ["CLB","Clear Light of Bliss",TH+"c/l/clear_light_of_bliss_3d-paperback-front_and_ebook-phone-android-cover_combo_web_2019-09.jpg"],
+    ["MT","Mahamudra Tantra",TH+"m/a/mahamudra-tantra_2d-paperback-front-crop_2024-10_web_1.jpg"]
   ];
   function norm(s){ return String(s||"").toLowerCase().replace(/[’‘]/g,"'").trim(); }
-  var _bk={}; BOOKS.forEach(function(b){ _bk[norm(b[0])]=b[1]; _bk[norm(b[1])]=b[1]; });
+  var _bk={}, _cv={};
+  BOOKS.forEach(function(b){ _bk[norm(b[0])]=b[1]; _bk[norm(b[1])]=b[1]; _cv[norm(b[0])]=b[2]; _cv[norm(b[1])]=b[2]; });
   function bookTitle(x){ return x ? (_bk[norm(x)] || String(x)) : ""; }
+  function bookCover(x){ return x ? (_cv[norm(x)] || "") : ""; }
 
   /* DEMO rows — shown until the CSV addresses above are filled in */
   var DEMO = {
@@ -88,6 +104,7 @@
   ".akx-recordings .akr-mon{font-family:'Fraunces',Georgia,serif;font-weight:600;color:#b5443c;font-size:17px;margin:20px 0 4px;}" +
   ".akx-recordings .akr-row{display:flex;align-items:center;gap:13px;padding:11px 8px;border-bottom:1px solid #f0ede6;border-radius:10px;}" +
   ".akx-recordings .akr-row .d{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;color:#8a857c;width:56px;flex-shrink:0;line-height:1.3;}" +
+  ".akx-recordings .akr-row .cv{width:46px;height:52px;flex-shrink:0;object-fit:contain;border-radius:4px;}" +
   ".akx-recordings .akr-row .t{font-size:14.5px;font-weight:500;flex:1;min-width:0;}" +
   ".akx-recordings .akr-row .t .sub{display:block;font-size:12px;color:#8a857c;font-weight:400;margin-top:2px;}" +
   ".akx-recordings .akr-row .tick{color:#3E7C46;font-size:11.5px;font-weight:700;white-space:nowrap;}" +
@@ -101,6 +118,7 @@
   "@media (max-width:600px){" +
   " .akx-recordings .akr-hd{font-size:26px;}" +
   " .akx-recordings .akr-row .d{width:46px;font-size:11px;}" +
+  " .akx-recordings .akr-row .cv{width:36px;height:44px;}" +
   " .akx-recordings .akr-ctr{gap:10px;}" +
   "}";
 
@@ -271,6 +289,9 @@
         var listened = lsGet(doneKey(it.url))==="1";
         if(listened) row.classList.add("listened");
         row.appendChild(el("span","d", d.getTime()? DAYS[d.getDay()]+" "+d.getDate() : ""));
+        var cvUrl=bookCover(it.book);
+        if(cvUrl){ var cv=document.createElement("img"); cv.className="cv"; cv.alt=""; cv.loading="lazy";
+          cv.src=cvUrl; cv.addEventListener("error",function(){ cv.remove(); }); row.appendChild(cv); }
         var t=el("span","t",itemTitle(it));
         if(listened){ t.appendChild(document.createTextNode(" ")); t.appendChild(el("span","tick","✓ listened")); }
         var sl=subLine(it); if(sl) t.appendChild(el("span","sub",sl));
