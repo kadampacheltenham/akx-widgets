@@ -2,7 +2,7 @@
  * Sheet-driven audio player for the password-protected /ttp and /homestudy pages.
  *
  *   <div class="akx-recordings" data-prog="ttp"></div>
- *   <script src="https://kadampacheltenham.github.io/akx-widgets/class-recordings.js"></script>
+ *   <script src="https://kadampacheltenham.github.io/akx-widgets/homestudy-recordings.js"></script>
  *
  * data-prog : "ttp" | "fp"  (required — picks the sheet tab / heading)
  *
