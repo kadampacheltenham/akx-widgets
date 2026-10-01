@@ -1,4 +1,4 @@
-/* Akanishta — EVENT PROMO BLOCK (v2.1, 1 Oct 2026)
+/* Akanishta — EVENT PROMO BLOCK (v2.3, 1 Oct 2026)
    One hosted file, used on every page. Promotes a single special event and moves
    itself through its stages by date: offer → early bird → standard → last week →
    final days → gone (after the event it renders nothing, everywhere, at once).
@@ -89,17 +89,17 @@
   /* ------------------------------------------------------------------ */
   var CSS = [
     '@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap");',
-    '.akxep{font-family:Poppins,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;margin:58px auto 34px;max-width:1040px;}',
+    '.akxep{font-family:Poppins,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;margin:58px auto 34px;max-width:min(1040px,100%);min-width:0;overflow-wrap:break-word;}',
     '.akxep *{box-sizing:border-box;}',
     '.akxep a{text-decoration:none;}',
     '.akxep .bx{display:flex;border-radius:20px;overflow:hidden;background:#F8F1E9;min-height:310px;}',
     '.akxep .pic{width:340px;flex-shrink:0;position:relative;background-size:cover;background-position:50% 6%;}',
     '.akxep .pic:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(248,241,233,0) 68%,rgba(248,241,233,.98) 100%);}',
-    '.akxep .bd{flex:1;padding:36px 40px 34px 30px;}',
+    '.akxep .bd{flex:1;min-width:0;padding:36px 40px 34px 30px;}',
     '.akxep .tp{display:flex;align-items:baseline;justify-content:space-between;gap:20px;}',
     '.akxep .eb{font-size:11.5px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:#C2492C;}',
     '.akxep .blue .eb{color:#2A66A6;}',
-    '.akxep .cd{font-size:11.5px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:#A09484;white-space:nowrap;}',
+    '.akxep .cd{font-size:11.5px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:#A09484;}',
     '.akxep .hl{font-size:38px;font-weight:600;line-height:1.1;color:#2A66A6;margin:16px 0 0;letter-spacing:-.005em;}',
     '.akxep .mt{font-size:15px;color:#5C554B;margin-top:13px;font-weight:300;}',
     '.akxep .mt b{font-weight:600;color:#2B2620;}',
@@ -125,7 +125,9 @@
     '.akxep .pic{display:none;}',
     '.akxep .bd{padding:0;}',
     '.akxep .arch{display:block;width:146px;height:168px;border-radius:73px 73px 18px 18px;background-size:cover;background-position:50% 4%;margin:0 auto 18px;box-shadow:0 2px 10px rgba(43,38,32,.10);}',
-    '.akxep .tp{justify-content:center;gap:10px;}',
+    '.akxep .tp{display:block;text-align:center;}',
+    '.akxep .cd{display:block;margin-top:6px;white-space:normal;}',
+    '.akxep .eb{display:block;}',
     '.akxep .hl{font-size:29px;margin-top:12px;text-align:center;}',
     '.akxep .mt{text-align:center;}',
     '.akxep .pr{justify-content:center;margin-top:18px;}',
