@@ -1,4 +1,4 @@
-/* Akanishta — EVENT PROMO BLOCK (v2.5, 1 Oct 2026)
+/* Akanishta — EVENT PROMO BLOCK (v2.6, 1 Oct 2026)
    One hosted file, used on every page. Promotes a single special event and moves
    itself through its stages by date: offer → early bird → standard → last week →
    final days → gone (after the event it renders nothing, everywhere, at once).
@@ -36,7 +36,7 @@
     teacher:  'Kadam Bridget Heyes',
     photo:    'https://kadampacheltenham.github.io/akx-widgets/images/bridget-heyes.jpg',
     book:     'https://www.tickettailor.com/events/akanishtakadampabuddhistcentre/2416076',
-    code:     'code STUDENT or U25'
+    code:     '<span class="nb">code STUDENT or U25</span>'
   };
 
   // Stages run in order; the first one whose 'until' has not passed is shown.
@@ -47,7 +47,7 @@
       till:    'until 14 Oct',
       offerName:'2-for-1 offer',
       button:  'Book 2 for 1',
-      fine:    'Or a single early bird ticket, <b>£12 until 21 Oct</b>. Students &amp; under 25s save 30% — ' + EVENT.code + '.',
+      fine:    'Or a single early bird ticket, <b class="nb">£12 until 21&nbsp;Oct</b>. Full-time students &amp; under 25s save 30% — ' + EVENT.code + '.',
       chip:    'offer' },
 
     { until: '2026-10-21', accent: 'blue',
@@ -56,7 +56,7 @@
       till:    'until 21 Oct',
       offerName:'Early bird price',
       button:  'Book early bird',
-      fine:    'Standard price £15 after 21 Oct. Students &amp; under 25s save 30% — ' + EVENT.code + '.',
+      fine:    'Standard price £15 after 21 Oct. Full-time students &amp; under 25s save 30% — ' + EVENT.code + '.',
       chip:    'offer' },
 
     { until: '2026-10-28', accent: 'blue',
@@ -64,7 +64,7 @@
       price:   'Tickets £15',
       till:    'everybody welcome',
       button:  'Book now',
-      fine:    'No experience needed. Students &amp; under 25s save 30% — ' + EVENT.code + '.',
+      fine:    'No experience needed. Full-time students &amp; under 25s save 30% — ' + EVENT.code + '.',
       chip:    'countdown' },
 
     { until: '2026-11-02', accent: 'blue',
@@ -72,7 +72,7 @@
       price:   'Tickets £15',
       till:    'everybody welcome',
       button:  'Book your seat',
-      fine:    'No experience needed. Students &amp; under 25s save 30% — ' + EVENT.code + '.',
+      fine:    'No experience needed. Full-time students &amp; under 25s save 30% — ' + EVENT.code + '.',
       chip:    'countdown',
       meta:    '<b>Next Wednesday, 4 Nov · 7pm</b> · ' + EVENT.venue + ' · doors &amp; bookshop from 6pm' },
 
@@ -81,7 +81,7 @@
       price:   'A few seats left',
       till:    'tickets £15',
       button:  'Book your seat',
-      fine:    'On the door if not sold out. Students &amp; under 25s save 30% — ' + EVENT.code + '.',
+      fine:    'On the door if not sold out. Full-time students &amp; under 25s save 30% — ' + EVENT.code + '.',
       chip:    'countdown',
       meta:    '<b>Wed 4 Nov · 7pm</b> · with ' + EVENT.teacher + ' · doors from 6pm' }
   ];
@@ -112,7 +112,8 @@
     '.akxep .pr{margin-top:22px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;}',
     '.akxep .pr .big{font-size:25px;font-weight:600;color:#C2492C;letter-spacing:-.01em;}',
     '.akxep .blue .pr .big{color:#2A66A6;}',
-    '.akxep .pr .till{font-size:14.5px;font-weight:500;color:#8A8073;border-left:1px solid #E0D4C4;padding-left:14px;}',
+    '.akxep .till{font-size:14px;font-weight:400;color:#8A8073;margin-top:3px;}',
+    '.akxep .nb{white-space:nowrap;}',
     '.akxep .rw{display:flex;align-items:center;gap:24px;margin-top:22px;flex-wrap:wrap;}',
     '.akxep .bt{background:#E8664A;color:#fff;font-weight:600;font-size:16.5px;border-radius:999px;padding:15px 32px;display:inline-flex;gap:10px;align-items:center;box-shadow:0 2px 8px rgba(232,102,74,.28);transition:transform .15s ease;}',
     '.akxep .bt:hover{transform:translateY(-1px);}',
@@ -134,6 +135,7 @@
     '.akxep .arch{display:block;width:146px;height:168px;border-radius:73px 73px 18px 18px;background-size:cover;background-position:50% 4%;margin:0 auto 18px;box-shadow:0 2px 10px rgba(43,38,32,.10);}',
     '.akxep .tp{display:block;text-align:center;}',
     '.akxep .cd{text-align:center;}',
+    '.akxep .till{text-align:center;}',
     '.akxep .eb{display:block;}',
     '.akxep .hl{font-size:29px;margin-top:12px;text-align:center;}',
     '.akxep .mt{text-align:center;}',
@@ -206,9 +208,9 @@
         '</div>' +
         '<h3 class="hl">' + EVENT.title + '</h3>' +
         '<div class="mt">' + metaLine(stage) + '</div>' +
-        '<div class="pr"><span class="big">' + stage.price + '</span>' +
-          '<span class="till">' + stage.till + '</span></div>' +
+        '<div class="pr"><span class="big">' + stage.price + '</span></div>' +
         '<div class="cd">' + countdown(stage) + '</div>' +
+        '<div class="till">' + stage.till + '</div>' +
         '<div class="rw">' +
           '<span class="bt">' + stage.button + ' &nbsp;&rarr;</span>' +
           '<div class="fn">' + stage.fine + '</div>' +
