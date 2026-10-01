@@ -1,4 +1,4 @@
-/* Akanishta — EVENT PROMO BLOCK (v2.4, 1 Oct 2026)
+/* Akanishta — EVENT PROMO BLOCK (v2.5, 1 Oct 2026)
    One hosted file, used on every page. Promotes a single special event and moves
    itself through its stages by date: offer → early bird → standard → last week →
    final days → gone (after the event it renders nothing, everywhere, at once).
@@ -45,6 +45,7 @@
       eyebrow: 'Special evening event · ' + EVENT.town,
       price:   '2 tickets for £15',
       till:    'until 14 Oct',
+      offerName:'2-for-1 offer',
       button:  'Book 2 for 1',
       fine:    'Or a single early bird ticket, <b>£12 until 21 Oct</b>. Students &amp; under 25s save 30% — ' + EVENT.code + '.',
       chip:    'offer' },
@@ -53,6 +54,7 @@
       eyebrow: 'Special evening event · ' + EVENT.town,
       price:   'Early bird £12',
       till:    'until 21 Oct',
+      offerName:'Early bird price',
       button:  'Book early bird',
       fine:    'Standard price £15 after 21 Oct. Students &amp; under 25s save 30% — ' + EVENT.code + '.',
       chip:    'offer' },
@@ -102,7 +104,8 @@
     '.akxep .tp{display:flex;align-items:baseline;justify-content:space-between;gap:20px;}',
     '.akxep .eb{font-size:11.5px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:#C2492C;}',
     '.akxep .blue .eb{color:#2A66A6;}',
-    '.akxep .cd{font-size:11.5px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:#A09484;}',
+    '.akxep .cd{font-size:11.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#C2492C;margin-top:7px;}',
+    '.akxep .blue .cd{color:#2A66A6;}',
     '.akxep .hl{font-size:38px;font-weight:600;line-height:1.1;color:#2A66A6;margin:16px 0 0;letter-spacing:-.005em;}',
     '.akxep .mt{font-size:15px;color:#5C554B;margin-top:13px;font-weight:300;}',
     '.akxep .mt b{font-weight:600;color:#2B2620;}',
@@ -130,7 +133,7 @@
     '.akxep .bd{padding:0;}',
     '.akxep .arch{display:block;width:146px;height:168px;border-radius:73px 73px 18px 18px;background-size:cover;background-position:50% 4%;margin:0 auto 18px;box-shadow:0 2px 10px rgba(43,38,32,.10);}',
     '.akxep .tp{display:block;text-align:center;}',
-    '.akxep .cd{display:block;margin-top:6px;white-space:normal;}',
+    '.akxep .cd{text-align:center;}',
     '.akxep .eb{display:block;}',
     '.akxep .hl{font-size:29px;margin-top:12px;text-align:center;}',
     '.akxep .mt{text-align:center;}',
@@ -153,10 +156,11 @@
   function countdown(stage) {
     var left = days(d(EVENT.date), today());
     if (stage.chip === 'offer') {
+      var name = stage.offerName || 'Offer';
       var o = days(d(stage.until), today());
-      if (o <= 0) return 'Last day of the offer';
-      if (o === 1) return 'Offer ends tomorrow';
-      return 'Offer ends in ' + o + ' days';
+      if (o <= 0) return name + ' — last day';
+      if (o === 1) return name + ' ends tomorrow';
+      return name + ' ends in ' + o + ' days';
     }
     if (left <= 0) return 'Tonight';
     if (left === 1) return 'Tomorrow';
@@ -199,12 +203,12 @@
         '<div class="arch" style="' + img + '"></div>' +
         '<div class="tp">' +
           '<div class="eb">' + stage.eyebrow + '</div>' +
-          '<div class="cd">' + countdown(stage) + '</div>' +
         '</div>' +
         '<h3 class="hl">' + EVENT.title + '</h3>' +
         '<div class="mt">' + metaLine(stage) + '</div>' +
         '<div class="pr"><span class="big">' + stage.price + '</span>' +
           '<span class="till">' + stage.till + '</span></div>' +
+        '<div class="cd">' + countdown(stage) + '</div>' +
         '<div class="rw">' +
           '<span class="bt">' + stage.button + ' &nbsp;&rarr;</span>' +
           '<div class="fn">' + stage.fine + '</div>' +
