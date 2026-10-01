@@ -1,4 +1,4 @@
-/* Akanishta — EVENT PROMO BLOCK (v2.3, 1 Oct 2026)
+/* Akanishta — EVENT PROMO BLOCK (v2.4, 1 Oct 2026)
    One hosted file, used on every page. Promotes a single special event and moves
    itself through its stages by date: offer → early bird → standard → last week →
    final days → gone (after the event it renders nothing, everywhere, at once).
@@ -92,7 +92,10 @@
     '.akxep{font-family:Poppins,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;margin:58px auto 34px;max-width:min(1040px,100%);min-width:0;overflow-wrap:break-word;}',
     '.akxep *{box-sizing:border-box;}',
     '.akxep a{text-decoration:none;}',
-    '.akxep .bx{display:flex;border-radius:20px;overflow:hidden;background:#F8F1E9;min-height:310px;}',
+    '.akxep .bx{display:flex;border-radius:20px;overflow:hidden;background:#F8F1E9;min-height:310px;color:inherit;cursor:pointer;transition:box-shadow .18s ease,transform .18s ease;}',
+    '.akxep .bx:hover{box-shadow:0 6px 22px rgba(43,38,32,.13);transform:translateY(-2px);}',
+    '.akxep .bx:hover .bt{filter:brightness(1.04);}',
+    '.akxep .bx:focus-visible,.akxep .qt:focus-visible{outline:3px solid #2A66A6;outline-offset:3px;}',
     '.akxep .pic{width:340px;flex-shrink:0;position:relative;background-size:cover;background-position:50% 6%;}',
     '.akxep .pic:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(248,241,233,0) 68%,rgba(248,241,233,.98) 100%);}',
     '.akxep .bd{flex:1;min-width:0;padding:36px 40px 34px 30px;}',
@@ -114,7 +117,8 @@
     '.akxep .fn b{font-weight:600;color:#3A342C;}',
     '.akxep .arch{display:none;}',
     /* quiet variant */
-    '.akxep .qt{display:flex;align-items:center;gap:20px;padding:18px 24px;background:#F8F1E9;border-radius:16px;}',
+    '.akxep .qt{display:flex;align-items:center;gap:20px;padding:18px 24px;background:#F8F1E9;border-radius:16px;color:inherit;cursor:pointer;transition:box-shadow .18s ease;}',
+    '.akxep .qt:hover{box-shadow:0 4px 16px rgba(43,38,32,.12);}',
     '.akxep .qt .sm{width:62px;height:72px;border-radius:31px 31px 10px 10px;background-size:cover;background-position:50% 4%;flex-shrink:0;}',
     '.akxep .qt .t1{font-size:16.5px;font-weight:600;color:#2A66A6;}',
     '.akxep .qt .t2{font-size:13.5px;color:#6B6358;margin-top:4px;font-weight:300;}',
@@ -187,7 +191,9 @@
   /* ------------------------------------------------------------------ */
   function renderFull(stage) {
     var img = 'background-image:url(' + EVENT.photo + ')';
-    return '<div class="bx ' + stage.accent + '">' +
+    return '<a class="bx ' + stage.accent + '" href="' + EVENT.book +
+      '" target="_blank" rel="noopener" aria-label="' + stage.button +
+      ' — Meditation for less stress and worry, Wed 4 Nov, 7pm">' +
       '<div class="pic" style="' + img + '"></div>' +
       '<div class="bd">' +
         '<div class="arch" style="' + img + '"></div>' +
@@ -200,24 +206,23 @@
         '<div class="pr"><span class="big">' + stage.price + '</span>' +
           '<span class="till">' + stage.till + '</span></div>' +
         '<div class="rw">' +
-          '<a class="bt" href="' + EVENT.book + '" target="_blank" rel="noopener">' +
-            stage.button + ' &nbsp;&rarr;</a>' +
+          '<span class="bt">' + stage.button + ' &nbsp;&rarr;</span>' +
           '<div class="fn">' + stage.fine + '</div>' +
         '</div>' +
       '</div>' +
-    '</div>';
+    '</a>';
   }
 
   function renderQuiet() {
-    return '<div class="qt">' +
+    return '<a class="qt" href="' + EVENT.book + '" target="_blank" rel="noopener">' +
       '<div class="sm" style="background-image:url(' + EVENT.photo + ')"></div>' +
       '<div>' +
         '<div class="t1">An evening with ' + EVENT.teacher + ' · ' + EVENT.dateLine +
           ', ' + EVENT.time + '</div>' +
         '<div class="t2">' + EVENT.titleOne + ' · ' + EVENT.venue + ', ' + EVENT.town + '</div>' +
       '</div>' +
-      '<a class="bq" href="' + EVENT.book + '" target="_blank" rel="noopener">Book now &rarr;</a>' +
-    '</div>';
+      '<span class="bq">Book now &rarr;</span>' +
+    '</a>';
   }
 
   function mount(el) {
