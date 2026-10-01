@@ -1,4 +1,4 @@
-/* Akanishta — EVENT PROMO BLOCK (v2.0, 1 Oct 2026)
+/* Akanishta — EVENT PROMO BLOCK (v2.1, 1 Oct 2026)
    One hosted file, used on every page. Promotes a single special event and moves
    itself through its stages by date: offer → early bird → standard → last week →
    final days → gone (after the event it renders nothing, everywhere, at once).
@@ -89,7 +89,7 @@
   /* ------------------------------------------------------------------ */
   var CSS = [
     '@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap");',
-    '.akxep{font-family:Poppins,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;margin:28px auto;max-width:1040px;}',
+    '.akxep{font-family:Poppins,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;margin:58px auto 34px;max-width:1040px;}',
     '.akxep *{box-sizing:border-box;}',
     '.akxep a{text-decoration:none;}',
     '.akxep .bx{display:flex;border-radius:20px;overflow:hidden;background:#F8F1E9;min-height:310px;}',
