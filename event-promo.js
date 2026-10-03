@@ -89,7 +89,6 @@
     '.akxep .hl{font-size:37px;font-weight:600;line-height:1.1;color:#2A66A6;margin:14px 214px 0 0;letter-spacing:-.005em;}',
     '.akxep .mt{font-size:15px;color:#5C554B;margin-top:12px;font-weight:300;}',
     '.akxep .mt b{font-weight:600;color:#2B2620;}',
-    '.akxep .mb{display:none;}',
     '.akxep .pr{margin-top:19px;font-size:25px;font-weight:600;color:#C2492C;letter-spacing:-.01em;}',
     '.akxep .blue .pr{color:#2A66A6;}',
     '.akxep .akxnb{white-space:nowrap;}',
@@ -153,17 +152,15 @@
     /* phone */
     '@media(max-width:720px){',
     '.akxep .bx{display:block;padding:26px 22px 26px;border-radius:18px;min-height:0;text-align:center;box-shadow:0 8px 24px rgba(43,38,32,.14);border:1px solid rgba(43,38,32,.05);}',
-    '.akxep .dk{display:none;}',
-    '.akxep .mb{display:inline;}',
     '.akxep .pic{display:none;}',
     '.akxep .bd{padding:0;}',
     '.akxep .circ{display:block;width:150px;height:150px;border-radius:50%;background-size:cover;background-position:50% 8%;margin:0 auto 16px;box-shadow:0 2px 10px rgba(43,38,32,.12);}',
     '.akxep .eb,.akxep .hl{margin-right:0;}',
     '.akxep .hl{font-size:27px;margin-top:11px;}',
-    '.akxep .cnr{position:static;margin:0 0 14px;display:flex;justify-content:center;}',
-    '.akxep .badge{top:0;right:0;width:auto;height:auto;border-radius:0 18px 0 14px;padding:9px 16px 9px 18px;}',
+    '.akxep .cnr{position:static;margin:18px 0;display:flex;justify-content:center;}',
+    '.akxep .badge{top:0;right:0;width:auto;height:auto;border-radius:0 18px 0 16px;padding:11px 15px 12px 17px;align-items:flex-start;}',
     '.akxep .badge .b3{display:none;}',
-    '.akxep .badge .b1{display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;line-height:1;}',
+    '.akxep .badge .b1{display:block;text-align:right;font-size:11px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;line-height:1.35;}',
     '.akxep .rw{display:flex;flex-direction:column-reverse;align-items:stretch;gap:0;margin-top:14px;}',
     '.akxep .bt{display:flex;justify-content:center;width:100%;}',
     '.akxep .exp{display:block;margin:0 0 12px;}',
@@ -296,7 +293,7 @@
     var corner = '';
     if (p === 1) {
       corner = '<div class="badge"><span class="b3">One<br>night<br>only</span>' +
-               '<span class="b1">One night only</span></div>';
+               '<span class="b1">One<br>night<br>only</span></div>';
     } else if (p === 3) {
       corner = '<div class="cnr">' + hairHTML(r) + '</div>';
     } else if (p === 4) {
@@ -322,8 +319,7 @@
         '<div class="eb">An evening with ' + EVENT.teacher + '</div>' +
         '<h3 class="hl">' + EVENT.title + '</h3>' +
         '<div class="mt"><b>' + EVENT.dateLine + ' · ' + EVENT.time + '</b> · ' +
-          EVENT.venue + ' · <span class="dk">Café &amp; bookshop from 6pm</span>' +
-          '<span class="mb">Café from 6pm</span></div>' +
+          EVENT.venue + ' · Café &amp; bookshop from 6pm</div>' +
         clock +
         '<div class="pr">' + price + '</div>' +
         '<div class="rw"><span class="bt">' + button + ' &nbsp;&rarr;</span>' + tail + '</div>' +
