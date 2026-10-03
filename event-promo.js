@@ -1,4 +1,5 @@
-/* Akanishta — EVENT PROMO BLOCK (v3.0, 3 Oct 2026)
+/* Akanishta — EVENT PROMO BLOCK
+   VERSION 3.2 — built 4 Oct 2026 — marker AKXEP_V3_2
    One hosted file, used on every page. Promotes a single special event and moves
    itself through four phases by date, then removes itself after the event.
 
@@ -26,6 +27,8 @@
    =========================================================================== */
 (function () {
   'use strict';
+
+  var VERSION = 'AKXEP_V3_2';   // visible stamp, so you can tell what is live
 
   /* ------------------------------------------------------------------ */
   /* CONFIG                                                             */
