@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Akanishta</title>
+<meta name="apple-mobile-web-app-title" content="Akanishta">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#2A66A6">
+<meta name="robots" content="noindex">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+  /* Launcher for the Akanishta KBC Dashboard: carries the centre's lotus as the home-screen icon, then opens the dashboard */
+  :root { --blue: #2A66A6; --ink: #243B53; --mute: #5B6573; --bg: #F7F6F3; --card: #fff; --line: #E6E2D8; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--bg); color: var(--ink); font-family: 'Helvetica Neue', Arial, sans-serif; display: flex; align-items: center; justify-content: center; padding: 24px 16px; }
+  main { width: 100%; max-width: 420px; background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 30px 26px 26px; text-align: center; }
+  .ic { width: 96px; height: 96px; border-radius: 22px; display: block; margin: 0 auto 16px; box-shadow: 0 6px 18px rgba(36, 59, 83, .18); }
+  h1 { font-size: 22px; margin: 0 0 6px; text-wrap: balance; }
+  p { font-size: 15px; line-height: 1.5; color: var(--mute); margin: 0 0 14px; }
+  ol { text-align: left; font-size: 15px; line-height: 1.55; color: var(--ink); background: #F1F5FA; border-radius: 14px; padding: 12px 16px 12px 34px; margin: 0 0 18px; }
+  a.go { display: inline-block; background: var(--blue); color: #fff; font-weight: 700; font-size: 16px; text-decoration: none; border-radius: 24px; padding: 12px 24px; }
+  a.go:focus-visible { outline: 3px solid #9CC0EA; outline-offset: 2px; }
+  .opening { display: none; font-size: 15px; color: var(--mute); }
+  body.launch main > :not(.ic):not(.opening) { display: none; }
+  body.launch .opening { display: block; }
+</style>
+</head>
+<body>
+<main>
+  <img class="ic" src="apple-touch-icon.png" alt="">
+  <h1>Akanishta KBC Dashboard</h1>
+  <p>Keep the dashboard on your Home Screen with the centre's lotus as its icon.</p>
+  <ol>
+    <li>Open this page in Safari (iPhone) or Chrome (Android).</li>
+    <li>Tap <b>Share</b>, then <b>Add to Home Screen</b> (Android: the <b>⋮</b> menu, then <b>Add to Home screen</b>).</li>
+    <li>Open it from the new lotus icon; you can remove the old dashboard icon.</li>
+  </ol>
+  <a class="go" id="go" href="#">Open the dashboard</a>
+  <div class="opening">Opening the dashboard…</div>
+</main>
+<script>
+  // The dashboard's production address (the AKfycbw2 deployment). Opened from the Home Screen, this page goes straight there.
+  var APP_URL = 'https://script.google.com/a/macros/meditationincheltenham.org.uk/s/AKfycbw2EVkLDea3Pot2MYHyz9K9EHWsp1fgVqdjoZUQovseUdIM28dNpNeR8-i1K6sjnCut5Q/exec';
+  document.getElementById('go').href = APP_URL;
+  var standalone = window.navigator.standalone === true || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+  if (standalone) { document.body.classList.add('launch'); location.replace(APP_URL); }
+</script>
+</body>
+</html>
