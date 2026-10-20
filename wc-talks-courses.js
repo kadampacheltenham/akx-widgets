@@ -1,4 +1,7 @@
 /* Akanishta &mdash; TALKS & SHORT COURSES widget  [23 Aug 2026: swirl motif option E — opacity .28, 187.5% scale] [23 Aug: "Book your Spot" button; drop-in price moved to the left column; "Online discounts available"]
+   [15 Oct 2026 — v1.4] Venues come from the sheet's "Locations" tab (Location ID → display_name, address, access_note):
+   the class panel shows the venue name + access note, and "Get directions" maps that address. Draft rows are ignored.
+   If the tab can't be read, it falls back to the old behaviour (the centre's own address only). Was: two hard-coded addresses.
    [4 Sep 2026 — v1.3] Multi-option cards: the detail panel stays COLLAPSED until a class option is tapped; a quiet "Hide details ▴" under it collapses again (single-option cards stay always-visible — nothing to choose).
    [4 Sep 2026 — v1.2] "Choose a class →" is now a plain bold darker-orange (#F5761A) label, not a pill; the series special-offer chip sits UNDER the Book button.
    [24 Aug: "Get directions" now a dynamic map link per venue — replaces the /visit-us link, which was a 404]
@@ -42,21 +45,37 @@
   var TAB_ITEMS = 'Talks & series';
   var TAB_CLASSES = 'Class details';        // renamed 24 Aug 2026; old name kept as fallback
   var TAB_CLASSES_OLD = 'Class times';      // gviz silently serves the FIRST tab for a bad name, so we validate the header
+  var TAB_LOCATIONS = 'Locations';          // venues (v1.4): Location ID -> display_name, address, access_note
   /* Directions: Apple devices (iPhone, iPad, Mac) -> Apple Maps, everything else -> Google Maps.
-     Venue addresses live here for now; when the Weekly Classes sheet gains a Venues tab this
-     becomes a lookup by the venue name already in the "location" column. */
+     v1.4: venues come from the Locations tab. VENUE_Q is only the fallback for when that tab can't
+     be read, and holds just the centre itself — branch venues must come from the sheet, so an
+     out-of-date hard-coded address can never be used (the old Cirencester one had gone stale). */
   var VENUE_Q={
-    cheltenham:'59 Whaddon Road, Cheltenham GL52 5NE',
-    cirencester:'28 King Street, Cirencester, Gloucestershire GL7 1JT'
+    cheltenham:'59 Whaddon Road, Cheltenham GL52 5NE'
   };
+  var VENUES={};   // from the Locations tab: lower-case Location ID -> {name, address, access}
+  function loadVenues(rows){
+    VENUES={};
+    rows.forEach(function(o){
+      var id=String(o['Location ID']||o.location||'').trim().toLowerCase(); if(!id) return;
+      if(/draft/i.test(o.status||o.Status||'')) return;            // venue not confirmed yet
+      VENUES[id]={ name:String(o.display_name||'').trim(), address:String(o.address||'').trim(), access:String(o.access_note||'').trim() };
+    });
+  }
+  function venueOf(loc){ return VENUES[String(loc||'').trim().toLowerCase()]||null; }
+  function venueName(loc){ var v=venueOf(loc); return (v&&v.name)||String(loc||''); }
   var _ua=(typeof navigator!=='undefined'&&navigator.userAgent)||'';
   var IS_APPLE=/iphone|ipad|ipod|macintosh|mac os x/i.test(_ua);
   function mapsURL(q){ return IS_APPLE
     ? 'https://maps.apple.com/?q='+encodeURIComponent(q)
     : 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q); }
   function directionsURL(loc){
-    var q=VENUE_Q[String(loc||'').trim().toLowerCase()];
-    return q ? mapsURL(q) : '';   // unknown venue (e.g. Tewkesbury until its address is added): no link, never the wrong town
+    var v=venueOf(loc), q='';
+    if(v){ if(v.address){
+        // the address alone if it starts with a house number or already names the venue; otherwise "Venue, address"
+        q = (/^\d/.test(v.address) || !v.name || v.address.toLowerCase().indexOf(v.name.toLowerCase())>-1) ? v.address : v.name+', '+v.address; } }
+    else q=VENUE_Q[String(loc||'').trim().toLowerCase()]||'';
+    return q ? mapsURL(q) : '';   // unknown venue or no address yet: no link, never the wrong town
   }
   var IMG_BASE = 'https://kadampacheltenham.github.io/akx-widgets/images/'; // auto image by id: images/<id>.jpg
   var STYLE = String.raw`
@@ -131,6 +150,7 @@
   .d-main{padding:18px 22px;}
   .d-loc{font-size:.9rem;font-weight:700;display:inline-flex;align-items:center;gap:4px;margin-bottom:6px;color:#3f7e78;} .d-loc.ciren{color:#5B8C1A;} .d-loc svg{width:12px;height:12px;}
   .d-loc .dir{color:#8a857c;font-weight:500;text-decoration:underline;margin-left:6px;font-size:.82rem;}
+  .d-acc{font-size:.8rem;line-height:1.45;color:#8a857c;margin:-2px 0 6px 16px;}
   .d-tt{font-weight:700;font-size:1.1rem;} .d-tt .dur{font-weight:500;color:#8a857c;font-size:.92rem;}
   .d-meta{font-size:.95rem;color:var(--ink);margin-top:4px;} .d-meta a{color:var(--ink);font-weight:700;text-decoration:underline;text-decoration-color:rgba(0,0,0,.28);text-underline-offset:3px;}
   .d-dates{font-size:.95rem;color:var(--ink);margin-top:4px;}   /* same weight & colour as the 'with' line */
@@ -365,7 +385,8 @@
     var book = cl.booking_url ? '<a class="book" href="'+esc(cl.booking_url)+'" target="_blank" rel="noopener">Book your Spot &rarr;</a>' : '';
     return '<div class="pane'+(c?' ciren':'')+(on?' on':'')+'" data-i="'+i+'">'
       +'<div class="d-main">'
-        +'<div class="d-loc'+(c?' ciren':'')+'"><svg viewBox="0 0 24 24" fill="'+(c?'#7AA84A':'#4E938C')+'">'+PIN+'</svg>'+esc(cl.location||'')+(directionsURL(cl.location)?'<a class="dir" href="'+directionsURL(cl.location)+'" target="_blank" rel="noopener">Get directions</a>':'')+'</div>'
+        +'<div class="d-loc'+(c?' ciren':'')+'"><svg viewBox="0 0 24 24" fill="'+(c?'#7AA84A':'#4E938C')+'">'+PIN+'</svg>'+esc(venueName(cl.location))+(directionsURL(cl.location)?'<a class="dir" href="'+directionsURL(cl.location)+'" target="_blank" rel="noopener">Get directions</a>':'')+'</div>'
+        +(venueOf(cl.location)&&venueOf(cl.location).access?'<div class="d-acc">'+esc(venueOf(cl.location).access).replace(/\s*\|\s*/g,' &middot; ')+'</div>':'')
         +(cl.teacher?'<div class="d-meta">with <a href="/about-us#teachers">'+esc(cl.teacher)+'</a></div>':'')
         +'<div class="d-tt">'+esc(fullDay(cl.day))+' '+esc(cl.time)+(cl.duration?' <span class="dur">| '+esc(cl.duration)+'</span>':'')+'</div>'
         +(datesHtml?'<div class="d-dates">'+datesHtml+'</div>':'')
@@ -622,9 +643,13 @@
     Promise.all([
       fetch(csvUrl(TAB_ITEMS)).then(function(r){return r.text();}),
       fetch(csvUrl(TAB_CLASSES)).then(function(r){return r.text();})
-        .then(function(t){ return /"location( id)?"/i.test((t.split('\n')[0]||'')) ? t : fetch(csvUrl(TAB_CLASSES_OLD)).then(function(r){return r.text();}); })
+        .then(function(t){ return /"location( id)?"/i.test((t.split('\n')[0]||'')) ? t : fetch(csvUrl(TAB_CLASSES_OLD)).then(function(r){return r.text();}); }),
+      fetch(csvUrl(TAB_LOCATIONS)).then(function(r){return r.text();})
+        .then(function(t){ var h=(t.split('\n')[0]||''); return (/"location id"/i.test(h) && /"(display_name|address)"/i.test(h)) ? t : ''; })  // a bad tab name returns the FIRST tab: only trust a real Locations header
+        .catch(function(){ return ''; })
     ]).then(function(res){
       var items=toObjs(parseCSV(res[0])), classes=toObjs(parseCSV(res[1]));
+      loadVenues(res[2] ? toObjs(parseCSV(res[2])) : []);
       render(mount, items, classes);
     }).catch(function(e){ mount.innerHTML='<div class="pg-msg">Sorry &mdash; the programme couldn&rsquo;t load just now.</div>'; console.warn('programme load failed',e); });
   }
