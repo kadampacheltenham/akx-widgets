@@ -1,6 +1,11 @@
 /* ===========================================================================
    akx branch-pages.js — the whole branch page, from one stub
-   Akanishta Kadampa Buddhist Centre · v2.3 · 4 Sep 2026
+   Akanishta Kadampa Buddhist Centre · v2.4 · 21 Oct 2026
+   v2.4: the drop-in card describes the town's CURRENT/NEXT class — the row with the soonest
+   upcoming date, skipping Draft courses — not simply the first row in the sheet (Cirencester
+   showed a finished September course and "Next class Thu 9 Sep"). Dates with no year now take
+   the year nearest today (an old course no longer jumps to next year), and dates joined with
+   "&" or "and" are read. Reads the Talks & series tab for course status.
    v2.3: drop-in card banner strip now sage green #A3B18A (was coral #E2886A).
    v2.2: 2027 pop-up events banner (popup-events-signpost.js) added under the
    lotuses, on active and quiet pages alike.
@@ -228,13 +233,22 @@
   function parseDates(s) {
     var now = new Date(); now.setHours(0,0,0,0);
     var out = [];
-    String(s).split(/[,;]+/).forEach(function (bit) {
-      var m = bit.trim().match(/^(\d{1,2})[\/\-.](\d{1,2})(?:[\/\-.](\d{2,4}))?$/);
+    String(s).split(/[,;&]+|\s+and\s+/i).forEach(function (bit) {     // v2.4: "&" / "and" too
+      bit = bit.trim();
+      var g = bit.match(/^Date\((\d{4}),(\d{1,2}),(\d{1,2})/);       // a real date cell, as gviz sends it
+      if (g) { out.push(new Date(+g[1], +g[2], +g[3])); return; }
+      var m = bit.match(/^(\d{1,2})[\/\-.](\d{1,2})(?:[\/\-.](\d{2,4}))?$/);
       if (!m) return;
-      var d = +m[1], mo = +m[2] - 1, y = m[3] ? +m[3] : now.getFullYear();
-      if (y < 100) y += 2000;
-      var dt = new Date(y, mo, d);
-      if (!m[3] && dt < new Date(now.getTime() - 31*864e5)) dt.setFullYear(y + 1);
+      var d = +m[1], mo = +m[2] - 1, dt;
+      if (m[3]) { var y = +m[3]; if (y < 100) y += 2000; dt = new Date(y, mo, d); }
+      else {
+        /* no year: the year that puts the date nearest today — a course that ended last month
+           stays in the past, a January date typed in the autumn lands next year. (v2.3 moved
+           anything over 31 days old to next year, so an old September course became "next".) */
+        var y0 = now.getFullYear();
+        dt = [y0 - 1, y0, y0 + 1].map(function (y) { return new Date(y, mo, d); })
+               .sort(function (a, b) { return Math.abs(a - now) - Math.abs(b - now); })[0];
+      }
       out.push(dt);
     });
     return out.sort(function (a,b) { return a - b; });
@@ -245,6 +259,32 @@
     return null;
   }
   function fmt(d) { return DOW[d.getDay()] + ' ' + d.getDate() + ' ' + MON[d.getMonth()]; }
+
+  /* v2.4 — courses that are published: Talks & series status not Draft, show_from passed.
+     null = the tab couldn't be read, so nothing is filtered (the old behaviour). */
+  function liveEventIds(items) {
+    if (!items || !items.some(function (o) { return 'status' in o; })) return null;
+    var today = new Date(); today.setHours(0,0,0,0);
+    var ids = {};
+    items.forEach(function (it) {
+      var id = (val(it,'Event ID') || val(it,'id')).toLowerCase(); if (!id) return;
+      var st = val(it,'status'); if (st && !/live/i.test(st)) return;
+      var sf = parseDates(val(it,'show_from'))[0]; if (sf && sf > today) return;
+      ids[id] = 1;
+    });
+    return ids;
+  }
+  /* v2.4 — the row the card describes: the soonest upcoming class; if nothing is upcoming,
+     the most recent one (then no Next class chip). Was: the first row in the sheet. */
+  function pickSlot(rows) {
+    var best = null, bestNext = null, latest = null, latestLast = null;
+    rows.forEach(function (r) {
+      var ds = parseDates(val(r,'dates')), n = nextDate(ds), last = ds[ds.length - 1];
+      if (n && (!bestNext || n < bestNext)) { best = r; bestNext = n; }
+      if (last && (!latestLast || last > latestLast)) { latest = r; latestLast = last; }
+    });
+    return best || latest || rows[0];
+  }
   function mapsHref(a) { return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(a); }
   function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
@@ -269,6 +309,11 @@
       return val(r,'Location ID').toLowerCase() === town; })[0];
     var slots = data.classes.filter(function (r) {
       return val(r,'Location ID').toLowerCase() === town; });
+    var liveIds = liveEventIds(data.items);                       // v2.4: skip Draft courses
+    if (liveIds) {
+      var published = slots.filter(function (r) { return liveIds[(val(r,'Event ID') || val(r,'id')).toLowerCase()]; });
+      if (published.length) slots = published;
+    }
 
     /* The Locations status column decides whether a town's activity is published.
        Anything other than Live = the page goes quiet: waiting card, no classes, no
@@ -291,7 +336,7 @@
                 '<p class="akxb-after">' + SOON_2 + '<span class="arw">&#8595;</span></p>' +
               '</div>';
     } else {
-      var s = slots[0];
+      var s = pickSlot(slots);
       var teacher = val(s,'teacher'), day = val(s,'day'), time = val(s,'time'),
           duration = val(s,'duration'), ds = parseDates(val(s,'dates')), nxt = nextDate(ds);
       var when = esc(day) + (day && time ? ', ' : '') + esc(time) +
@@ -471,9 +516,10 @@
     if (!mounts.length) return;
     injectCSS();
 
-    Promise.all([gviz('Locations'), gviz('Class details')])
+    Promise.all([gviz('Locations'), gviz('Class details'),
+                 gviz('Talks & series').catch(function () { return []; })])   // v2.4: course status
       .then(function (res) {
-        var data = { locations: res[0], classes: res[1] };
+        var data = { locations: res[0], classes: res[1], items: res[2] };
         mounts.forEach(function (m) {
           try { build(m, data); }
           catch (e) { if (window.console) console.warn('[akx-branch] build failed', e); }
