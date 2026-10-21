@@ -1,4 +1,4 @@
-/* Akanishta — Weekend Courses & Retreats widget. v2.4 (23 Aug 2026: "Book your Spot" button). v2.3 (swirl motif option E). v2.2 (20 Aug 2026): sheet colour overrides — "Title colour" (titles/accent; old "Colour" still accepted; names or hex) + "Background colour" (generated tile background). v2.1: no photo -> generated type graphic (event-graphics.js).
+/* Akanishta — Weekend Courses & Retreats widget. v2.5 (21 Oct 2026): "Weekend Retreat" Event Type — teal, shown as the large stand-out card like Special Events (border tinted teal; Special Events keep gold), early bird drops off 14 days before — plus an optional "End date" column for events over more than one day (date tile 9–10 / JAN / SAT–SUN, line "Sat 9 – Sun 10 Jan", listed until the End date has passed; sorted by the start Date). v2.4 (23 Aug 2026: "Book your Spot" button). v2.3 (swirl motif option E). v2.2 (20 Aug 2026): sheet colour overrides — "Title colour" (titles/accent; old "Colour" still accepted; names or hex) + "Background colour" (generated tile background). v2.1: no photo -> generated type graphic (event-graphics.js).
    Reads a public Google Sheet (tabs "Events", "Timetables", "Teachers")
    and renders poster tiles.
    Include with:  <div id="akx-events"></div>
@@ -22,6 +22,7 @@
     'silent day':     {tag:'Silent day',     colour:'#6A4A9C'},
     'free half-day':  {tag:'Free half-day',  colour:'#4FA35A', free:true},
     'away day':       {tag:'Away day',       colour:'#2E9BB5'},
+    'weekend retreat':{tag:'Weekend retreat', colour:'#227A72', feature:true},
     'other':          {tag:'',               colour:'#C56B45'}
   };
   var DEFAULT_COLOUR = '#2A66A6';
@@ -46,6 +47,9 @@
   #akx-events .img .gfx .gt{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:22px;line-height:1.16;letter-spacing:-.01em;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
   #akx-events .img .gfx .gm{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px;margin-top:8px;opacity:.85;}
   #akx-events .img .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#ffffff66;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;}
+  #akx-events .img.has-chip.has-range .gfx .gtxt{left:112px;}
+  /* large card (desktop): the photo panel is only 300px wide, so the generated text sits under the date tile, full width */
+  @media(min-width:761px){ #akx-events .card.feature .img .gfx .gtxt{left:20px;right:20px;top:122px;} }
   #akx-events .datechip{position:absolute;top:14px;left:14px;background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:13px;padding:7px 12px;text-align:center;line-height:1;box-shadow:0 4px 14px rgba(0,0,0,.28);z-index:3;}
   #akx-events .datechip .d{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:1.32rem;}
   #akx-events .datechip .m{font-size:.64rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--mut);margin-top:3px;}
@@ -87,7 +91,7 @@
   #akx-events .dropin{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:.86rem;padding:0 17px;min-height:42px;border-radius:999px;border:1.6px dashed var(--accent);color:var(--accent);white-space:nowrap;}
   #akx-events .dropin .dot{width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.7;}
   /* featured (Special Event): full-width, image left */
-  #akx-events .card.feature{grid-column:1 / -1;display:grid;grid-template-columns:300px 1fr;gap:0;border:1.5px solid #E7CE9A;box-shadow:0 14px 40px rgba(120,90,20,.14);}
+  #akx-events .card.feature{grid-column:1 / -1;display:grid;grid-template-columns:300px 1fr;gap:0;border:1.5px solid var(--fb,#E7CE9A);box-shadow:0 14px 40px var(--fs,rgba(120,90,20,.14));}
   #akx-events .card.feature .img{height:auto;min-height:280px;}
   #akx-events .card.feature .ctitle{font-size:1.72rem;}
   /* mobile fold */
@@ -105,6 +109,7 @@
     #akx-events .card.open .fold{display:block;}
     #akx-events .card.open .img{height:190px;}
   }
+  @media(max-width:640px){ #akx-events .img.has-chip.has-range .gfx .gtxt{left:106px;} }
   `;
 
   // ---------- CSV ----------
@@ -138,6 +143,13 @@
     var m=s.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})/); if(m){var y=+m[3];if(y<100)y+=2000;return new Date(y,+m[2]-1,+m[1]);}
     var iso=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/); if(iso) return new Date(+iso[1],+iso[2]-1,+iso[3]);
     var t=Date.parse(s); return isNaN(t)?null:new Date(t); }
+  // End date (optional): only counts when it is after the Date
+  function endDateOf(ev, d){ var e=parseDate(ev['End date']||ev['End Date']||''); return (d && e && e>d) ? e : null; }
+  function sameMonth(a,b){ return a.getMonth()===b.getMonth() && a.getFullYear()===b.getFullYear(); }
+  // tile: 9–10 / Jan / Sat–Sun   (across months: 31–1 / Jan–Feb / Sat–Sun)
+  function rangeChip(d,e){ return '<div class="datechip range"><div class="d">'+d.getDate()+'\u2013'+e.getDate()+'</div><div class="m">'+MON[d.getMonth()]+(sameMonth(d,e)?'':'\u2013'+MON[e.getMonth()])+'</div><div class="w">'+WD[d.getDay()]+'\u2013'+WD[e.getDay()]+'</div></div>'; }
+  // line: Sat 9 – Sun 10 Jan   (across months: Sat 31 Jan – Sun 1 Feb)
+  function rangeLine(d,e){ return WD[d.getDay()]+' '+d.getDate()+(sameMonth(d,e)?'':' '+MON[d.getMonth()])+' \u2013 '+WD[e.getDay()]+' '+e.getDate()+' '+MON[e.getMonth()]; }
   function shade(hex,p){ hex=hex.replace('#',''); if(hex.length===3)hex=hex.replace(/./g,'$&$&');
     var r=parseInt(hex.slice(0,2),16),g=parseInt(hex.slice(2,4),16),b=parseInt(hex.slice(4,6),16);
     var t=p<0?0:255,a=Math.abs(p);
@@ -203,7 +215,8 @@
     var isFree = low(ev['Free'])==='yes' || !!type.free;
     var tag = ev['Event tag'] || type.tag || '';
     var d = parseDate(ev['Date']);
-    var chip = d ? '<div class="datechip"><div class="d">'+d.getDate()+'</div><div class="m">'+MON[d.getMonth()]+'</div><div class="w">'+WD[d.getDay()]+'</div></div>' : '';
+    var de = endDateOf(ev, d);
+    var chip = (d && de) ? rangeChip(d, de) : d ? '<div class="datechip"><div class="d">'+d.getDate()+'</div><div class="m">'+MON[d.getMonth()]+'</div><div class="w">'+WD[d.getDay()]+'</div></div>' : '';
 
     // teacher
     var te = teMap[low(ev['Teacher ID'])];
@@ -224,8 +237,8 @@
 
     // event image loaded as the panel BACKGROUND (so overlays always sit on top)
     var imgbase = ev['Event ID'] ? IMG+encodeURIComponent(ev['Event ID'].trim()) : '';
-    var gfxDate = d ? WD[d.getDay()]+' '+d.getDate()+' '+MON[d.getMonth()] + (ev['Time']?' \u00b7 '+String(ev['Time']).trim():'') : (ev['Time']||'');
-    var img = '<div class="img'+(chip?' has-chip':'')+'"'+(imgbase?' data-imgbase="'+imgbase+'"':'')+' data-gtype="'+esc(ev['Event Type']||'')+'"'+(gbg?' data-gbg="'+gbg+'"':'')+' data-gtitle="'+esc(ev['Title']||'')+'" data-gdate="'+esc(gfxDate)+'"><span class="ph">event photo</span>'+chip
+    var gfxDate = d ? (de ? rangeLine(d, de) : WD[d.getDay()]+' '+d.getDate()+' '+MON[d.getMonth()]) + (ev['Time']?' \u00b7 '+String(ev['Time']).trim():'') : (ev['Time']||'');
+    var img = '<div class="img'+(chip?' has-chip':'')+(de?' has-range':'')+'"'+(imgbase?' data-imgbase="'+imgbase+'"':'')+' data-gtype="'+esc(ev['Event Type']||'')+'"'+(gbg?' data-gbg="'+gbg+'"':'')+' data-gtitle="'+esc(ev['Title']||'')+'" data-gdate="'+esc(gfxDate)+'"><span class="ph">event photo</span>'+chip
       + (tag? '<div class="type"><i></i>'+esc(tag)+'</div>':'')
       + av + '</div>';
 
@@ -259,6 +272,7 @@
       + '</div>';
 
     var vars='--accent:'+accent+';--a2:'+shade(accent,0.30)+';';
+    if(isFeature && low(ev['Event Type'])!=='special event'){ vars+='--fb:'+shade(accent,0.62)+';--fs:rgba(38,48,58,.12);'; }
     return '<article class="card'+(isFeature?' feature':'')+'" style="'+vars+'">'+img+body+'</article>';
   }
 
@@ -267,7 +281,7 @@
     if(!ev['Title']) return false;
     if(low(ev['Status'])==='draft') return false;
     var sf=parseDate(ev['Show from']); if(sf){sf.setHours(0,0,0,0); if(today<sf) return false;}
-    var d=parseDate(ev['Date']); if(d){d.setHours(0,0,0,0); if(today>d) return false;}
+    var d=parseDate(ev['Date']); var last=endDateOf(ev,d)||d; if(last){last.setHours(0,0,0,0); if(today>last) return false;}
     return true;
   }
   function render(mount, events, ttMap, teMap){
