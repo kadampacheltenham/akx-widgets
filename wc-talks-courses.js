@@ -1,4 +1,9 @@
 /* Akanishta &mdash; TALKS & SHORT COURSES widget  [23 Aug 2026: swirl motif option E — opacity .28, 187.5% scale] [23 Aug: "Book your Spot" button; drop-in price moved to the left column; "Online discounts available"]
+   [21 Oct 2026 — v1.6] (1) A date with no year takes the year nearest today: January dates typed in the autumn mean next
+   January, and a course that ended last month stays in the past. (The New Year course read as January THIS year, so branch
+   pages sorted it first and called it "Current classes".) A typed year (dd/mm/yyyy) always wins; the old 120-day roll-forward
+   is gone (it could bring a long-finished course back). (2) A course with its own image shows it clean — no type/title/date
+   printed over it; the title sits in the card text instead, as it already did on phones.
    [21 Oct 2026 — v1.5] (1) Every branch venue (a Locations row with a "Branch website") gets the Cirencester treatment:
    its own town pill + green styling — Tewkesbury showed as "Thu 18:30". (2) The class panel says WHERE: "Friends Meeting
    House, Cirencester", "Tewkesbury Academy", "Pittville Pump Room, Cheltenham" (from display_name + the address). (3) Dates
@@ -131,6 +136,9 @@
   .gfx .gtitle{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:1.14rem;line-height:1.1;margin-top:auto;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
   .gfx .gdate{font-family:'SFMono-Regular',Consolas,'Roboto Mono',Menlo,monospace;font-weight:500;font-size:.58rem;letter-spacing:.02em;opacity:.85;margin-top:7px;}
   @media(min-width:641px){ #akx-programme .cc-head .ctitle{display:none;} }  /* desktop: the poster carries the title */
+  /* v1.6: a course's own image is shown clean — no poster text over it; the title shows in the card text instead */
+  #akx-programme .cc.has-photo .gfx .gtxt{display:none;}
+  @media(min-width:641px){ #akx-programme .cc.has-photo .cc-head .ctitle{display:block;} }
   .ctitle{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:1.62rem;line-height:1.12;color:var(--ink);margin:0 0 12px;}
   .tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:13px;}
   .tag{font-size:.69rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:4px 11px;border-radius:999px;}
@@ -290,12 +298,19 @@
     var iso=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/); if(iso) return new Date(+iso[1],+iso[2]-1,+iso[3]);
     var uk=s.match(/^(\d{1,2})[\/.](\d{1,2})[\/.](\d{2,4})/); if(uk){var y=+uk[3]; if(y<100)y+=2000; return new Date(y,+uk[2]-1,+uk[1]);}
     var t=Date.parse(s); return isNaN(t)?null:new Date(t); }
-  function parseDDMM(s,year){ var m=(s||'').match(/(\d{1,2})\s*[\/.\-]\s*(\d{1,2})/); return m?new Date(year,(+m[2])-1,+m[1]):null; }
+  function nearestYear(dd,mm){   // v1.6: no year given -> the year that puts the date nearest today
+    var t=new Date(); t.setHours(0,0,0,0); var y=t.getFullYear(), best=null;
+    [y-1,y,y+1].forEach(function(yy){ var c=new Date(yy,mm-1,dd); if(!best || Math.abs(c-t)<Math.abs(best-t)) best=c; });
+    return best;
+  }
+  function parseDDMM(s,year){ var m=(s||'').match(/(\d{1,2})\s*[\/.\-]\s*(\d{1,2})(?:\s*[\/.\-]\s*(\d{2,4}))?/); if(!m) return null;
+    if(m[3]){ var y=+m[3]; if(y<100) y+=2000; return new Date(y,(+m[2])-1,+m[1]); }   // a typed year always wins (v1.6)
+    return year==null ? nearestYear(+m[1],+m[2]) : new Date(year,(+m[2])-1,+m[1]); }
   function formatDate(raw){
     var m=(raw||'').match(/(\d{1,2})[\/.\-](\d{1,2})(?:[\/.\-](\d{2,4}))?/); if(!m) return raw;
     var dd=('0'+(+m[1])).slice(-2), mm=('0'+(+m[2])).slice(-2), yy;
     if(m[3]){ yy=+m[3]; if(yy<100) yy+=2000; }
-    else { var t0=new Date(); t0.setHours(0,0,0,0); yy=t0.getFullYear(); var test=new Date(yy,+m[2]-1,+m[1]); test.setHours(0,0,0,0); if(test<t0) yy+=1; }
+    else { yy=nearestYear(+m[1],+m[2]).getFullYear(); }   // v1.6: same rule as the card dates
     return dd+'/'+mm+'/'+yy;
   }
   function shortDMY(raw){ var f=formatDate(raw); var m=f.match(/(\d{2})\/(\d{2})/); return m?m[1]+'/'+m[2]:f; }  // dd/mm
@@ -303,18 +318,16 @@
   function allClassDates(classes, showFrom){
     var raw=[]; classes.forEach(function(cl){ splitDates(cl.dates).forEach(function(d){raw.push(d);}); });
     if(!raw.length) return [];
-    var now=new Date(), anchor = showFrom ? showFrom.getFullYear() : now.getFullYear();
-    var dates=raw.map(function(d){ var dt=parseDDMM(d,anchor);
-      if(dt && showFrom && dt.getMonth() < showFrom.getMonth()) dt.setFullYear(anchor+1);
+    var anchor = showFrom ? showFrom.getFullYear() : null;     // v1.6: no show_from -> nearest year per date
+    var dates=raw.map(function(d){ var dt=parseDDMM(d,anchor), typed=/\d{1,2}\s*[\/.\-]\s*\d{1,2}\s*[\/.\-]\s*\d{2,4}/.test(d);
+      if(dt && showFrom && !typed && dt.getMonth() < showFrom.getMonth()) dt.setFullYear(anchor+1);
       if(dt) dt.setHours(0,0,0,0); return dt; }).filter(Boolean).sort(function(a,b){return a-b;});
     return dates;
   }
   function lastClassDate(classes, showFrom){
     var dates=allClassDates(classes, showFrom);
     if(!dates.length) return null;
-    var now=new Date(), max=dates[dates.length-1];
-    if(!showFrom && (now-max)/86400000 > 120){ max=new Date(max); max.setFullYear(max.getFullYear()+1); }
-    return max;
+    return dates[dates.length-1];   // v1.6: the year is already right, so no roll-forward guesswork
   }
   function isVisible(it, classes, today){
     if(!it.title) return false;
@@ -448,9 +461,9 @@
       +(pDate?'<span class="gdate">'+pDate+'</span>':'')+'</div>';
     var gfx;
     if(item.graphic){                         // explicit URL wins; photo covers the tile, poster text sits over it
-      gfx = '<div class="gfx">'+motif+'<img class="byid" src="'+esc(item.graphic)+'" alt="" onerror="this.remove()">'+poster+'</div>';
+      gfx = '<div class="gfx">'+motif+'<img class="byid" src="'+esc(item.graphic)+'" alt="" onload="var c=this.closest(\'.cc\');if(c)c.classList.add(\'has-photo\')" onerror="this.remove()">'+poster+'</div>';
     } else if(item.id){                        // else try images/<id>.jpg, then .png; if none, the coded poster shows
-      gfx = '<div class="gfx">'+motif+'<img class="byid" crossorigin="anonymous" src="'+IMG_BASE+encodeURIComponent(item.id)+'.jpg" alt="" onerror="if(this.dataset.tried){this.remove()}else{this.dataset.tried=1;this.src=this.src.replace(/\\.jpg$/,\'.png\')}">'+poster+'</div>';
+      gfx = '<div class="gfx">'+motif+'<img class="byid" crossorigin="anonymous" src="'+IMG_BASE+encodeURIComponent(item.id)+'.jpg" alt="" onload="var c=this.closest(\'.cc\');if(c)c.classList.add(\'has-photo\')" onerror="if(this.dataset.tried){this.remove()}else{this.dataset.tried=1;this.src=this.src.replace(/\\.jpg$/,\'.png\')}">'+poster+'</div>';
     } else {
       gfx = '<div class="gfx">'+motif+poster+'</div>';
     }
