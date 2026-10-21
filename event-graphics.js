@@ -1,4 +1,4 @@
-/* Akanishta KBC — shared EVENT-GRAPHIC module v1.2 (23 Aug 2026: swirl motif option E — opacity .28, stroke 2.2, 125% scale) (bg/ink overrides; motifs use currentColor) (single source of truth for the
+/* Akanishta KBC — shared EVENT-GRAPHIC module v1.3 (21 Oct 2026: "Weekend Retreat" type uses the teal retreat graphic) v1.2 (23 Aug 2026: swirl motif option E — opacity .28, stroke 2.2, 125% scale) (bg/ink overrides; motifs use currentColor) (single source of truth for the
  * type -> colour + motif taxonomy used on BOTH Weekly Classes and Courses & Retreats).
  *
  * Load once per page (site-wide footer is fine), then either:
@@ -32,6 +32,7 @@
     "course":"course", "short course":"course", "day course":"course",
     "half-day course":"course", "half day course":"course",
     "retreat":"retreat", "day retreat":"retreat", "half-day retreat":"retreat",
+    "weekend retreat":"retreat", "weekend retreats":"retreat",
     "half day retreat":"retreat", "meditation":"retreat", "drop-in":"retreat",
     "drop in":"retreat", "class":"retreat", "evening class":"retreat",
     "free":"free", "free event":"free", "free events":"free",
