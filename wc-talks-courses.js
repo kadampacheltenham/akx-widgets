@@ -1,4 +1,8 @@
 /* Akanishta &mdash; TALKS & SHORT COURSES widget  [23 Aug 2026: swirl motif option E — opacity .28, 187.5% scale] [23 Aug: "Book your Spot" button; drop-in price moved to the left column; "Online discounts available"]
+   [21 Oct 2026 — v1.5] (1) Every branch venue (a Locations row with a "Branch website") gets the Cirencester treatment:
+   its own town pill + green styling — Tewkesbury showed as "Thu 18:30". (2) The class panel says WHERE: "Friends Meeting
+   House, Cirencester", "Tewkesbury Academy", "Pittville Pump Room, Cheltenham" (from display_name + the address). (3) Dates
+   joined with "&" or "and" are read ("22/10 & 29/10") — they were dropped, so class counts were short and cards expired early.
    [15 Oct 2026 — v1.4] Venues come from the sheet's "Locations" tab (Location ID → display_name, address, access_note):
    the class panel shows the venue name + access note, and "Get directions" maps that address. Draft rows are ignored.
    If the tab can't be read, it falls back to the old behaviour (the centre's own address only). Was: two hard-coded addresses.
@@ -59,11 +63,28 @@
     rows.forEach(function(o){
       var id=String(o['Location ID']||o.location||'').trim().toLowerCase(); if(!id) return;
       if(/draft/i.test(o.status||o.Status||'')) return;            // venue not confirmed yet
-      VENUES[id]={ name:String(o.display_name||'').trim(), address:String(o.address||'').trim(), access:String(o.access_note||'').trim() };
+      VENUES[id]={ name:String(o.display_name||'').trim(), address:String(o.address||'').trim(), access:String(o.access_note||'').trim(),
+                   branch:String(o['Branch website']||'').trim() };
     });
   }
   function venueOf(loc){ return VENUES[String(loc||'').trim().toLowerCase()]||null; }
   function venueName(loc){ var v=venueOf(loc); return (v&&v.name)||String(loc||''); }
+  /* v1.5 — what the class panel says for "where" (Gen, 21 Oct: say where it is, not just the town).
+     A town-only display_name is led by the venue named at the start of the address
+     ("Friends Meeting House, Cirencester"; "Tewkesbury Academy" already names its town); a venue
+     display_name gains its town when the address starts with one ("Pittville Pump Room, Cheltenham"). */
+  function venueLabel(loc){
+    var v=venueOf(loc), id=String(loc||'').trim(); if(!v) return id;
+    var low=function(x){return String(x).toLowerCase();}, name=v.name||id, first=(v.address.split(',')[0]||'').trim();
+    var placeName = !!first && !/\d/.test(first);          // a name — not "59 Whaddon Road" or a postcode
+    if(low(name)===low(id)){                                 // display_name is just the town
+      if(placeName && low(first)!==low(id)) return low(first).indexOf(low(id))>-1 ? first : first+', '+name;
+      return name;
+    }
+    if(placeName && name.indexOf(',')===-1 && low(name).indexOf(low(first))===-1 && first.split(/\s+/).length<=2) return name+', '+first;
+    return name;
+  }
+  function isBranch(loc){ var v=venueOf(loc); return v ? !!v.branch : /ciren/i.test(loc||''); }   // tab unreadable: old rule
   var _ua=(typeof navigator!=='undefined'&&navigator.userAgent)||'';
   var IS_APPLE=/iphone|ipad|ipod|macintosh|mac os x/i.test(_ua);
   function mapsURL(q){ return IS_APPLE
@@ -151,6 +172,7 @@
   .d-loc{font-size:.9rem;font-weight:700;display:inline-flex;align-items:center;gap:4px;margin-bottom:6px;color:#3f7e78;} .d-loc.ciren{color:#5B8C1A;} .d-loc svg{width:12px;height:12px;}
   .d-loc .dir{color:#8a857c;font-weight:500;text-decoration:underline;margin-left:6px;font-size:.82rem;}
   .d-acc{font-size:.8rem;line-height:1.45;color:#8a857c;margin:-2px 0 6px 16px;}
+  .d-loc{flex-wrap:wrap;row-gap:2px;} .d-loc .dir{white-space:nowrap;}   /* v1.5: longer venue names — the link drops to its own line on phones instead of squeezing */
   .d-tt{font-weight:700;font-size:1.1rem;} .d-tt .dur{font-weight:500;color:#8a857c;font-size:.92rem;}
   .d-meta{font-size:.95rem;color:var(--ink);margin-top:4px;} .d-meta a{color:var(--ink);font-weight:700;text-decoration:underline;text-decoration-color:rgba(0,0,0,.28);text-underline-offset:3px;}
   .d-dates{font-size:.95rem;color:var(--ink);margin-top:4px;}   /* same weight & colour as the 'with' line */
@@ -233,6 +255,7 @@
       .filter(function(o){return Object.keys(o).some(function(k){return o[k];});}); }
   function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
   function splitList(s){return (s||'').split(/[;,]|\r?\n/).map(function(x){return x.trim();}).filter(Boolean);}
+  function splitDates(s){return (s||'').split(/[;,&]|\r?\n|\s+and\s+/i).map(function(x){return x.trim();}).filter(Boolean);}  // v1.5: dates only — tags keep their "&"
   function splitLines(s){return (s||'').split(/[;\n]|\r\n/).map(function(x){return x.trim();}).filter(Boolean);}  /* bullets: split on line-breaks/semicolons only &mdash; keep commas inside a bullet */
   function tagClass(t){t=t.toLowerCase();
     if(/mini|series/.test(t))return'purple'; if(/beginn|start|open|free|welcome/.test(t))return'green';
@@ -261,7 +284,7 @@
   var DAYS={mon:'Monday',tue:'Tuesday',wed:'Wednesday',thu:'Thursday',fri:'Friday',sat:'Saturday',sun:'Sunday'};
   function fullDay(d){var k=(d||'').slice(0,3).toLowerCase();return DAYS[k]||d;}
   function shortDay(d){var s=(d||'').slice(0,3);return s?s.charAt(0).toUpperCase()+s.slice(1).toLowerCase():d;}
-  function isCiren(loc){return /ciren/i.test(loc||'');}
+  function isCiren(loc){return isBranch(loc);}   // historical name: the green "ciren" styling now means any branch venue (v1.5)
   // ---- scheduling: show_from (planning) + auto-expire after the last class date ----
   function parseFullDate(s){ if(!s) return null;
     var iso=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/); if(iso) return new Date(+iso[1],+iso[2]-1,+iso[3]);
@@ -278,7 +301,7 @@
   function shortDMY(raw){ var f=formatDate(raw); var m=f.match(/(\d{2})\/(\d{2})/); return m?m[1]+'/'+m[2]:f; }  // dd/mm
   function ddmm(d){ return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2); }
   function allClassDates(classes, showFrom){
-    var raw=[]; classes.forEach(function(cl){ splitList(cl.dates).forEach(function(d){raw.push(d);}); });
+    var raw=[]; classes.forEach(function(cl){ splitDates(cl.dates).forEach(function(d){raw.push(d);}); });
     if(!raw.length) return [];
     var now=new Date(), anchor = showFrom ? showFrom.getFullYear() : now.getFullYear();
     var dates=raw.map(function(d){ var dt=parseDDMM(d,anchor);
@@ -357,7 +380,7 @@
   function summaryDates(isTalk, classes, showFrom){
     if(isTalk){
       var lines = classes.map(function(cl){
-        var d0=splitList(cl.dates)[0];
+        var d0=splitDates(cl.dates)[0];
         var lbl = (shortDay(cl.day)+(d0?' '+shortDMY(d0):'')).trim();
         return lbl ? '<span class="cc-sum-line">'+esc(lbl)+'</span>' : '';
       }).filter(Boolean);
@@ -372,20 +395,20 @@
     if(cl.audience) lab = cl.audience;
     else if(isCiren(cl.location) && !isTalk) lab = cl.location;
     else if(isTalk){                                   // talks: Day | Date | Time
-      var d0 = splitList(cl.dates)[0];
+      var d0 = splitDates(cl.dates)[0];
       lab = shortDay(cl.day) + (d0 ? ' | '+shortDMY(d0) : '') + (cl.time ? ' | '+cl.time : '');
     } else lab = cl.day+' '+cl.time;
     return '<button class="tab-btn'+(isCiren(cl.location)?' ciren':'')+(on?' on':'')+'" data-i="'+i+'"><span class="pin"></span>'+esc(lab)+'</button>';
   }
   function pane(cl,i,on){
-    var c=isCiren(cl.location), dates=splitList(cl.dates), n=dates.length;
+    var c=isCiren(cl.location), dates=splitDates(cl.dates), n=dates.length;
     var datesHtml = n>1 ? esc(n+' classes')+' &middot; '+esc(dates.join(', ')) : (n===1 ? '<span class="d-lbl">Date:</span> '+esc(formatDate(dates[0])) : '');
     var pp = cl.price_class ? '<div class="d-drop"><span class="d-lbl">Drop-in price</span> \u00b7 '+esc(cl.price_class)+'</div>' : '';
     var offer = (cl.price_series && n>1) ? '<span class="d-offer">Special offer '+n+' classes only '+esc(cl.price_series)+'</span>' : '';
     var book = cl.booking_url ? '<a class="book" href="'+esc(cl.booking_url)+'" target="_blank" rel="noopener">Book your Spot &rarr;</a>' : '';
     return '<div class="pane'+(c?' ciren':'')+(on?' on':'')+'" data-i="'+i+'">'
       +'<div class="d-main">'
-        +'<div class="d-loc'+(c?' ciren':'')+'"><svg viewBox="0 0 24 24" fill="'+(c?'#7AA84A':'#4E938C')+'">'+PIN+'</svg>'+esc(venueName(cl.location))+(directionsURL(cl.location)?'<a class="dir" href="'+directionsURL(cl.location)+'" target="_blank" rel="noopener">Get directions</a>':'')+'</div>'
+        +'<div class="d-loc'+(c?' ciren':'')+'"><svg viewBox="0 0 24 24" fill="'+(c?'#7AA84A':'#4E938C')+'">'+PIN+'</svg>'+esc(venueLabel(cl.location))+(directionsURL(cl.location)?'<a class="dir" href="'+directionsURL(cl.location)+'" target="_blank" rel="noopener">Get directions</a>':'')+'</div>'
         +(venueOf(cl.location)&&venueOf(cl.location).access?'<div class="d-acc">'+esc(venueOf(cl.location).access).replace(/\s*\|\s*/g,' &middot; ')+'</div>':'')
         +(cl.teacher?'<div class="d-meta">with <a href="/about-us#teachers">'+esc(cl.teacher)+'</a></div>':'')
         +'<div class="d-tt">'+esc(fullDay(cl.day))+' '+esc(cl.time)+(cl.duration?' <span class="dur">| '+esc(cl.duration)+'</span>':'')+'</div>'
@@ -412,12 +435,12 @@
     var isTalk = (type==='talk');
     var showFrom = parseFullDate(item.show_from);
     var motif = gfxMotif(item.type);          // faint white type-motif behind the box
-    var totalDates = classes.reduce(function(n,cl){return n+splitList(cl.dates).length;},0);
-    var weeks = classes.reduce(function(m,cl){var k=splitList(cl.dates).length;return k>m?k:m;},0);   // course length = longest single class run, not all sittings added up
+    var totalDates = classes.reduce(function(n,cl){return n+splitDates(cl.dates).length;},0);
+    var weeks = classes.reduce(function(m,cl){var k=splitDates(cl.dates).length;return k>m?k:m;},0);   // course length = longest single class run, not all sittings added up
     var typeLabel = isTalk ? ((classes.length>1||totalDates>1) ? 'Public Talks' : 'Public Talk') : theme.label;
     // mini-poster (Fable recipe): type label + title + one date line, from the first class
     var pDate='';
-    if(classes[0]){ var _d0=splitList(classes[0].dates)[0];
+    if(classes[0]){ var _d0=splitDates(classes[0].dates)[0];
       pDate=(shortDay(classes[0].day)+' '+(classes[0].time||'')).trim().toUpperCase()
            +(_d0?' &middot; '+(isTalk?'':'FROM ')+shortDMY(_d0):''); }
     var poster='<div class="gtxt"><span class="glabel">'+esc(typeLabel)+'</span>'
