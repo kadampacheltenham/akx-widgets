@@ -1,4 +1,4 @@
-/* Akanishta — FEATURED "Coming up" block (v1.1, 18 Aug 2026 — Book → goes straight to the booking form; rest of card opens the page)
+/* Akanishta — FEATURED "Coming up" block (v1.2, 21 Oct 2026 — weekend events: "Weekend Retreat" type (teal) and the optional "End date" column: date range on the tile (9–10 Jan) and in the date line (Sat 9 – Sun 10 Jan), shown until the End date. Fix: the date tile now sits above the generated graphic, whose small type label is hidden when there is a tile (it printed over the date). v1.1, 18 Aug 2026 — Book → goes straight to the booking form; rest of card opens the page)
    Shows the next Featured weekly class (talk / short course) and the next Featured weekend event
    as two "ticket" cards, side by side (stacked on phones).
    Reads: Weekly Classes sheet (tabs "Talks & series" + "Class details" — falls back to old name "Class times", column Featured = yes)
@@ -43,7 +43,8 @@
   .akx-feat .cta .go{color:var(--c);white-space:nowrap;text-decoration:none;position:relative;z-index:2;}
   .akx-feat .cta .go.book{background:var(--c);color:#fff;border-radius:999px;padding:8px 14px;}
   .akx-feat .cover{position:absolute;inset:0;z-index:1;}
-  .akx-feat .chip{position:absolute;top:10px;left:10px;background:#fff;border-radius:11px;padding:6px 9px;text-align:center;line-height:1;box-shadow:0 4px 12px rgba(0,0,0,.25);}
+  .akx-feat .chip{position:absolute;top:10px;left:10px;z-index:3;background:#fff;border-radius:11px;padding:6px 9px;text-align:center;line-height:1;box-shadow:0 4px 12px rgba(0,0,0,.25);}
+  .akx-feat .pic.has-chip .evg .evg-k{visibility:hidden;}   /* v1.2: the graphic's small type label sat under the date tile and printed over it — the same words are beside the image (hidden, keeping its space) */
   .akx-feat .chip .d{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:1.1rem;}
   .akx-feat .chip .mo{font-size:.55rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#5c6773;margin-top:2px;}
   @media(max-width:640px){
@@ -71,6 +72,10 @@
   function shortDay(d){var s=(d||'').slice(0,3);return s?s.charAt(0).toUpperCase()+s.slice(1).toLowerCase():'';}
   function fmt(d){return WD[d.getDay()]+' '+d.getDate()+' '+MON[d.getMonth()];}
   function ddmm(d){return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2);}
+  // weekend events over more than one day: optional "End date" column (only counts when after the Date)
+  function endOf(e,d){ var x=parseFull(e['End date']||e['End Date']||''); return (d&&x&&x>d)?x:null; }
+  function sameMo(a,b){ return a.getMonth()===b.getMonth()&&a.getFullYear()===b.getFullYear(); }
+  function fmtRange(d,x){ return WD[d.getDay()]+' '+d.getDate()+(sameMo(d,x)?'':' '+MON[d.getMonth()])+' \u2013 '+fmt(x); }   // Sat 9 – Sun 10 Jan
 
   function parseCSV(text){
     var rows=[],row=[],f='',i=0,q=false,c;
@@ -138,26 +143,30 @@
   // ---------- weekend event ----------
   var EV_TYPES={'special event':['Special event','#B5771E'],'half-day course':['Half-day course','#2A66A6'],'day course':['Day course','#2A66A6'],
     'half-day retreat':['Half-day retreat','#227A72'],'day retreat':['Day retreat','#227A72'],'silent day':['Silent day','#6A4A9C'],
-    'free half-day':['Free half-day','#4FA35A'],'away day':['Away day','#2E9BB5'],'other':['','#C56B45']};
+    'free half-day':['Free half-day','#4FA35A'],'away day':['Away day','#2E9BB5'],'weekend retreat':['Weekend retreat','#227A72'],'other':['','#C56B45']};
   function pickEvents(evs, col, filt){
     var t0=today();
     return evs.filter(function(e){ if(!e.Title||!colYes(e,col)) return false; if(low(e.Status)==='draft') return false;
         if(filt==='free' && !(yes(e.Free)||low(e['Event Type'])==='free half-day')) return false;
-        var sf=parseFull(e['Show from']); if(sf&&t0<sf) return false; var d=parseFull(e.Date); e._d=d; return !(d && d<t0); })
+        var sf=parseFull(e['Show from']); if(sf&&t0<sf) return false; var d=parseFull(e.Date); e._d=d; e._e=endOf(e,d);
+        var last=e._e||d; return !(last && last<t0); })   // a weekend retreat stays until its End date
       .sort(function(a,b){return (a._d||8e15)-(b._d||8e15);});
   }
   function eventCard(e, teMap){
     var G=window.AKX_GFX, ty=EV_TYPES[low(e['Event Type'])]||['', '#2A66A6'];
     var colour=e.Colour||ty[1], tag=e['Event tag']||ty[0]||'';
-    var d=e._d, chip=d?'<div class="chip"><div class="d">'+d.getDate()+'</div><div class="mo">'+MON[d.getMonth()]+'</div></div>':'';
+    var d=e._d, x=e._e, chip=!d?'' : x
+      ? '<div class="chip"><div class="d">'+d.getDate()+'\u2013'+x.getDate()+'</div><div class="mo">'+MON[d.getMonth()]+(sameMo(d,x)?'':'\u2013'+MON[x.getMonth()])+'</div></div>'
+      : '<div class="chip"><div class="d">'+d.getDate()+'</div><div class="mo">'+MON[d.getMonth()]+'</div></div>';
+    var when=d?(x?fmtRange(d,x):fmt(d)):'';
     var te=teMap[low(e['Teacher ID'])], who=te?te.Name:'';
-    var meta=(d?fmt(d):'')+(e.Time?' '+esc(e.Time):'')+(who?' · with '+esc(who):'');
+    var meta=when+(e.Time?' '+esc(e.Time):'')+(who?' · with '+esc(who):'');
     var isFree=yes(e.Free)||low(e['Event Type'])==='free half-day';
     var fee=(isFree?'Free':esc(e.Fee||''))+(e['Booking link']?' · booking open':' · drop-in');
     var id=(e['Event ID']||'').trim();
     var gt=G.typeOf(e['Event Type'])||'course';
-    var gfx=G.render(gt,{title:e.Title,date:(d?fmt(d):'')+(e.Time?' · '+e.Time:''),shape:'sq',label:tag||undefined});
-    var pic='<div class="pic" style="--c:'+colour+'"'+(id?' data-imgbase="'+IMG+encodeURIComponent(id)+'"':'')+'><span class="g">'+gfx+'</span>'+chip+'</div>';
+    var gfx=G.render(gt,{title:e.Title,date:when+(e.Time?' · '+e.Time:''),shape:'sq',label:tag||undefined});
+    var pic='<div class="pic'+(chip?' has-chip':'')+'" style="--c:'+colour+'"'+(id?' data-imgbase="'+IMG+encodeURIComponent(id)+'"':'')+'><span class="g">'+gfx+'</span>'+chip+'</div>';
     var go=e['Booking link']?'<a class="go book" href="'+esc(e['Booking link'])+'" target="_blank" rel="noopener">Book →</a>':'<span class="go">See details →</span>';
     return '<div class="card" style="--c:'+colour+'"><a class="cover" href="'+LINK_EV+'" aria-label="'+esc(e.Title)+' — see details"></a>'+pic
       +'<div class="txt"><span class="kind">Weekend event'+(tag?' · '+esc(tag):'')+'</span><span class="t">'+esc(e.Title)+'</span>'
