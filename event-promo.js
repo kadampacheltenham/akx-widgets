@@ -1,11 +1,11 @@
 /* Akanishta — EVENT PROMO BLOCK
-   VERSION 3.2 — built 4 Oct 2026 — marker AKXEP_V3_2
+   VERSION 3.3 — 21 Oct 2026: early bird extended to 23 Oct — marker AKXEP_V3_3
    One hosted file, used on every page. Promotes a single special event and moves
    itself through four phases by date, then removes itself after the event.
 
    PHASES
      1  2-for-1 offer          → badge + "N days left · until 14 Oct" after the button
-     2  early bird             → badge + "N days left · until 21 Oct" after the button
+     2  early bird             → badge + "N days left · extended until 23 Oct" after the button
      3  days 8-14 to go        → no badge; hairline countdown, pulsing colons
      4  final 7 days           → no badge; ticket stub with split-flap leaves
      -  after the event        → renders nothing, everywhere, at once
@@ -28,7 +28,7 @@
 (function () {
   'use strict';
 
-  var VERSION = 'AKXEP_V3_2';   // visible stamp, so you can tell what is live
+  var VERSION = 'AKXEP_V3_3';   // visible stamp, so you can tell what is live
 
   /* ------------------------------------------------------------------ */
   /* CONFIG                                                             */
@@ -59,12 +59,12 @@
       tail:    'until 14 Oct',
       line1:   'Or a single early bird ticket, <b class="akxnb">£12 until 21&nbsp;Oct</b>' },
 
-    { until:   '2026-10-21',
+    { until:   '2026-10-23',
       price:   'Early bird £12',
       accent:  'blue',
       button:  'Book early bird',
-      tail:    'until 21 Oct',
-      line1:   'Standard price £15 after 21 Oct' }
+      tail:    'extended until 23 Oct',
+      line1:   'Standard price £15 after 23 Oct' }
   ];
 
   // Once the offers are over
