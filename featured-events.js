@@ -1,4 +1,4 @@
-/* Akanishta — FEATURED "Coming up" block (v1.2, 21 Oct 2026 — weekend events: "Weekend Retreat" type (teal) and the optional "End date" column: date range on the tile (9–10 Jan) and in the date line (Sat 9 – Sun 10 Jan), shown until the End date. Fix: the date tile now sits above the generated graphic, whose small type label is hidden when there is a tile (it printed over the date). v1.1, 18 Aug 2026 — Book → goes straight to the booking form; rest of card opens the page)
+/* Akanishta — FEATURED "Coming up" block (v1.3.1, 22 Oct 2026 — on-site booking: Book on talks and events from 1 Jan 2027 opens Ticket Tailor's checkout in a pop-up on our page (tt-onsite-booking.js, loaded on demand); the normal link stays as the fallback. v1.2, 21 Oct 2026 — weekend events: "Weekend Retreat" type (teal) and the optional "End date" column: date range on the tile (9–10 Jan) and in the date line (Sat 9 – Sun 10 Jan), shown until the End date. Fix: the date tile now sits above the generated graphic, whose small type label is hidden when there is a tile (it printed over the date). v1.1, 18 Aug 2026 — Book → goes straight to the booking form; rest of card opens the page)
    Shows the next Featured weekly class (talk / short course) and the next Featured weekend event
    as two "ticket" cards, side by side (stacked on phones).
    Reads: Weekly Classes sheet (tabs "Talks & series" + "Class details" — falls back to old name "Class times", column Featured = yes)
@@ -60,6 +60,17 @@
   function splitList(s){return (s||'').split(/[,;\n]+/).map(function(x){return x.trim();}).filter(Boolean);}
   var MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], WD=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   function today(){var t=new Date();t.setHours(0,0,0,0);return t;}
+  // v1.3 on-site booking: mark Ticket Tailor Book links; tt-onsite-booking.js opens them in a pop-up (events from its start date)
+  var TT_EVENT=/^https?:\/\/(?:tickets\.meditationincheltenham\.org\.uk|(?:www\.)?tickettailor\.com)\/events\/akanishtakadampabuddhistcentre\/(\d+)/i;
+  function bookAttrs(url, title, d){
+    var m=TT_EVENT.exec(String(url||'').trim()); if(!m) return '';
+    var ds=d ? d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2) : '';
+    return ' data-akx-book="'+m[1]+'" data-akx-title="'+esc(title)+'"'+(ds?' data-akx-date="'+ds+'"':'');
+  }
+  function loadBooking(mount){
+    if(window.AKXBook || document.getElementById('akx-book-loader') || !mount.querySelector('[data-akx-book]')) return;
+    var s=document.createElement('script'); s.id='akx-book-loader'; s.async=true; s.src=BASE+'tt-onsite-booking.js'; document.head.appendChild(s);
+  }
   function parseFull(s){ if(!s) return null; s=String(s).trim();
     var iso=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/); if(iso) return new Date(+iso[1],+iso[2]-1,+iso[3]);
     var uk=s.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})/); if(uk){var y=+uk[3]; if(y<100)y+=2000; return new Date(y,+uk[2]-1,+uk[1]);}
@@ -132,7 +143,7 @@
     var pic=G.render(type,{title:it.title,date:gdate,shape:'sq'});
     var kind='Weekly class · '+(th.label||type);
     var bookUrl=(o.cl&&o.cl.booking_url)||(o.classes.filter(function(c){return c.booking_url;})[0]||{}).booking_url||'';
-    var go=bookUrl?'<a class="go book" href="'+esc(bookUrl)+'" target="_blank" rel="noopener">Book →</a>':'<span class="go">See details →</span>';
+    var go=bookUrl?'<a class="go book" href="'+esc(bookUrl)+'" target="_blank" rel="noopener"'+bookAttrs(bookUrl, it.title, o.next)+'>Book →</a>':'<span class="go">See details →</span>';
     return '<div class="card" style="--c:'+th.colour+'"><a class="cover" href="'+LINK_WC+'" aria-label="'+esc(it.title)+' — see details"></a>'
       +'<div class="pic">'+pic+'</div>'
       +'<div class="txt"><span class="kind">'+esc(kind)+'</span><span class="t">'+esc(it.title)+'</span>'
@@ -167,7 +178,7 @@
     var gt=G.typeOf(e['Event Type'])||'course';
     var gfx=G.render(gt,{title:e.Title,date:when+(e.Time?' · '+e.Time:''),shape:'sq',label:tag||undefined});
     var pic='<div class="pic'+(chip?' has-chip':'')+'" style="--c:'+colour+'"'+(id?' data-imgbase="'+IMG+encodeURIComponent(id)+'"':'')+'><span class="g">'+gfx+'</span>'+chip+'</div>';
-    var go=e['Booking link']?'<a class="go book" href="'+esc(e['Booking link'])+'" target="_blank" rel="noopener">Book →</a>':'<span class="go">See details →</span>';
+    var go=e['Booking link']?'<a class="go book" href="'+esc(e['Booking link'])+'" target="_blank" rel="noopener"'+bookAttrs(e['Booking link'], e.Title, e._d)+'>Book →</a>':'<span class="go">See details →</span>';
     return '<div class="card" style="--c:'+colour+'"><a class="cover" href="'+LINK_EV+'" aria-label="'+esc(e.Title)+' — see details"></a>'+pic
       +'<div class="txt"><span class="kind">Weekend event'+(tag?' · '+esc(tag):'')+'</span><span class="t">'+esc(e.Title)+'</span>'
       +'<span class="m">'+meta+'</span>'
@@ -198,6 +209,7 @@
     mount.innerHTML='<div class="akx-feat"'+(mw?' style="max-width:'+esc(mw)+'px"':'')+'><div class="fh">'+(kicker?'<span class="kick">'+esc(kicker)+'</span>':'')+'<h3>'+esc(heading)+'</h3><span class="line"></span></div>'
       +'<div class="grid'+(cards.length===1?' one':'')+'">'+cards.join('')+'</div></div>';
     wireImages(mount);
+    loadBooking(mount);
   }
 
   function init(){
