@@ -1,16 +1,16 @@
 /* Akanishta — EVENT PROMO BLOCK
-   VERSION 3.3 — 21 Oct 2026: early bird extended to 23 Oct — marker AKXEP_V3_3
+   VERSION 8.1 — 22 Oct 2026 — marker AKXEP_V8_1
    One hosted file, used on every page. Promotes a single special event and moves
-   itself through four phases by date, then removes itself after the event.
+   itself through phases by date, then removes itself after the event.
 
-   PHASES
-     1  2-for-1 offer          → badge + "N days left · until 14 Oct" after the button
-     2  early bird             → badge + "N days left · extended until 23 Oct" after the button
-     3  days 8-14 to go        → no badge; hairline countdown, pulsing colons
-     4  final 7 days           → no badge; ticket stub with split-flap leaves
-     -  after the event        → renders nothing, everywhere, at once
+   PHASES (UK time; an offer runs to 23:55 on its last day, matching Ticket Tailor)
+     1  early bird        → design A, coral line "Early bird ends Friday / ends tomorrow / Last day of early bird"
+     2  countdown         → design A, coral line "11 days to go"
+     3  final week        → design C (blue field) from 7 days to go, "Tomorrow · 7pm", "Tonight · 7pm"
+     0  after the event   → renders nothing, everywhere, at once
 
-   The clock is live: figures update every minute while the page is open.
+   DESIGN A  cream card · coral strap · photo panel · blue title · coral countdown · coral button
+   DESIGN C  blue card  · coral strap · round portrait · white title · peach countdown · coral button
 
    EMBED (Squarespace Code Block):
      <div id="akx-event-promo"></div>
@@ -19,155 +19,125 @@
    Optional attributes on the div:
      data-variant="quiet"     one quiet line + Book button (branch pages, low on a page)
      data-maxwidth="1040"     px (default 1040)
-
    Several blocks on one page: use class="akx-event-promo" instead of the id.
 
+   IMAGES (upload with this file): images/bridget-heyes-portrait.jpg, images/bridget-heyes-band.jpg
+
    EDIT THE EVENT IN THE CONFIG BLOCK BELOW — nothing else needs touching.
-   Dates are UK time, YYYY-MM-DD. An offer runs to the END of its 'until' day.
    =========================================================================== */
 (function () {
   'use strict';
 
-  var VERSION = 'AKXEP_V3_3';   // visible stamp, so you can tell what is live
+  var VERSION = 'AKXEP_V8_1';
 
   /* ------------------------------------------------------------------ */
   /* CONFIG                                                             */
   /* ------------------------------------------------------------------ */
+  var BASE = 'https://kadampacheltenham.github.io/akx-widgets/images/';
   var EVENT = {
     title:    'Meditation for less<br>stress &amp; worry',
     titleOne: 'Meditation for less stress &amp; worry',
     date:     '2026-11-04',
-    hour:     19,                       // 7pm, 24-hour clock
+    hour:     19,                      // 7pm
     dateLine: 'Wed 4 Nov',
-    dayShort: '4 Nov',                  // printed on the ticket stub
     time:     '7pm',
-    venue:    'Pittville Pump Room',
-    town:     'Cheltenham',
+    venue:    'Pittville Pump Room, Cheltenham',
     teacher:  'Kadam Bridget Heyes',
-    photo:    'https://kadampacheltenham.github.io/akx-widgets/images/bridget-heyes.jpg',
+    strap:    'One night only · Wednesday 4 November',
+    portrait: BASE + 'bridget-heyes-portrait.jpg',   // desktop panel and round portrait
+    band:     BASE + 'bridget-heyes-band.jpg',       // phone photo band (design A)
     book:     'https://www.tickettailor.com/events/akanishtakadampabuddhistcentre/2416076'
   };
 
-  var STUDENT = '<b>Full-time students &amp; under 25s save 30%</b> — code STUDENT or U25';
+  // The early bird: runs to 23:55 on this day.
+  var EARLY = { until: '2026-10-23', price: 12, button: 'Book early bird' };
+  var PRICE = 15;
 
-  // Offer phases, in order. The first whose 'until' has not passed is shown.
-  var OFFERS = [
-    { until:   '2026-10-14',
-      price:   '2 tickets for £15',
-      accent:  'coral',
-      button:  'Book 2 for 1',
-      tail:    'until 14 Oct',
-      line1:   'Or a single early bird ticket, <b class="akxnb">£12 until 21&nbsp;Oct</b>' },
-
-    { until:   '2026-10-23',
-      price:   'Early bird £12',
-      accent:  'blue',
-      button:  'Book early bird',
-      tail:    'extended until 23 Oct',
-      line1:   'Standard price £15 after 23 Oct' }
-  ];
-
-  // Once the offers are over
-  var LATE = { price: 'Tickets £15', button: 'Book your seat' };
-
-  // Phase 3 runs while this many days or more remain; below it, phase 4.
-  var STUB_FROM = 7;
+  // Design C takes over when this many days or fewer remain.
+  var FINAL_WEEK_FROM = 7;
 
   /* ------------------------------------------------------------------ */
   /* STYLES                                                             */
   /* ------------------------------------------------------------------ */
   var CSS = [
-    '@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;600;700&display=swap");',
+    '@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;700&display=swap");',
     '.akxep{font-family:Poppins,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;margin:58px auto 34px;max-width:min(1040px,100%);min-width:0;overflow-wrap:break-word;}',
     '.akxep *{box-sizing:border-box;}',
     '.akxep a{text-decoration:none;}',
-    '.akxep .bx{position:relative;display:flex;border-radius:20px;overflow:hidden;background:#F8F1E9;min-height:316px;color:inherit;cursor:pointer;transition:box-shadow .18s ease,transform .18s ease;}',
+    '.akxep .bx{position:relative;display:flex;flex-direction:column;border-radius:20px;overflow:hidden;min-height:440px;color:#2B2620;cursor:pointer;transition:box-shadow .18s ease,transform .18s ease;}',
     '.akxep .bx:hover{box-shadow:0 6px 22px rgba(43,38,32,.13);transform:translateY(-2px);}',
     '.akxep .bx:hover .bt{filter:brightness(1.04);}',
     '.akxep .bx:focus-visible,.akxep .qt:focus-visible{outline:3px solid #2A66A6;outline-offset:3px;}',
-    '.akxep .pic{width:336px;flex-shrink:0;position:relative;background-size:cover;background-position:50% 6%;}',
-    '.akxep .pic:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(248,241,233,0) 70%,rgba(248,241,233,.98) 100%);}',
-    '.akxep .bd{flex:1;min-width:0;padding:36px 40px 34px 30px;}',
-    '.akxep .eb{font-size:11.5px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:#C2492C;margin-right:214px;}',
-    '.akxep .hl{font-size:37px;font-weight:600;line-height:1.1;color:#2A66A6;margin:14px 214px 0 0;letter-spacing:-.005em;}',
-    '.akxep .mt{font-size:15px;color:#5C554B;margin-top:12px;font-weight:300;}',
-    '.akxep .mt b{font-weight:600;color:#2B2620;}',
-    '.akxep .pr{margin-top:19px;font-size:25px;font-weight:600;color:#C2492C;letter-spacing:-.01em;}',
-    '.akxep .blue .pr{color:#2A66A6;}',
-    '.akxep .akxnb{white-space:nowrap;}',
-    '.akxep .rw{display:flex;align-items:center;gap:18px;margin-top:18px;flex-wrap:wrap;}',
-    '.akxep .bt{background:#E8664A;color:#fff;font-weight:600;font-size:16.5px;border-radius:999px;padding:15px 32px;display:inline-flex;gap:10px;align-items:center;box-shadow:0 2px 8px rgba(232,102,74,.26);transition:transform .15s ease;}',
-    '.akxep .bt:hover{transform:translateY(-1px);}',
-    '.akxep .exp{font-size:15px;font-weight:600;color:#C2492C;white-space:nowrap;}',
-    '.akxep .exp i{font-style:normal;font-weight:300;color:#8A8073;}',
-    '.akxep .fn{font-size:13.5px;color:#6B6358;font-weight:300;line-height:1.7;margin-top:15px;}',
-    '.akxep .fn b{font-weight:600;color:#3A342C;}',
-    '.akxep .fn .l1{display:block;}',
-    '.akxep .fn .stu{display:block;color:#C2492C;}',
-    '.akxep .fn .stu b{font-weight:600;color:#C2492C;}',
-    '.akxep .cnr{position:absolute;top:30px;right:30px;z-index:4;}',
+    '.akxep .strap{min-height:44px;flex:none;background:#E8664A;color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;padding:0 16px;font-size:12.5px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;}',
+    '.akxep .row{display:flex;flex:1;min-height:0;}',
+    '.akxep .pic{width:336px;flex:none;background-size:cover;background-position:50% 0;}',
+    '.akxep .band{display:none;}',
+    '.akxep .bd{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:28px 40px 28px 34px;}',
+    '.akxep .hl{margin:0;font-size:44px;line-height:1.08;font-weight:600;letter-spacing:-.005em;}',
+    '.akxep .by{margin-top:8px;font-size:15px;font-weight:600;}',
+    '.akxep .cd{margin-top:20px;font-size:40px;line-height:1;font-weight:600;letter-spacing:-.02em;}',
+    '.akxep .bt{margin-top:22px;display:inline-flex;align-items:center;gap:8px;background:#E8664A;color:#fff;font-size:17px;font-weight:600;border-radius:999px;padding:15px 34px;box-shadow:0 2px 8px rgba(232,102,74,.26);transition:transform .15s ease;}',
+    '.akxep .bt .ar{font-size:20px;line-height:1;}',
+    '.akxep .es{margin-top:18px;font-size:14px;font-weight:300;line-height:1.5;text-wrap:balance;}',
 
-    /* "One night only" circle — offer phases only */
-    '.akxep .badge{position:absolute;top:26px;right:28px;width:118px;height:118px;border-radius:50%;background:#EA4D3D;color:#fff;display:flex;align-items:center;justify-content:center;z-index:5;}',
-    '.akxep .badge .b3{display:block;text-align:center;font-size:20px;font-weight:700;line-height:1;letter-spacing:-.01em;transform:rotate(12deg);}',
-    '.akxep .badge .b1{display:none;}',
+    /* design A — cream */
+    '.akxep .A{background:#F8F1E9;border:1px solid rgba(42,102,166,.12);}',
+    '.akxep .A .hl,.akxep .A .by{color:#2A66A6;}',
+    '.akxep .A .cd{color:#DE5A3E;}',
+    '.akxep .A .es{color:#5C554B;}',
 
-    /* Phase 3 — hairline columns, pulsing colons */
-    '.akxep .hair{display:flex;align-items:flex-start;}',
-    '.akxep .hc{text-align:center;min-width:62px;}',
-    '.akxep .hc .v{font-size:42px;font-weight:200;color:#C2492C;line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums;}',
-    '.akxep .hc .u{font-size:8.5px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:#A2978A;margin-top:10px;}',
-    '.akxep .hcolon{font-size:30px;font-weight:200;color:#C2492C;line-height:1.28;padding:0 9px;animation:akxpulse 2s ease-in-out infinite;}',
-    '@keyframes akxpulse{0%,45%{opacity:1}55%,100%{opacity:.25}}',
-
-    /* Phase 4 — ticket stub with split-flap leaves */
-    '.akxep .stub{display:inline-flex;align-items:stretch;background:#C2492C;color:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px rgba(194,73,44,.22);}',
-    '.akxep .stub .end{width:40px;display:flex;align-items:center;justify-content:center;border-right:2px dashed rgba(255,255,255,.42);}',
-    '.akxep .stub .end span{transform:rotate(-90deg);white-space:nowrap;font-size:10.5px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;}',
-    '.akxep .stub .in{display:flex;align-items:center;gap:9px;padding:15px 17px;}',
-    '.akxep .fu{text-align:center;}',
-    '.akxep .fu .u{font-size:8px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;opacity:.75;margin-top:7px;}',
-    '.akxep .flap{position:relative;width:54px;height:50px;border-radius:7px;background:#8E2F1C;color:#FFF3EC;font-size:27px;font-weight:600;letter-spacing:-.02em;overflow:hidden;font-variant-numeric:tabular-nums;isolation:isolate;}',
-    '.akxep .flap .face{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}',
-    '.akxep .flap .hinge{position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(255,255,255,.42);z-index:6;}',
-    '.akxep .sheen{position:absolute;inset:0;z-index:7;pointer-events:none;border-radius:7px;background:linear-gradient(145deg,rgba(255,255,255,.20) 0%,rgba(255,255,255,.07) 34%,rgba(255,255,255,0) 50%,rgba(0,0,0,.06) 100%);}',
-    '.akxep .leaf{position:absolute;left:0;right:0;height:50%;overflow:hidden;backface-visibility:hidden;z-index:4;background:#8E2F1C;}',
-    '.akxep .leaf:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(145deg,rgba(255,255,255,.20) 0%,rgba(255,255,255,.07) 68%,rgba(255,255,255,0) 100%);}',
-    '.akxep .leaf.b:after{background:linear-gradient(145deg,rgba(255,255,255,0) 0%,rgba(0,0,0,.06) 100%);}',
-    '.akxep .leaf.t{top:0;transform-origin:bottom center;}',
-    '.akxep .leaf.b{bottom:0;transform-origin:top center;}',
-    '.akxep .leaf span{position:absolute;left:0;width:100%;height:50px;display:flex;align-items:center;justify-content:center;}',
-    '.akxep .leaf.t span{top:0;}',
-    '.akxep .leaf.b span{top:-25px;}',
-    '@keyframes akxfoldDown{from{transform:rotateX(0)}to{transform:rotateX(-90deg)}}',
-    '@keyframes akxfoldUp{from{transform:rotateX(90deg)}to{transform:rotateX(0)}}',
-
-    '.akxep .circ{display:none;}',
+    /* design C — blue field */
+    '.akxep .C{background:#2A66A6;color:#fff;}',
+    '.akxep .C .row{align-items:center;gap:44px;padding:0 52px 0 48px;}',
+    '.akxep .C .cam{width:300px;height:300px;border-radius:50%;flex:none;background-size:cover;background-position:50% 22%;box-shadow:0 0 0 6px #fff;}',
+    '.akxep .C .bd{padding:0;}',
+    '.akxep .C .hl{color:#fff;font-size:40px;}',
+    '.akxep .C .by{color:#FFD2C2;}',
+    '.akxep .C .act{margin-top:22px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;}',
+    '.akxep .C .cd{margin-top:0;font-size:44px;color:#FFD2C2;}',
+    '.akxep .C .bt{margin-top:0;border:2px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.18);}',
+    '.akxep .C .es{margin-top:20px;color:rgba(255,255,255,.85);}',
 
     /* quiet variant */
     '.akxep .qt{display:flex;align-items:center;gap:20px;padding:18px 24px;background:#F8F1E9;border-radius:16px;color:inherit;cursor:pointer;transition:box-shadow .18s ease;}',
     '.akxep .qt:hover{box-shadow:0 4px 16px rgba(43,38,32,.12);}',
-    '.akxep .qt .sm{width:62px;height:62px;border-radius:50%;background-size:cover;background-position:50% 8%;flex-shrink:0;}',
+    '.akxep .qt .sm{width:62px;height:62px;border-radius:50%;background-size:cover;background-position:50% 12%;flex-shrink:0;}',
     '.akxep .qt .t1{font-size:16.5px;font-weight:600;color:#2A66A6;}',
     '.akxep .qt .t2{font-size:13.5px;color:#6B6358;margin-top:4px;font-weight:300;}',
     '.akxep .qt .bq{margin-left:auto;background:#E8664A;color:#fff;font-weight:600;font-size:14.5px;border-radius:999px;padding:11px 24px;white-space:nowrap;}',
 
+    /* tablet */
+    '@media(min-width:721px) and (max-width:900px){',
+    '.akxep .pic{width:250px;}',
+    '.akxep .bd{padding:26px 28px 26px 26px;}',
+    '.akxep .hl{font-size:36px;}',
+    '.akxep .cd{font-size:34px;}',
+    '.akxep .C .row{gap:28px;padding:0 32px 0 30px;}',
+    '.akxep .C .cam{width:190px;height:190px;}',
+    '.akxep .C .hl{font-size:34px;}',
+    '.akxep .C .cd{font-size:34px;}',
+    '}',
+
     /* phone */
     '@media(max-width:720px){',
-    '.akxep .bx{display:block;padding:26px 22px 26px;border-radius:18px;min-height:0;text-align:center;box-shadow:0 8px 24px rgba(43,38,32,.14);border:1px solid rgba(43,38,32,.05);}',
+    '.akxep .bx{min-height:0;border-radius:18px;box-shadow:0 8px 24px rgba(43,38,32,.14);}',
+    '.akxep .strap{min-height:40px;padding:10px 16px;font-size:10.5px;letter-spacing:.14em;}',
+    '.akxep .row{display:block;}',
     '.akxep .pic{display:none;}',
-    '.akxep .bd{padding:0;}',
-    '.akxep .circ{display:block;width:150px;height:150px;border-radius:50%;background-size:cover;background-position:50% 8%;margin:0 auto 16px;box-shadow:0 2px 10px rgba(43,38,32,.12);}',
-    '.akxep .eb,.akxep .hl{margin-right:0;}',
-    '.akxep .hl{font-size:27px;margin-top:11px;}',
-    '.akxep .cnr{position:static;margin:18px 0;display:flex;justify-content:center;}',
-    '.akxep .badge{top:0;right:0;width:auto;height:auto;border-radius:0 18px 0 16px;padding:11px 15px 12px 17px;align-items:flex-start;}',
-    '.akxep .badge .b3{display:none;}',
-    '.akxep .badge .b1{display:block;text-align:right;font-size:11px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;line-height:1.35;}',
-    '.akxep .rw{display:flex;flex-direction:column-reverse;align-items:stretch;gap:0;margin-top:14px;}',
-    '.akxep .bt{display:flex;justify-content:center;width:100%;}',
-    '.akxep .exp{display:block;margin:0 0 12px;}',
-    '.akxep .fn{margin-top:13px;}',
+    '.akxep .A .band{display:block;height:240px;background-size:cover;background-position:50% 50%;}',
+    '.akxep .bd{padding:24px 22px 26px;}',
+    '.akxep .hl{font-size:30px;}',
+    '.akxep .by{font-size:14px;}',
+    '.akxep .cd{margin-top:16px;font-size:26px;}',
+    '.akxep .bt{margin-top:18px;display:flex;justify-content:center;width:100%;}',
+    '.akxep .es{margin-top:16px;font-size:13.5px;}',
+    '.akxep .C .row{padding:0;}',
+    '.akxep .C .bd{align-items:center;text-align:center;padding:24px 22px 26px;}',
+    '.akxep .C .cam{width:150px;height:150px;margin:28px auto 0;box-shadow:0 0 0 5px #fff;}',
+    '.akxep .C .hl{font-size:30px;}',
+    '.akxep .C .act{flex-direction:column;align-items:stretch;gap:0;margin-top:16px;width:100%;}',
+    '.akxep .C .cd{font-size:32px;text-align:center;}',
+    '.akxep .C .bt{margin-top:18px;}',
     '.akxep .qt{flex-wrap:wrap;text-align:left;}',
     '.akxep .qt .bq{margin-left:0;width:100%;text-align:center;margin-top:6px;}',
     '}'
@@ -177,167 +147,85 @@
   /* TIME                                                               */
   /* ------------------------------------------------------------------ */
   function dayStart(s) { var p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
-  function dayEnd(s)   { var d = dayStart(s); d.setHours(23, 59, 59, 999); return d; }
+  function dayEnd(s)   { var d = dayStart(s); d.setHours(23, 55, 0, 0); return d; }   // Ticket Tailor's cut-off
   function today()     { var t = new Date(); t.setHours(0, 0, 0, 0); return t; }
+  function daysToDate(s) { return Math.round((dayStart(s) - today()) / 86400000); }
+  function daysToEvent() { return daysToDate(EVENT.date); }
 
-  function eventStart() {
-    var d = dayStart(EVENT.date);
-    d.setHours(EVENT.hour, 0, 0, 0);
-    return d;
-  }
-
-  // Whole days from today to the end of the given day — used for offer deadlines.
-  function daysToDate(s) {
-    return Math.round((dayStart(s) - today()) / 86400000);
-  }
-
-  // Live remainder to the event, split into days / hours / minutes.
-  function remainder() {
-    var ms = eventStart() - new Date();
-    if (ms < 0) ms = 0;
-    var s = Math.floor(ms / 1000);
-    return {
-      total: ms,
-      d: Math.floor(s / 86400),
-      h: Math.floor(s % 86400 / 3600),
-      m: Math.floor(s % 3600 / 60)
-    };
-  }
-
-  function pad(n) { return n < 10 ? '0' + n : '' + n; }
-
-  function currentOffer() {
-    var now = new Date();
-    for (var i = 0; i < OFFERS.length; i++) {
-      if (now <= dayEnd(OFFERS[i].until)) return OFFERS[i];
-    }
-    return null;
-  }
-
-  // 1 = offer, 3 = hairline, 4 = stub, 0 = finished
+  // 1 = early bird, 2 = countdown (A), 3 = final week (C), 0 = finished
   function phase() {
-    var end = dayEnd(EVENT.date);
-    if (new Date() > end) return 0;
-    if (currentOffer()) return 1;
-    return remainder().d >= STUB_FROM + 1 ? 3 : 4;
-  }
-
-  function offerTail(offer) {
-    var n = daysToDate(offer.until);
-    if (n <= 0) return 'Last day <i>· ' + offer.tail + '</i>';
-    if (n === 1) return '1 day left <i>· ' + offer.tail + '</i>';
-    return n + ' days left <i>· ' + offer.tail + '</i>';
+    var now = new Date();
+    if (now > dayEnd(EVENT.date)) return 0;
+    if (now <= dayEnd(EARLY.until)) return 1;
+    return daysToEvent() <= FINAL_WEEK_FROM ? 3 : 2;
   }
 
   /* ------------------------------------------------------------------ */
-  /* CORNER DEVICES                                                     */
+  /* COPY                                                               */
   /* ------------------------------------------------------------------ */
-  function hairHTML(r) {
-    function col(v, u, id) {
-      return '<div class="hc"><div class="v" data-k="' + id + '">' + v +
-             '</div><div class="u">' + u + '</div></div>';
-    }
-    return '<div class="hair">' +
-      col(r.d, 'days', 'd') + '<div class="hcolon">:</div>' +
-      col(pad(r.h), 'hrs', 'h') + '<div class="hcolon">:</div>' +
-      col(pad(r.m), 'mins', 'm') + '</div>';
+  function earlyLine() {
+    var n = daysToDate(EARLY.until);
+    if (n <= 0) return 'Last day of early bird';
+    if (n === 1) return 'Early bird ends tomorrow';
+    return 'Early bird ends ' + dayStart(EARLY.until).toLocaleDateString('en-GB', { weekday: 'long' });
   }
-
-  function stubHTML(r) {
-    function unit(u, id) {
-      return '<div class="fu"><div class="flap" data-k="' + id + '"></div>' +
-             '<div class="u">' + u + '</div></div>';
-    }
-    return '<div class="stub"><div class="end"><span>' + EVENT.dayShort + '</span></div>' +
-      '<div class="in">' + unit('days', 'd') + unit('hrs', 'h') + unit('mins', 'm') +
-      '</div></div>';
+  function countLine() {
+    var n = daysToEvent();
+    if (n <= 0) return 'Tonight · ' + EVENT.time;
+    if (n === 1) return 'Tomorrow · ' + EVENT.time;
+    return n + ' days to go';
   }
-
-  function buildFlap(el, v) {
-    el.innerHTML = '<div class="face">' + v + '</div><div class="hinge"></div>' +
-                   '<div class="sheen"></div>';
-    el.setAttribute('data-v', v);
-  }
-
-  function flipFlap(el, v) {
-    if (el.getAttribute('data-v') === v) return;
-    var old = el.getAttribute('data-v');
-    el.setAttribute('data-v', v);
-    var lt = document.createElement('div');
-    lt.className = 'leaf t';
-    lt.innerHTML = '<span>' + old + '</span>';
-    var lb = document.createElement('div');
-    lb.className = 'leaf b';
-    lb.innerHTML = '<span>' + v + '</span>';
-    lb.style.transform = 'rotateX(90deg)';
-    var face = el.querySelector('.face');
-    if (face) face.textContent = v;
-    el.appendChild(lt);
-    el.appendChild(lb);
-    lt.style.animation = 'akxfoldDown .26s ease-in forwards';
-    setTimeout(function () {
-      if (lt.parentNode) lt.parentNode.removeChild(lt);
-      lb.style.animation = 'akxfoldUp .26s ease-out forwards';
-      setTimeout(function () {
-        if (lb.parentNode) lb.parentNode.removeChild(lb);
-      }, 300);
-    }, 260);
+  function essentials(p) {
+    var price = p === 1 ? '£' + EARLY.price + ' now, £' + PRICE + ' after ' + dayStart(EARLY.until).toLocaleDateString('en-GB', { weekday: 'long' })
+                        : 'Tickets £' + PRICE;
+    return EVENT.dateLine + ' · ' + EVENT.time + ' · ' + EVENT.venue + ' · ' + price;
   }
 
   /* ------------------------------------------------------------------ */
   /* RENDER                                                             */
   /* ------------------------------------------------------------------ */
-  function cardHTML(p, offer, r) {
-    var img = 'background-image:url(' + EVENT.photo + ')';
-    var accent = offer ? offer.accent : 'blue';
-    var price  = offer ? offer.price  : LATE.price;
-    var button = offer ? offer.button : LATE.button;
-
-    var corner = '';
-    if (p === 1) {
-      corner = '<div class="badge"><span class="b3">One<br>night<br>only</span>' +
-               '<span class="b1">One<br>night<br>only</span></div>';
-    } else if (p === 3) {
-      corner = '<div class="cnr">' + hairHTML(r) + '</div>';
-    } else if (p === 4) {
-      corner = '<div class="cnr">' + stubHTML(r) + '</div>';
+  function cardHTML(p) {
+    var design = (p === 3) ? 'C' : 'A';
+    var line   = (p === 1) ? earlyLine() : countLine();
+    var button = (p === 1) ? EARLY.button : 'Book now';
+    var btn = '<span class="bt">' + button + ' <span class="ar" aria-hidden="true">&rarr;</span></span>';
+    var body;
+    if (design === 'A') {
+      body =
+        '<div class="row">' +
+          '<div class="pic" style="background-image:url(' + EVENT.portrait + ')"></div>' +
+          '<div class="band" style="background-image:url(' + EVENT.band + ')"></div>' +
+          '<div class="bd">' +
+            '<h3 class="hl">' + EVENT.title + '</h3>' +
+            '<div class="by">with ' + EVENT.teacher + '</div>' +
+            '<div class="cd">' + line + '</div>' +
+            btn +
+            '<div class="es">' + essentials(p) + '</div>' +
+          '</div>' +
+        '</div>';
+    } else {
+      body =
+        '<div class="row">' +
+          '<div class="cam" style="background-image:url(' + EVENT.portrait + ')"></div>' +
+          '<div class="bd">' +
+            '<h3 class="hl">' + EVENT.title + '</h3>' +
+            '<div class="by">with ' + EVENT.teacher + '</div>' +
+            '<div class="act"><div class="cd">' + line + '</div>' + btn + '</div>' +
+            '<div class="es">' + essentials(p) + '</div>' +
+          '</div>' +
+        '</div>';
     }
-
-    var fine = '<div class="fn">' +
-      (offer ? '<span class="l1">' + offer.line1 + '</span>' : '') +
-      '<span class="stu">' + STUDENT + '</span></div>';
-
-    var tail = offer ? '<span class="exp">' + offerTail(offer) + '</span>' : '';
-
-    var badge = (p === 1) ? corner : '';
-    var clock = (p === 1) ? '' : corner;
-
-    return '<a class="bx ' + accent + '" href="' + EVENT.book +
-      '" target="_blank" rel="noopener" aria-label="' + button +
-      ' — Meditation for less stress and worry, Wed 4 Nov, 7pm">' +
-      badge +
-      '<div class="pic" style="' + img + '"></div>' +
-      '<div class="bd">' +
-        '<div class="circ" style="' + img + '"></div>' +
-        '<div class="eb">An evening with ' + EVENT.teacher + '</div>' +
-        '<h3 class="hl">' + EVENT.title + '</h3>' +
-        '<div class="mt"><b>' + EVENT.dateLine + ' · ' + EVENT.time + '</b> · ' +
-          EVENT.venue + ' · Café &amp; bookshop from 6pm</div>' +
-        clock +
-        '<div class="pr">' + price + '</div>' +
-        '<div class="rw"><span class="bt">' + button + ' &nbsp;&rarr;</span>' + tail + '</div>' +
-        fine +
-      '</div>' +
-    '</a>';
+    return '<a class="bx ' + design + '" href="' + EVENT.book + '" target="_blank" rel="noopener" aria-label="' +
+      button + ' — Meditation for less stress and worry, ' + EVENT.dateLine + ', ' + EVENT.time + '">' +
+      '<div class="strap">' + EVENT.strap + '</div>' + body + '</a>';
   }
 
-  function quietHTML() {
+  function quietHTML(p) {
     return '<a class="qt" href="' + EVENT.book + '" target="_blank" rel="noopener">' +
-      '<div class="sm" style="background-image:url(' + EVENT.photo + ')"></div>' +
+      '<div class="sm" style="background-image:url(' + EVENT.portrait + ')"></div>' +
       '<div>' +
-        '<div class="t1">An evening with ' + EVENT.teacher + ' · ' + EVENT.dateLine +
-          ', ' + EVENT.time + '</div>' +
-        '<div class="t2">' + EVENT.titleOne + ' · ' + EVENT.venue + ', ' + EVENT.town + '</div>' +
+        '<div class="t1">An evening with ' + EVENT.teacher + ' · ' + EVENT.dateLine + ', ' + EVENT.time + '</div>' +
+        '<div class="t2">' + EVENT.titleOne + ' · ' + ((p === 1) ? earlyLine() : countLine()) + '</div>' +
       '</div>' +
       '<span class="bq">Book now &rarr;</span>' +
     '</a>';
@@ -346,8 +234,7 @@
   /* ------------------------------------------------------------------ */
   /* MOUNT + TICK                                                       */
   /* ------------------------------------------------------------------ */
-  var mounted = [];
-  var lastPhase = null;
+  var mounted = [], lastKey = null;
 
   function injectCSS() {
     if (document.getElementById('akxep-css')) return;
@@ -360,47 +247,15 @@
   function paint(el) {
     var p = phase();
     if (p === 0) { el.innerHTML = ''; el.style.display = 'none'; return; }
-    var r = remainder();
-    el.innerHTML = (el.getAttribute('data-variant') === 'quiet')
-      ? quietHTML()
-      : cardHTML(p, currentOffer(), r);
-
-    if (p === 4) {
-      var flaps = el.querySelectorAll('.flap');
-      for (var i = 0; i < flaps.length; i++) {
-        var k = flaps[i].getAttribute('data-k');
-        buildFlap(flaps[i], k === 'd' ? pad(r.d) : k === 'h' ? pad(r.h) : pad(r.m));
-      }
-    }
+    el.style.display = '';
+    el.innerHTML = (el.getAttribute('data-variant') === 'quiet') ? quietHTML(p) : cardHTML(p);
   }
 
-  function tick() {
-    var p = phase();
-    if (p !== lastPhase) {              // phase change — repaint everything
-      lastPhase = p;
-      for (var i = 0; i < mounted.length; i++) paint(mounted[i]);
-      return;
-    }
-    if (p === 0 || p === 1) return;     // nothing ticking in the offer phases
-    var r = remainder();
-    for (var j = 0; j < mounted.length; j++) {
-      var el = mounted[j];
-      if (el.getAttribute('data-variant') === 'quiet') continue;
-      if (p === 3) {
-        var cells = el.querySelectorAll('.hc .v');
-        for (var c = 0; c < cells.length; c++) {
-          var k = cells[c].getAttribute('data-k');
-          var v = k === 'd' ? '' + r.d : k === 'h' ? pad(r.h) : pad(r.m);
-          if (cells[c].textContent !== v) cells[c].textContent = v;
-        }
-      } else {
-        var flaps = el.querySelectorAll('.flap');
-        for (var f = 0; f < flaps.length; f++) {
-          var fk = flaps[f].getAttribute('data-k');
-          flipFlap(flaps[f], fk === 'd' ? pad(r.d) : fk === 'h' ? pad(r.h) : pad(r.m));
-        }
-      }
-    }
+  function tick() {                       // repaint when the phase or the day changes
+    var key = phase() + '|' + daysToEvent() + '|' + daysToDate(EARLY.until);
+    if (key === lastKey) return;
+    lastKey = key;
+    for (var i = 0; i < mounted.length; i++) paint(mounted[i]);
   }
 
   function mount(el) {
@@ -409,7 +264,6 @@
     var mw = el.getAttribute('data-maxwidth');
     if (mw) el.style.maxWidth = parseInt(mw, 10) + 'px';
     mounted.push(el);
-    paint(el);
   }
 
   function start() {
@@ -417,17 +271,12 @@
     var one = document.getElementById('akx-event-promo');
     if (one) seen.push(one);
     var many = document.querySelectorAll('.akx-event-promo');
-    for (var i = 0; i < many.length; i++) {
-      if (seen.indexOf(many[i]) === -1) seen.push(many[i]);
-    }
+    for (var i = 0; i < many.length; i++) if (seen.indexOf(many[i]) === -1) seen.push(many[i]);
     for (var j = 0; j < seen.length; j++) mount(seen[j]);
-    lastPhase = phase();
-    if (seen.length) setInterval(tick, 1000);
+    tick();
+    if (seen.length) setInterval(tick, 30000);
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', start);
-  } else {
-    start();
-  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+  else start();
 })();
