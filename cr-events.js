@@ -1,4 +1,4 @@
-/* Akanishta — Weekend Courses & Retreats widget. v2.5 (21 Oct 2026): "Weekend Retreat" Event Type — teal, shown as the large stand-out card like Special Events (border tinted teal; Special Events keep gold), early bird drops off 14 days before — plus an optional "End date" column for events over more than one day (date tile 9–10 / JAN / SAT–SUN, line "Sat 9 – Sun 10 Jan", listed until the End date has passed; sorted by the start Date). v2.4 (23 Aug 2026: "Book your Spot" button). v2.3 (swirl motif option E). v2.2 (20 Aug 2026): sheet colour overrides — "Title colour" (titles/accent; old "Colour" still accepted; names or hex) + "Background colour" (generated tile background). v2.1: no photo -> generated type graphic (event-graphics.js).
+/* Akanishta — Weekend Courses & Retreats widget. v2.6.1 (22 Oct 2026): on-site booking — "Book your Spot" on events from 1 Jan 2027 opens Ticket Tailor's checkout in a pop-up on our page (tt-onsite-booking.js, loaded on demand); the normal link stays as the fallback. v2.5 (21 Oct 2026): "Weekend Retreat" Event Type — teal, shown as the large stand-out card like Special Events (border tinted teal; Special Events keep gold), early bird drops off 14 days before — plus an optional "End date" column for events over more than one day (date tile 9–10 / JAN / SAT–SUN, line "Sat 9 – Sun 10 Jan", listed until the End date has passed; sorted by the start Date). v2.4 (23 Aug 2026: "Book your Spot" button). v2.3 (swirl motif option E). v2.2 (20 Aug 2026): sheet colour overrides — "Title colour" (titles/accent; old "Colour" still accepted; names or hex) + "Background colour" (generated tile background). v2.1: no photo -> generated type graphic (event-graphics.js).
    Reads a public Google Sheet (tabs "Events", "Timetables", "Teachers")
    and renders poster tiles.
    Include with:  <div id="akx-events"></div>
@@ -131,6 +131,17 @@
   function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
   function splitLines(s){return (s||'').split(/\r?\n|;/).map(function(x){return x.trim();}).filter(Boolean);}
   function low(s){return (s||'').trim().toLowerCase();}
+  // v2.6 on-site booking: mark Ticket Tailor Book links; tt-onsite-booking.js opens them in a pop-up (events from its start date)
+  var TT_EVENT=/^https?:\/\/(?:tickets\.meditationincheltenham\.org\.uk|(?:www\.)?tickettailor\.com)\/events\/akanishtakadampabuddhistcentre\/(\d+)/i;
+  function bookAttrs(url, title, d){
+    var m=TT_EVENT.exec(String(url||'').trim()); if(!m) return '';
+    var ds=d ? d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2) : '';
+    return ' data-akx-book="'+m[1]+'" data-akx-title="'+esc(title||'').replace(/"/g,'&quot;')+'"'+(ds?' data-akx-date="'+ds+'"':'');
+  }
+  function loadBooking(mount){
+    if(window.AKXBook || document.getElementById('akx-book-loader') || !mount.querySelector('[data-akx-book]')) return;
+    var s=document.createElement('script'); s.id='akx-book-loader'; s.async=true; s.src=IMG.replace(/images\/$/,'')+'tt-onsite-booking.js'; document.head.appendChild(s);
+  }
   function normColour(v){ v=String(v||'').trim(); if(!v) return '';
     var c=document.createElement('canvas').getContext('2d');
     c.fillStyle='#000'; c.fillStyle=v; if(c.fillStyle!=='#000000'||/^black$|^#0{3,8}$/i.test(v)) return c.fillStyle;
@@ -249,7 +260,7 @@
 
     var feeTxt = isFree ? 'Free' : esc(ev['Fee']||'');
     var cta = ev['Booking link']
-        ? '<a class="book" href="'+esc(ev['Booking link'])+'" target="_blank" rel="noopener">Book your Spot &rarr;</a>'
+        ? '<a class="book" href="'+esc(ev['Booking link'])+'" target="_blank" rel="noopener"'+bookAttrs(ev['Booking link'], ev['Title'], d)+'>Book your Spot &rarr;</a>'
         : '<span class="dropin"><span class="dot"></span>Drop-in event</span>';
 
     var loc = ev['Location'] || 'Akanishta Centre';
@@ -295,6 +306,7 @@
     wireImages(mount);
     wireMore(mount);
     wireFold(mount);
+    loadBooking(mount);
     if(document.fonts&&document.fonts.ready){document.fonts.ready.then(function(){wireMore(mount);});}
   }
   // No photo -> generated graphic (same type/colour/motif family as the Weekly Classes cards, via event-graphics.js)
