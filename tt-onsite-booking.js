@@ -1,4 +1,8 @@
-/* Akanishta - ON-SITE BOOKING  v1.0 (22 Oct 2026)  marker AKXOB_V1_0
+/* Akanishta - ON-SITE BOOKING  v1.1 (23 Oct 2026)  marker AKXOB_V1_1
+   v1.1: on for every event (START = ''); direct booking links (see DIRECT LINKS below).
+         Apple Pay shows inside the pop-up in Safari (checked 23 Oct) once both domains were added in
+         Stripe > Settings > Payments > Payment method domains.
+   v1.0 (22 Oct 2026): first version, events from 1 Jan 2027 only.
    "Book" buttons open Ticket Tailor's checkout in a pop-up on our own page, so visitors stay on the site.
    Tested 22 Oct 2026 on a hidden test event, desktop and iPhone ("A v2"): Ticket Tailor's booking page
    in a plain frame inside our pop-up - no Ticket Tailor widget script, so nothing clashes with the
@@ -13,12 +17,20 @@
    - The pop-up goes straight to ticket selection. Bookings are tagged "website_widget" in Ticket Tailor.
    - Close with the round x, the Esc key, or a click outside the box.
 
+   DIRECT LINKS (one step to booking, e.g. for emails, posts and QR codes)
+   - Add #book-<Ticket Tailor event number> to the address of a page that lists the event:
+       https://www.meditationincheltenham.org.uk/courses-retreats#book-2488842
+     The page opens with that event's booking pop-up already open (the card scrolls into view behind it).
+     The number is the one at the end of the event's Ticket Tailor link.
+   - Works on pages whose widget shows Ticket Tailor Book buttons (Courses & Retreats, What's On).
+   - Closing the pop-up removes #book-... from the address, so a refresh doesn't reopen it.
+
    SETTINGS
    - START: first event date that uses the pop-up. '' = every event.
 */
 (function(){
   if(window.AKXBook) return;
-  var START = '2027-01-01';
+  var START = '';
   var BOX = 'akanishtakadampabuddhistcentre', DOMAIN = 'tickets.meditationincheltenham.org.uk', REF = 'website_widget';
 
   var CSS = ''
@@ -40,12 +52,16 @@
     dlg = document.createElement('dialog'); dlg.id = 'akx-book'; dlg.setAttribute('aria-label', 'Book');
     dlg.innerHTML = '<div class="bh"><span class="bt"></span><button type="button" class="bx" aria-label="Close">\u00d7</button></div><div class="bb"></div>';
     document.body.appendChild(dlg);
-    function clear(){ dlg.querySelector('.bb').innerHTML = ''; }
+    function clear(){ dlg.querySelector('.bb').innerHTML = ''; dropHash(); }
     function shut(){ if(dlg.open) dlg.close(); clear(); }
     dlg.querySelector('.bx').addEventListener('click', shut);
     dlg.addEventListener('click', function(e){ if(e.target === dlg) shut(); });
     dlg.addEventListener('close', function(){ if(!dlg.open) clear(); });
     return dlg;
+  }
+  // remove a direct-link #book-... from the address once the pop-up closes
+  function dropHash(){
+    if(/^#book-\d+$/.test(location.hash || '') && window.history && history.replaceState) history.replaceState(null, '', location.pathname + location.search);
   }
   // Ticket Tailor's booking page for the event; keeps any extra settings from the original link (e.g. a code)
   function frameUrl(id, href){
@@ -77,5 +93,19 @@
     e.preventDefault();
     open(id, a.getAttribute('data-akx-title') || '', a.getAttribute('href'));
   });
-  window.AKXBook = { open: open, version: '1.0', start: START };
+  // bring the event's card into view behind the pop-up (instant: the site's smooth scrolling gets interrupted)
+  function reveal(a){
+    try { a.scrollIntoView({ block: 'center', behavior: 'instant' }); } catch(e){ try { a.scrollIntoView(); } catch(e2){} }
+  }
+  // Direct links: #book-<event number> in the address opens that event's booking straight away
+  function fromHash(){
+    var m = /^#book-(\d+)$/.exec(location.hash || '');
+    if(!m || !supported()) return;
+    var a = document.querySelector('a[data-akx-book="' + m[1] + '"]');
+    if(a) reveal(a);
+    open(m[1], a ? (a.getAttribute('data-akx-title') || '') : '', a ? a.getAttribute('href') : '');
+  }
+  window.addEventListener('hashchange', fromHash);
+  window.AKXBook = { open: open, version: '1.1', start: START };
+  fromHash();
 })();
