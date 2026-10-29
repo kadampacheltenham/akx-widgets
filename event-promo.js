@@ -1,5 +1,7 @@
 /* Akanishta — EVENT PROMO BLOCK
-   VERSION 8.1 — 22 Oct 2026 — marker AKXEP_V8_1
+   VERSION 8.2 — 26 Oct 2026 — marker AKXEP_V8_2
+   v8.2: Book opens Ticket Tailor's checkout in the on-site pop-up (tt-onsite-booking.js, loaded on
+         demand), like the event cards; the normal Ticket Tailor link stays as the fallback.
    One hosted file, used on every page. Promotes a single special event and moves
    itself through phases by date, then removes itself after the event.
 
@@ -28,7 +30,7 @@
 (function () {
   'use strict';
 
-  var VERSION = 'AKXEP_V8_1';
+  var VERSION = 'AKXEP_V8_2';
 
   /* ------------------------------------------------------------------ */
   /* CONFIG                                                             */
@@ -182,6 +184,23 @@
   }
 
   /* ------------------------------------------------------------------ */
+  /* ON-SITE BOOKING (v8.2)                                             */
+  /* ------------------------------------------------------------------ */
+  // marks the Book link so tt-onsite-booking.js opens it in the pop-up; any other link stays as it is
+  var TT_EVENT = /^https?:\/\/(?:tickets\.meditationincheltenham\.org\.uk|(?:www\.)?tickettailor\.com)\/events\/akanishtakadampabuddhistcentre\/(\d+)/i;
+  function bookAttrs() {
+    var m = TT_EVENT.exec(EVENT.book || '');
+    return m ? ' data-akx-book="' + m[1] + '" data-akx-title="' + EVENT.titleOne.replace(/"/g, '&quot;') + '" data-akx-date="' + EVENT.date + '"' : '';
+  }
+  function loadBooking() {
+    if (window.AKXBook || document.getElementById('akx-book-loader') || !TT_EVENT.test(EVENT.book || '')) return;
+    var s = document.createElement('script');
+    s.id = 'akx-book-loader'; s.async = true;
+    s.src = BASE.replace(/images\/$/, '') + 'tt-onsite-booking.js';
+    document.head.appendChild(s);
+  }
+
+  /* ------------------------------------------------------------------ */
   /* RENDER                                                             */
   /* ------------------------------------------------------------------ */
   function cardHTML(p) {
@@ -215,13 +234,13 @@
           '</div>' +
         '</div>';
     }
-    return '<a class="bx ' + design + '" href="' + EVENT.book + '" target="_blank" rel="noopener" aria-label="' +
+    return '<a class="bx ' + design + '" href="' + EVENT.book + '" target="_blank" rel="noopener"' + bookAttrs() + ' aria-label="' +
       button + ' — Meditation for less stress and worry, ' + EVENT.dateLine + ', ' + EVENT.time + '">' +
       '<div class="strap">' + EVENT.strap + '</div>' + body + '</a>';
   }
 
   function quietHTML(p) {
-    return '<a class="qt" href="' + EVENT.book + '" target="_blank" rel="noopener">' +
+    return '<a class="qt" href="' + EVENT.book + '" target="_blank" rel="noopener"' + bookAttrs() + '>' +
       '<div class="sm" style="background-image:url(' + EVENT.portrait + ')"></div>' +
       '<div>' +
         '<div class="t1">An evening with ' + EVENT.teacher + ' · ' + EVENT.dateLine + ', ' + EVENT.time + '</div>' +
@@ -249,6 +268,7 @@
     if (p === 0) { el.innerHTML = ''; el.style.display = 'none'; return; }
     el.style.display = '';
     el.innerHTML = (el.getAttribute('data-variant') === 'quiet') ? quietHTML(p) : cardHTML(p);
+    loadBooking();
   }
 
   function tick() {                       // repaint when the phase or the day changes
