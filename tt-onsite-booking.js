@@ -1,4 +1,7 @@
-/* Akanishta - ON-SITE BOOKING  v1.1 (23 Oct 2026)  marker AKXOB_V1_1
+/* Akanishta - ON-SITE BOOKING  v1.2 (30 Oct 2026)  marker AKXOB_V1_2
+   v1.2: a promo-code line under the title ("Have a promo code? Choose your tickets, then add it on the
+         next page.") - Ticket Tailor only shows its code box after tickets are chosen. The line hides
+         once the checkout moves on to its next page, and shows again each time the pop-up opens.
    v1.1: on for every event (START = ''); direct booking links (see DIRECT LINKS below).
          Apple Pay shows inside the pop-up in Safari (checked 23 Oct) once both domains were added in
          Stripe > Settings > Payments > Payment method domains.
@@ -40,9 +43,17 @@
     + '#akx-book .bh{flex:none;display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid #efe8da;font:600 1rem/1.3 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#26303A;text-align:left;}'
     + '#akx-book .bt{flex:1;min-width:0;}'
     + '#akx-book .bx{flex:none;border:0;margin:0;padding:0;background:#F3EEE4;border-radius:999px;width:36px;height:36px;font:400 20px/36px Inter,system-ui,sans-serif;text-align:center;cursor:pointer;color:#26303A;}'
+    + '#akx-book .bp{flex:none;display:flex;align-items:center;gap:10px;padding:10px 18px;background:#F8F1E9;border-bottom:1px solid #efe8da;font:400 14px/1.4 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#26303A;text-align:left;}'
+    + '#akx-book .bp b{font-weight:600;}'
+    + '#akx-book .bp svg{flex:none;}'
+    + '#akx-book .bp[hidden]{display:none;}'
     + '#akx-book .bb{flex:1;min-height:0;padding:0 24px;overflow:hidden;}'
     + '#akx-book .bb iframe{display:block;width:100%;height:100%;border:0;}'
-    + '@media(max-width:640px){dialog#akx-book,dialog#akx-book[open]{width:100vw;max-width:100vw;height:100%;max-height:100%;margin:0;border-radius:0;}#akx-book .bb{padding:0 16px;}}';
+    + '@media(max-width:640px){dialog#akx-book,dialog#akx-book[open]{width:100vw;max-width:100vw;height:100%;max-height:100%;margin:0;border-radius:0;}#akx-book .bb{padding:0 16px;}#akx-book .bp{padding:10px 16px;font-size:13.5px;}}';
+
+  // small tag icon for the promo-code line (coral, like the site's accents)
+  var TAG = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E2886A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    + '<path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>';
 
   var dlg = null;
   function supported(){ var d = document.createElement('dialog'); return typeof d.showModal === 'function'; }
@@ -50,7 +61,9 @@
     if(dlg) return dlg;
     var st = document.createElement('style'); st.id = 'akx-book-style'; st.textContent = CSS; document.head.appendChild(st);
     dlg = document.createElement('dialog'); dlg.id = 'akx-book'; dlg.setAttribute('aria-label', 'Book');
-    dlg.innerHTML = '<div class="bh"><span class="bt"></span><button type="button" class="bx" aria-label="Close">\u00d7</button></div><div class="bb"></div>';
+    dlg.innerHTML = '<div class="bh"><span class="bt"></span><button type="button" class="bx" aria-label="Close">\u00d7</button></div>'
+      + '<div class="bp">' + TAG + '<span><b>Have a promo code?</b> Choose your tickets, then add it on the next page.</span></div>'
+      + '<div class="bb"></div>';
     document.body.appendChild(dlg);
     function clear(){ dlg.querySelector('.bb').innerHTML = ''; dropHash(); }
     function shut(){ if(dlg.open) dlg.close(); clear(); }
@@ -77,7 +90,10 @@
     var d = build();
     d.querySelector('.bt').textContent = title ? 'Book: ' + title : 'Book';
     var body = d.querySelector('.bb'); body.innerHTML = '';
+    var hint = d.querySelector('.bp'); hint.hidden = false;      // promo-code line: shown on the first page only
+    var loads = 0;
     var f = document.createElement('iframe');
+    f.addEventListener('load', function(){ loads++; if(loads > 1) hint.hidden = true; });
     f.src = frameUrl(id, href || ''); f.title = title ? 'Book ' + title : 'Booking';
     f.setAttribute('allow', 'payment; fullscreen');
     body.appendChild(f);
@@ -106,6 +122,6 @@
     open(m[1], a ? (a.getAttribute('data-akx-title') || '') : '', a ? a.getAttribute('href') : '');
   }
   window.addEventListener('hashchange', fromHash);
-  window.AKXBook = { open: open, version: '1.1', start: START };
+  window.AKXBook = { open: open, version: '1.2', start: START };
   fromHash();
 })();
